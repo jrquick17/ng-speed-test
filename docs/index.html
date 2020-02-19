@@ -71,29 +71,24 @@
 <ul>
 <li>Checkout the demo and it&#39;s code for more examples.</li>
 </ul>
-<div><pre class="line-numbers"><code class="language-typescript">import {SpeedTestService} from &#39;ng-speed-test/services/speed-test.service&#39;;
+<div><pre class="line-numbers"><code class="language-typescript">import {SpeedTestService} from &#39;ng-speed-test&#39;;
 
 &#64;Injectable()
 export class TechCheckService {
   constructor(
     private speedTestService:SpeedTestService
   ) {
-    this.speedTestService.getSpeed().subscribe(
+    this.speedTestService.getMbps().subscribe(
       (speed) =&gt; {
         console.log(&#39;Your speed is &#39; + speed);
       }
     );
   }</code></pre></div><h2 id="documentation">Documentation</h2>
-<h3 id="events">Events</h3>
+<h3 id="functions">Functions</h3>
 <ul>
-<li><code>autoFocus($event)</code> is fired when the input is focused.  </li>
-<li><code>autoBlur($event)</code> is fired when the input is blured.  </li>
-<li><code>ionAutoInput($event)</code> is fired when user inputs.  </li>
-<li><code>itemChanged($event)</code> is fired when the selection changes (clicked).  </li>
-<li><code>itemsHidden($event)</code> is fired when items are hidden.  </li>
-<li><code>itemRemoved($event)</code> is fired when item is removed (clicked).  </li>
-<li><code>itemSelected($event)</code> is fired when item is selected from suggestions (clicked).  </li>
-<li><code>itemsShown($event)</code> is fired when items are shown.  </li>
+<li><code>getBps()</code> Get the current internet speed in BPS (bytes per second).</li>
+<li><code>getKbps()</code> Get the current internet speed in KBPS (kilobytes per second).</li>
+<li><code>getMbps()</code> Get the current internet speed in MBPS (megabytes per second).</li>
 </ul>
 <h2 id="contributing">Contributing</h2>
 <h3 id="thanks">Thanks</h3>
@@ -105,7 +100,7 @@ export class TechCheckService {
 <h2 id="deploy">Deploy</h2>
 <h3 id="demo">Demo</h3>
 <ul>
-<li>Run <code>npm install</code> to get packages required for the demo and then run <code>ng serve</code> to run locally.</li>
+<li>Run <code>npm install</code> to get packages required for the demo and then run <code>npm run demo</code> to run locally.</li>
 </ul>
 <h3 id="generate-docs">Generate Docs</h3>
 <ul>

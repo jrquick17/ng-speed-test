@@ -76,7 +76,13 @@
                     <td class="col-md-4">
                         <ul class="index-list">
                             <li>
-                                <a href="#getSpeed">getSpeed</a>
+                                <a href="#getBps">getBps</a>
+                            </li>
+                            <li>
+                                <a href="#getKbps">getKbps</a>
+                            </li>
+                            <li>
+                                <a href="#getMbps">getMbps</a>
                             </li>
                         </ul>
                     </td>
@@ -101,7 +107,7 @@
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="6" class="link-to-prism">src/app/services/speed-test.service.ts:6</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="7" class="link-to-prism">src/app/services/speed-test.service.ts:7</a></div>
                             </td>
                         </tr>
 
@@ -118,26 +124,26 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="getSpeed"></a>
+                    <a name="getBps"></a>
                     <span class="name">
                         <b>
-                            getSpeed
+                            getBps
                         </b>
-                        <a href="#getSpeed"><span class="icon ion-ios-link"></span></a>
+                        <a href="#getBps"><span class="icon ion-ios-link"></span></a>
                     </span>
                 </td>
             </tr>
             <tr>
                 <td class="col-md-4">
-<code>getSpeed()</code>
+<code>getBps()</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="11"
-                            class="link-to-prism">src/app/services/speed-test.service.ts:11</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="12"
+                            class="link-to-prism">src/app/services/speed-test.service.ts:12</a></div>
                 </td>
             </tr>
 
@@ -146,7 +152,85 @@
                 <td class="col-md-4">
 
                     <div class="io-description">
-                        <b>Returns : </b>    <code>Observable&lt;string | boolean&gt;</code>
+                        <b>Returns : </b>    <code>Observable&lt;number&gt;</code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getKbps"></a>
+                    <span class="name">
+                        <b>
+                            getKbps
+                        </b>
+                        <a href="#getKbps"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>getKbps()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="54"
+                            class="link-to-prism">src/app/services/speed-test.service.ts:54</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>Observable&lt;number&gt;</code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getMbps"></a>
+                    <span class="name">
+                        <b>
+                            getMbps
+                        </b>
+                        <a href="#getMbps"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>getMbps()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="64"
+                            class="link-to-prism">src/app/services/speed-test.service.ts:64</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>Observable&lt;number&gt;</code>
 
                     </div>
                 </td>
@@ -162,6 +246,7 @@
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import {Injectable} from &#x27;@angular/core&#x27;;
 
 import {Observable} from &#x27;rxjs&#x27;;
+import {map} from &#x27;rxjs/operators&#x27;;
 
 @Injectable()
 export class SpeedTestService {
@@ -169,17 +254,18 @@ export class SpeedTestService {
 
   }
 
-  getSpeed():Observable&lt;string|boolean&gt; {
+  getBps():Observable&lt;number&gt; {
     return new Observable(
       (observer) &#x3D;&gt; {
         window.setTimeout(
           () &#x3D;&gt; {
+            // const imageAddr &#x3D; &#x27;https://ng-speed-test.jrquick.com/assets/internet-speed-image.jpg&#x27;;
             const imageAddr &#x3D; &#x27;https://webapp.uic-chp.org/internet-speed-image.jpg&#x27;;
 
             let startTime, endTime;
             const download &#x3D; new Image();
 
-            download.onload &#x3D; () &#x3D;&gt; {
+            download.onload &#x3D; (a) &#x3D;&gt; {
               endTime &#x3D; (new Date()).getTime();
 
               const downloadSize &#x3D; 4995374;
@@ -188,17 +274,14 @@ export class SpeedTestService {
 
               const bitsLoaded &#x3D; downloadSize * 8;
 
-              const speedBps:any &#x3D; (bitsLoaded / duration).toFixed(2);
-              const speedKbps:any &#x3D; (speedBps / 1024).toFixed(2);
+              const speedBps &#x3D; bitsLoaded / duration;
 
-              const speedMbps &#x3D; (speedKbps / 1024).toFixed(2);
-
-              observer.next(speedMbps);
+              observer.next(speedBps);
               observer.complete();
             };
 
             download.onerror &#x3D; () &#x3D;&gt; {
-              observer.next(false);
+              observer.next(-1);
               observer.complete();
             };
 
@@ -210,6 +293,26 @@ export class SpeedTestService {
           1
         );
       }
+    );
+  }
+
+  getKbps():Observable&lt;number&gt; {
+    return this.getBps().pipe(
+      map(
+        (bps) &#x3D;&gt; {
+          return bps / 1024;
+        }
+      )
+    );
+  }
+
+  getMbps():Observable&lt;number&gt; {
+    return this.getKbps().pipe(
+      map(
+        (kpbs) &#x3D;&gt; {
+          return kpbs / 1024;
+        }
+      )
     );
   }
 }
