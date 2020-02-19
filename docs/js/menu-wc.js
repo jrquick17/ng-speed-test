@@ -83,16 +83,16 @@ customElements.define('compodoc-menu', class extends HTMLElement {
                                 <a href="modules/AppRoutingModule.html" data-type="entity-link">AppRoutingModule</a>
                             </li>
                             <li class="link">
-                                <a href="modules/NgSpeedTestModule.html" data-type="entity-link">NgSpeedTestModule</a>
+                                <a href="modules/SpeedTestModule.html" data-type="entity-link">SpeedTestModule</a>
                                 <li class="chapter inner">
                                     <div class="simple menu-toggler" data-toggle="collapse" ${ isNormalMode ?
-                                        'data-target="#injectables-links-module-NgSpeedTestModule-58d540754601d2b86140e79197f7798c"' : 'data-target="#xs-injectables-links-module-NgSpeedTestModule-58d540754601d2b86140e79197f7798c"' }>
+                                        'data-target="#injectables-links-module-SpeedTestModule-ab7d51fd31aeaf1ebf2fb450a2fc0188"' : 'data-target="#xs-injectables-links-module-SpeedTestModule-ab7d51fd31aeaf1ebf2fb450a2fc0188"' }>
                                         <span class="icon ion-md-arrow-round-down"></span>
                                         <span>Injectables</span>
                                         <span class="icon ion-ios-arrow-down"></span>
                                     </div>
-                                    <ul class="links collapse" ${ isNormalMode ? 'id="injectables-links-module-NgSpeedTestModule-58d540754601d2b86140e79197f7798c"' :
-                                        'id="xs-injectables-links-module-NgSpeedTestModule-58d540754601d2b86140e79197f7798c"' }>
+                                    <ul class="links collapse" ${ isNormalMode ? 'id="injectables-links-module-SpeedTestModule-ab7d51fd31aeaf1ebf2fb450a2fc0188"' :
+                                        'id="xs-injectables-links-module-SpeedTestModule-ab7d51fd31aeaf1ebf2fb450a2fc0188"' }>
                                         <li class="link">
                                             <a href="injectables/SpeedTestService.html"
                                                 data-type="entity-link" data-context="sub-entity" data-context-id="modules" }>SpeedTestService</a>

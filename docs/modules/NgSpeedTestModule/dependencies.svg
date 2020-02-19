@@ -21,11 +21,11 @@
 <polygon fill="#fb8072" stroke="transparent" points="406,-10 406,-30 426,-30 426,-10 406,-10"/>
 <text text-anchor="start" x="429.7258" y="-15.4" font-family="sans-serif" font-size="14.00" fill="#000000"> &#160;Exports</text>
 <g id="clust1" class="cluster">
-<title>cluster_NgSpeedTestModule</title>
+<title>cluster_SpeedTestModule</title>
 <polygon fill="none" stroke="#000000" stroke-dasharray="1,5" points="152,-70 152,-195 344,-195 344,-70 152,-70"/>
 </g>
 <g id="clust6" class="cluster">
-<title>cluster_NgSpeedTestModule_providers</title>
+<title>cluster_SpeedTestModule_providers</title>
 <polygon fill="none" stroke="#000000" points="160,-78 160,-130 336,-130 336,-78 160,-78"/>
 </g>
 <!-- SpeedTestService -->
@@ -34,15 +34,15 @@
 <ellipse fill="#fdb462" stroke="#000000" cx="248" cy="-104" rx="80.4325" ry="18"/>
 <text text-anchor="middle" x="248" y="-99.8" font-family="Times,serif" font-size="14.00" fill="#000000">SpeedTestService</text>
 </g>
-<!-- NgSpeedTestModule -->
+<!-- SpeedTestModule -->
 <g id="node2" class="node">
-<title>NgSpeedTestModule</title>
+<title>SpeedTestModule</title>
 <polygon fill="#8dd3c7" stroke="#000000" points="315.4706,-187 312.4706,-191 291.4706,-191 288.4706,-187 180.5294,-187 180.5294,-151 315.4706,-151 315.4706,-187"/>
-<text text-anchor="middle" x="248" y="-164.8" font-family="Times,serif" font-size="14.00" fill="#000000">NgSpeedTestModule</text>
+<text text-anchor="middle" x="248" y="-164.8" font-family="Times,serif" font-size="14.00" fill="#000000">SpeedTestModule</text>
 </g>
-<!-- SpeedTestService&#45;&gt;NgSpeedTestModule -->
+<!-- SpeedTestService&#45;&gt;SpeedTestModule -->
 <g id="edge1" class="edge">
-<title>SpeedTestService&#45;&gt;NgSpeedTestModule</title>
+<title>SpeedTestService&#45;&gt;SpeedTestModule</title>
 <path fill="none" stroke="#000000" d="M248,-122.1061C248,-122.1061 248,-140.991 248,-140.991"/>
 <polygon fill="#000000" stroke="#000000" points="244.5001,-140.9909 248,-150.991 251.5001,-140.991 244.5001,-140.9909"/>
 </g>

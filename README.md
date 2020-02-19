@@ -32,15 +32,15 @@ npm install ng-speed-test --save
 
 ### Import module ###
 
-* Import `NgSpeedTestModule` by adding the following to your parent module (i.e. `app.module.ts`):
+* Import `SpeedTestModule` by adding the following to your parent module (i.e. `app.module.ts`):
 
     ```
-    import { NgSpeedTestModule } from 'ng-speed-test';
+    import { SpeedTestModule } from 'ng-speed-test';
 
     @NgModule({
       ...
       imports: [
-        NgSpeedTestModule,
+        SpeedTestModule,
         ...
       ],
       ...

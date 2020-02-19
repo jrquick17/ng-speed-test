@@ -1,3 +1,2 @@
-export * from './services/speed-test.service';
-export declare class NgSpeedTestModule {
-}
+export * from './app/services/speed-test.service';
+export * from './app/speed-test.module';

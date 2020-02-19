@@ -1,6 +1,6 @@
 {
   "name": "ng-speed-test",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "readme": "README.md",
   "homepage": "https://ng-speed-test.jrquick.com",
   "repository": {
@@ -70,7 +70,8 @@
     "node": ">=6.0.0"
   },
   "peerDependencies": {
-    "@angular/core": "^8.0.0"
+    "@angular/core": "^8.0.0",
+    "rxjs": "^6.0.0"
   },
   "main": "bundles/ng-speed-test.umd.js",
   "module": "fesm5/ng-speed-test.js",

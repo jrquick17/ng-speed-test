@@ -7,4 +7,4 @@ import {SpeedTestService} from './services/speed-test.service';
     SpeedTestService
   ]
 })
-export class NgSpeedTestModule {}
+export class SpeedTestModule {}
