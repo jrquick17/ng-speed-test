@@ -53,14 +53,14 @@ npm install ng-speed-test --save
 * Checkout the demo and it's code for more examples.
 
 ```typescript
-import {SpeedTestService} from 'ng-speed-test/services/speed-test.service';
+import {SpeedTestService} from 'ng-speed-test';
 
 @Injectable()
 export class TechCheckService {
   constructor(
     private speedTestService:SpeedTestService
   ) {
-    this.speedTestService.getSpeed().subscribe(
+    this.speedTestService.getMbps().subscribe(
       (speed) => {
         console.log('Your speed is ' + speed);
       }
@@ -70,16 +70,11 @@ export class TechCheckService {
 
 ## Documentation ##
 
-### Events ###
+### Functions ###
 
-* `autoFocus($event)` is fired when the input is focused.  
-* `autoBlur($event)` is fired when the input is blured.  
-* `ionAutoInput($event)` is fired when user inputs.  
-* `itemChanged($event)` is fired when the selection changes (clicked).  
-* `itemsHidden($event)` is fired when items are hidden.  
-* `itemRemoved($event)` is fired when item is removed (clicked).  
-* `itemSelected($event)` is fired when item is selected from suggestions (clicked).  
-* `itemsShown($event)` is fired when items are shown.  
+* `getBps()` Get the current internet speed in BPS (bytes per second).
+* `getKbps()` Get the current internet speed in KBPS (kilobytes per second).
+* `getMbps()` Get the current internet speed in MBPS (megabytes per second).
 
 ## Contributing ##
 
@@ -95,7 +90,7 @@ If you find any issues feel free to open a request in [the Issues tab](https://g
 
 ### Demo ###
     
-* Run `npm install` to get packages required for the demo and then run `ng serve` to run locally.
+* Run `npm install` to get packages required for the demo and then run `npm run demo` to run locally.
 
 ### Generate Docs ###
 
