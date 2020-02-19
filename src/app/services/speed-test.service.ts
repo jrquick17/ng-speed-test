@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 
 import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 @Injectable()
 export class SpeedTestService {
@@ -8,7 +9,7 @@ export class SpeedTestService {
 
   }
 
-  getSpeed():Observable<string|boolean> {
+  getBps():Observable<number> {
     return new Observable(
       (observer) => {
         window.setTimeout(
@@ -18,7 +19,7 @@ export class SpeedTestService {
             let startTime, endTime;
             const download = new Image();
 
-            download.onload = () => {
+            download.onload = (a) => {
               endTime = (new Date()).getTime();
 
               const downloadSize = 4995374;
@@ -34,7 +35,7 @@ export class SpeedTestService {
             };
 
             download.onerror = () => {
-              observer.next(false);
+              observer.next(-1);
               observer.complete();
             };
 
@@ -46,6 +47,26 @@ export class SpeedTestService {
           1
         );
       }
+    );
+  }
+
+  getKbps():Observable<number> {
+    return this.getBps().pipe(
+      map(
+        (bps) => {
+          return bps / 1024;
+        }
+      )
+    );
+  }
+
+  getMbps():Observable<number> {
+    return this.getBps().pipe(
+      map(
+        (kpbs) => {
+          return kpbs / 1024;
+        }
+      )
     );
   }
 }
