@@ -48,9 +48,25 @@ npm install ng-speed-test --save
     export class AppModule {}
     ```
 
-### Use provider ###
+### Use service ###
 
-* The component is not responsible for getting the data from the server. There are two options for providing data to the component.
+* Checkout the demo and it's code for more examples.
+
+```typescript
+import {SpeedTestService} from 'ng-speed-test/services/speed-test.service';
+
+@Injectable()
+export class TechCheckService {
+  constructor(
+    private speedTestService:SpeedTestService
+  ) {
+    this.speedTestService.getSpeed().subscribe(
+      (speed) => {
+        console.log('Your speed is ' + speed);
+      }
+    );
+  }
+```
 
 ## Documentation ##
 
