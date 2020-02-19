@@ -11,3 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.1]
 ### Added
 * Service for returning the current internet speed by [jrquick17](https://github.com/jrquick17)
+
+## [0.0.1]
+### Added
+* Service for returning the current internet speed by [jrquick17](https://github.com/jrquick17)

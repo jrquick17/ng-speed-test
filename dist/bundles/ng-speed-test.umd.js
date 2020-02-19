@@ -1,8 +1,8 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('rxjs')) :
-    typeof define === 'function' && define.amd ? define('ng-speed-test', ['exports', '@angular/core', 'rxjs'], factory) :
-    (global = global || self, factory(global['ng-speed-test'] = {}, global.ng.core, global.rxjs));
-}(this, (function (exports, core, rxjs) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('rxjs'), require('rxjs/operators')) :
+    typeof define === 'function' && define.amd ? define('ng-speed-test', ['exports', '@angular/core', 'rxjs', 'rxjs/operators'], factory) :
+    (global = global || self, factory(global['ng-speed-test'] = {}, global.ng.core, global.rxjs, global.rxjs.operators));
+}(this, (function (exports, core, rxjs, operators) { 'use strict';
 
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation. All rights reserved.
@@ -204,25 +204,24 @@
     var SpeedTestService = /** @class */ (function () {
         function SpeedTestService() {
         }
-        SpeedTestService.prototype.getSpeed = function () {
+        SpeedTestService.prototype.getBps = function () {
             return new rxjs.Observable(function (observer) {
                 window.setTimeout(function () {
-                    var imageAddr = 'https://ng-speed-test.jrquick.com/assets/internet-speed-image.jpg';
+                    // const imageAddr = 'https://ng-speed-test.jrquick.com/assets/internet-speed-image.jpg';
+                    var imageAddr = 'https://webapp.uic-chp.org/internet-speed-image.jpg';
                     var startTime, endTime;
                     var download = new Image();
-                    download.onload = function () {
+                    download.onload = function (a) {
                         endTime = (new Date()).getTime();
                         var downloadSize = 4995374;
                         var duration = (endTime - startTime) / 1000;
                         var bitsLoaded = downloadSize * 8;
-                        var speedBps = (bitsLoaded / duration).toFixed(2);
-                        var speedKbps = (speedBps / 1024).toFixed(2);
-                        var speedMbps = (speedKbps / 1024).toFixed(2);
-                        observer.next(speedMbps);
+                        var speedBps = bitsLoaded / duration;
+                        observer.next(speedBps);
                         observer.complete();
                     };
                     download.onerror = function () {
-                        observer.next(false);
+                        observer.next(-1);
                         observer.complete();
                     };
                     startTime = (new Date()).getTime();
@@ -230,6 +229,16 @@
                     download.src = imageAddr + cacheBuster;
                 }, 1);
             });
+        };
+        SpeedTestService.prototype.getKbps = function () {
+            return this.getBps().pipe(operators.map(function (bps) {
+                return bps / 1024;
+            }));
+        };
+        SpeedTestService.prototype.getMbps = function () {
+            return this.getKbps().pipe(operators.map(function (kpbs) {
+                return kpbs / 1024;
+            }));
         };
         SpeedTestService = __decorate([
             core.Injectable()

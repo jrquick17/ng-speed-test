@@ -1,5 +1,7 @@
 import { Observable } from 'rxjs';
 export declare class SpeedTestService {
     constructor();
-    getSpeed(): Observable<string | boolean>;
+    getBps(): Observable<number>;
+    getKbps(): Observable<number>;
+    getMbps(): Observable<number>;
 }
