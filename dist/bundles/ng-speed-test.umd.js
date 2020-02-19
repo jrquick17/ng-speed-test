@@ -237,20 +237,20 @@
         return SpeedTestService;
     }());
 
-    var NgSpeedTestModule = /** @class */ (function () {
-        function NgSpeedTestModule() {
+    var SpeedTestModule = /** @class */ (function () {
+        function SpeedTestModule() {
         }
-        NgSpeedTestModule = __decorate([
+        SpeedTestModule = __decorate([
             core.NgModule({
                 providers: [
                     SpeedTestService
                 ]
             })
-        ], NgSpeedTestModule);
-        return NgSpeedTestModule;
+        ], SpeedTestModule);
+        return SpeedTestModule;
     }());
 
-    exports.NgSpeedTestModule = NgSpeedTestModule;
+    exports.SpeedTestModule = SpeedTestModule;
     exports.SpeedTestService = SpeedTestService;
 
     Object.defineProperty(exports, '__esModule', { value: true });

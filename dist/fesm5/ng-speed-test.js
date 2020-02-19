@@ -38,22 +38,22 @@ var SpeedTestService = /** @class */ (function () {
     return SpeedTestService;
 }());
 
-var NgSpeedTestModule = /** @class */ (function () {
-    function NgSpeedTestModule() {
+var SpeedTestModule = /** @class */ (function () {
+    function SpeedTestModule() {
     }
-    NgSpeedTestModule = __decorate([
+    SpeedTestModule = __decorate([
         NgModule({
             providers: [
                 SpeedTestService
             ]
         })
-    ], NgSpeedTestModule);
-    return NgSpeedTestModule;
+    ], SpeedTestModule);
+    return SpeedTestModule;
 }());
 
 /**
  * Generated bundle index. Do not edit.
  */
 
-export { NgSpeedTestModule, SpeedTestService };
+export { SpeedTestModule, SpeedTestService };
 //# sourceMappingURL=ng-speed-test.js.map

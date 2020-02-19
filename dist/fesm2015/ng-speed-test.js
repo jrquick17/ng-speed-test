@@ -37,19 +37,19 @@ SpeedTestService = __decorate([
     Injectable()
 ], SpeedTestService);
 
-let NgSpeedTestModule = class NgSpeedTestModule {
+let SpeedTestModule = class SpeedTestModule {
 };
-NgSpeedTestModule = __decorate([
+SpeedTestModule = __decorate([
     NgModule({
         providers: [
             SpeedTestService
         ]
     })
-], NgSpeedTestModule);
+], SpeedTestModule);
 
 /**
  * Generated bundle index. Do not edit.
  */
 
-export { NgSpeedTestModule, SpeedTestService };
+export { SpeedTestModule, SpeedTestService };
 //# sourceMappingURL=ng-speed-test.js.map

@@ -1,2 +1,2 @@
-export declare class NgSpeedTestModule {
+export declare class SpeedTestModule {
 }
