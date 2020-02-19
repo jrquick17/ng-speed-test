@@ -1,9 +1,11 @@
 <div>
   <h1>ng-speed-test</h1>
 
-  <p *ngIf="!hasChecked">Click the button to test your internet speed.</p>
+  <p *ngIf="!hasChecked && !hasError">Click the button to test your internet speed.</p>
 
-  <p *ngIf="hasChecked">Your internet speed is {{ speed }} MBPS</p>
+  <p *ngIf="hasChecked && !hasError">Your internet speed is {{ speed }} MBPS</p>
+
+  <p *ngIf="hasError">Something went wrong. Try again.</p>
 
   <input type="button"
          value="{{ isChecking ? 'Testing' : 'Test' }}"
