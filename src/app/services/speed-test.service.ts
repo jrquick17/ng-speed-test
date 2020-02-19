@@ -27,12 +27,9 @@ export class SpeedTestService {
 
               const bitsLoaded = downloadSize * 8;
 
-              const speedBps:any = (bitsLoaded / duration).toFixed(2);
-              const speedKbps:any = (speedBps / 1024).toFixed(2);
+              const speedBps = bitsLoaded / duration;
 
-              const speedMbps = (speedKbps / 1024).toFixed(2);
-
-              observer.next(speedMbps);
+              observer.next(speedBps);
               observer.complete();
             };
 
