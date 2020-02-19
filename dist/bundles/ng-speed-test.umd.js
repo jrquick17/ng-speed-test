@@ -207,8 +207,7 @@
         SpeedTestService.prototype.getBps = function () {
             return new rxjs.Observable(function (observer) {
                 window.setTimeout(function () {
-                    // const imageAddr = 'https://ng-speed-test.jrquick.com/assets/internet-speed-image.jpg';
-                    var imageAddr = 'https://webapp.uic-chp.org/internet-speed-image.jpg';
+                    var imageAddr = 'https://ng-speed-test.jrquick.com/assets/internet-speed-image.jpg';
                     var startTime, endTime;
                     var download = new Image();
                     download.onload = function (a) {

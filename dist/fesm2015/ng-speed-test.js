@@ -9,8 +9,7 @@ let SpeedTestService = class SpeedTestService {
     getBps() {
         return new Observable((observer) => {
             window.setTimeout(() => {
-                // const imageAddr = 'https://ng-speed-test.jrquick.com/assets/internet-speed-image.jpg';
-                const imageAddr = 'https://webapp.uic-chp.org/internet-speed-image.jpg';
+                const imageAddr = 'https://ng-speed-test.jrquick.com/assets/internet-speed-image.jpg';
                 let startTime, endTime;
                 const download = new Image();
                 download.onload = (a) => {
