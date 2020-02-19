@@ -8,7 +8,7 @@ var SpeedTestService = /** @class */ (function () {
     SpeedTestService.prototype.getSpeed = function () {
         return new Observable(function (observer) {
             window.setTimeout(function () {
-                var imageAddr = 'https://webapp.uic-chp.org/internet-speed-image.jpg';
+                var imageAddr = 'https://ng-speed-test.jrquick.com/assets/internet-speed-image.jpg';
                 var startTime, endTime;
                 var download = new Image();
                 download.onload = function () {
