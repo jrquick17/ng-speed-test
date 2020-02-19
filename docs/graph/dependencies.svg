@@ -95,7 +95,7 @@
 <!-- SpeedTestModule -->
 <g id="node6" class="node">
 <title>SpeedTestModule</title>
-<polygon fill="#8dd3c7" stroke="#000000" points="469.4706,-187 466.4706,-191 445.4706,-191 442.4706,-187 334.5294,-187 334.5294,-151 469.4706,-151 469.4706,-187"/>
+<polygon fill="#8dd3c7" stroke="#000000" points="460.8641,-187 457.8641,-191 436.8641,-191 433.8641,-187 343.1359,-187 343.1359,-151 460.8641,-151 460.8641,-187"/>
 <text text-anchor="middle" x="402" y="-164.8" font-family="Times,serif" font-size="14.00" fill="#000000">SpeedTestModule</text>
 </g>
 <!-- SpeedTestService&#45;&gt;SpeedTestModule -->

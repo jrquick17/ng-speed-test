@@ -86,13 +86,13 @@ customElements.define('compodoc-menu', class extends HTMLElement {
                                 <a href="modules/SpeedTestModule.html" data-type="entity-link">SpeedTestModule</a>
                                 <li class="chapter inner">
                                     <div class="simple menu-toggler" data-toggle="collapse" ${ isNormalMode ?
-                                        'data-target="#injectables-links-module-SpeedTestModule-ab7d51fd31aeaf1ebf2fb450a2fc0188"' : 'data-target="#xs-injectables-links-module-SpeedTestModule-ab7d51fd31aeaf1ebf2fb450a2fc0188"' }>
+                                        'data-target="#injectables-links-module-SpeedTestModule-17a482a283c06b4aa06422136bcacefa"' : 'data-target="#xs-injectables-links-module-SpeedTestModule-17a482a283c06b4aa06422136bcacefa"' }>
                                         <span class="icon ion-md-arrow-round-down"></span>
                                         <span>Injectables</span>
                                         <span class="icon ion-ios-arrow-down"></span>
                                     </div>
-                                    <ul class="links collapse" ${ isNormalMode ? 'id="injectables-links-module-SpeedTestModule-ab7d51fd31aeaf1ebf2fb450a2fc0188"' :
-                                        'id="xs-injectables-links-module-SpeedTestModule-ab7d51fd31aeaf1ebf2fb450a2fc0188"' }>
+                                    <ul class="links collapse" ${ isNormalMode ? 'id="injectables-links-module-SpeedTestModule-17a482a283c06b4aa06422136bcacefa"' :
+                                        'id="xs-injectables-links-module-SpeedTestModule-17a482a283c06b4aa06422136bcacefa"' }>
                                         <li class="link">
                                             <a href="injectables/SpeedTestService.html"
                                                 data-type="entity-link" data-context="sub-entity" data-context-id="modules" }>SpeedTestService</a>
