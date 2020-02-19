@@ -1,12 +1,2 @@
-import {NgModule} from '@angular/core';
-
-import {SpeedTestService} from './services/speed-test.service';
-
-export * from './services/speed-test.service';
-
-@NgModule({
-  providers: [
-    SpeedTestService
-  ]
-})
-export class NgSpeedTestModule {}
+export * from './app/services/speed-test.service';
+export * from './app/speed-test.module';
