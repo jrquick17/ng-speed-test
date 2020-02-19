@@ -14,8 +14,10 @@ export class AppComponent {
 
   public hasChecked:boolean = false;
   public hasError:boolean = false;
+  public hasTracked:boolean = false;
   public isChecking:boolean = false;
-  public speed:string = '';
+  public isTracking:boolean = false;
+  public speeds:string[] = [];
 
   constructor(
     private speedTestService:SpeedTestService
@@ -24,6 +26,8 @@ export class AppComponent {
   }
 
   getSpeed():void {
+    this.hasTracked = false;
+
     this.isChecking = true;
 
     this.speedTestService.getMbps().pipe(
@@ -37,10 +41,42 @@ export class AppComponent {
         this.hasError = speed === -1;
 
         if (!this.hasError) {
-          this.speed = speed.toFixed(2);
+          this.speeds = [
+            speed.toFixed(2)
+          ];
         }
 
         this.hasChecked = true;
+      }
+    )
+  }
+
+  trackSpeed():void {
+    if (this.hasChecked) {
+      this.speeds = [];
+
+      this.hasChecked = false;
+    }
+
+    this.isTracking = true;
+
+    this.speedTestService.getMbps().subscribe(
+      (speed) => {
+        this.hasError = speed === -1;
+
+        if (!this.hasError) {
+          this.speeds.push(
+            speed.toFixed(2)
+          );
+
+          if (this.speeds.length < 10) {
+            this.trackSpeed();
+          } else {
+            this.isTracking = false;
+          }
+        }
+
+        this.hasTracked = true;
       }
     )
   }
