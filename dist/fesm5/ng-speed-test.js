@@ -1,7 +1,5 @@
 import { __decorate } from 'tslib';
 import { Injectable, NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 var SpeedTestService = /** @class */ (function () {
@@ -43,22 +41,10 @@ var SpeedTestService = /** @class */ (function () {
 var NgSpeedTestModule = /** @class */ (function () {
     function NgSpeedTestModule() {
     }
-    NgSpeedTestModule_1 = NgSpeedTestModule;
-    NgSpeedTestModule.forRoot = function () {
-        return {
-            ngModule: NgSpeedTestModule_1,
-            providers: []
-        };
-    };
-    var NgSpeedTestModule_1;
-    NgSpeedTestModule = NgSpeedTestModule_1 = __decorate([
+    NgSpeedTestModule = __decorate([
         NgModule({
             providers: [
                 SpeedTestService
-            ],
-            imports: [
-                CommonModule,
-                FormsModule
             ]
         })
     ], NgSpeedTestModule);

@@ -1,8 +1,8 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('@angular/common'), require('@angular/forms'), require('rxjs')) :
-    typeof define === 'function' && define.amd ? define('ng-speed-test', ['exports', '@angular/core', '@angular/common', '@angular/forms', 'rxjs'], factory) :
-    (global = global || self, factory(global['ng-speed-test'] = {}, global.ng.core, global.ng.common, global.ng.forms, global.rxjs));
-}(this, (function (exports, core, common, forms, rxjs) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('rxjs')) :
+    typeof define === 'function' && define.amd ? define('ng-speed-test', ['exports', '@angular/core', 'rxjs'], factory) :
+    (global = global || self, factory(global['ng-speed-test'] = {}, global.ng.core, global.rxjs));
+}(this, (function (exports, core, rxjs) { 'use strict';
 
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation. All rights reserved.
@@ -240,22 +240,10 @@
     var NgSpeedTestModule = /** @class */ (function () {
         function NgSpeedTestModule() {
         }
-        NgSpeedTestModule_1 = NgSpeedTestModule;
-        NgSpeedTestModule.forRoot = function () {
-            return {
-                ngModule: NgSpeedTestModule_1,
-                providers: []
-            };
-        };
-        var NgSpeedTestModule_1;
-        NgSpeedTestModule = NgSpeedTestModule_1 = __decorate([
+        NgSpeedTestModule = __decorate([
             core.NgModule({
                 providers: [
                     SpeedTestService
-                ],
-                imports: [
-                    common.CommonModule,
-                    forms.FormsModule
                 ]
             })
         ], NgSpeedTestModule);

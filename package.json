@@ -1,6 +1,6 @@
 {
   "name": "ng-speed-test",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "readme": "README.md",
   "homepage": "https://ng-speed-test.jrquick.com",
   "scripts": {
@@ -16,12 +16,6 @@
     "publish": "npm publish dist",
     "shipit": "npm run lint && npm run test && npm run build && npm run demo:build && npm run docs:build && npm run publish",
     "test": "ng test --browsers PhantomJS --progress --watch false"
-  },
-  "ngPackage": {
-    "lib": {
-      "cssUrl": "inline",
-      "entryFile": "src/main.ts"
-    }
   },
   "repository": {
     "type": "git",
@@ -40,6 +34,11 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/jrquick17/ng-speed-test/issues"
+  },
+  "ngPackage": {
+    "lib": {
+      "entryFile": "src/main.ts"
+    }
   },
   "devDependencies": {
     "@angular-devkit/architect": "~0.803.25",
@@ -64,9 +63,9 @@
     "@types/jasmine": "~3.5.3",
     "@types/node": "^13.7.0",
     "codelyzer": "~5.2.1",
+    "fsevents": "^2.1.2",
     "hammerjs": "^2.0.8",
     "intl": "^1.2.5",
-    "fsevents": "^2.1.2",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "^4.4.1",
@@ -90,13 +89,6 @@
     "node": ">=6.0.0"
   },
   "peerDependencies": {
-    "@angular/animations": "^8.0.0",
-    "@angular/common": "^8.0.0",
-    "@angular/core": "^8.0.0",
-    "@angular/forms": "^8.0.0",
-    "@angular/platform-browser": "^8.0.0",
-    "@angular/platform-browser-dynamic": "^8.0.0",
-    "@angular/router": "^8.0.0",
-    "@angular/service-worker": "^8.0.0"
+    "@angular/core": "^8.0.0"
   }
 }

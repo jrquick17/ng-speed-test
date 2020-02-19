@@ -67,11 +67,23 @@
   })
   export class AppModule {}</code></pre></div></li>
 </ul>
-<h3 id="use-provider">Use provider</h3>
+<h3 id="use-service">Use service</h3>
 <ul>
-<li>The component is not responsible for getting the data from the server. There are two options for providing data to the component.</li>
+<li>Checkout the demo and it&#39;s code for more examples.</li>
 </ul>
-<h2 id="documentation">Documentation</h2>
+<div><pre class="line-numbers"><code class="language-typescript">import {SpeedTestService} from &#39;ng-speed-test/services/speed-test.service&#39;;
+
+&#64;Injectable()
+export class TechCheckService {
+  constructor(
+    private speedTestService:SpeedTestService
+  ) {
+    this.speedTestService.getSpeed().subscribe(
+      (speed) =&gt; {
+        console.log(&#39;Your speed is &#39; + speed);
+      }
+    );
+  }</code></pre></div><h2 id="documentation">Documentation</h2>
 <h3 id="events">Events</h3>
 <ul>
 <li><code>autoFocus($event)</code> is fired when the input is focused.  </li>

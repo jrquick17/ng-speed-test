@@ -86,13 +86,13 @@ customElements.define('compodoc-menu', class extends HTMLElement {
                                 <a href="modules/NgSpeedTestModule.html" data-type="entity-link">NgSpeedTestModule</a>
                                 <li class="chapter inner">
                                     <div class="simple menu-toggler" data-toggle="collapse" ${ isNormalMode ?
-                                        'data-target="#injectables-links-module-NgSpeedTestModule-82ab19e99ad866be7f546eb29456d432"' : 'data-target="#xs-injectables-links-module-NgSpeedTestModule-82ab19e99ad866be7f546eb29456d432"' }>
+                                        'data-target="#injectables-links-module-NgSpeedTestModule-58d540754601d2b86140e79197f7798c"' : 'data-target="#xs-injectables-links-module-NgSpeedTestModule-58d540754601d2b86140e79197f7798c"' }>
                                         <span class="icon ion-md-arrow-round-down"></span>
                                         <span>Injectables</span>
                                         <span class="icon ion-ios-arrow-down"></span>
                                     </div>
-                                    <ul class="links collapse" ${ isNormalMode ? 'id="injectables-links-module-NgSpeedTestModule-82ab19e99ad866be7f546eb29456d432"' :
-                                        'id="xs-injectables-links-module-NgSpeedTestModule-82ab19e99ad866be7f546eb29456d432"' }>
+                                    <ul class="links collapse" ${ isNormalMode ? 'id="injectables-links-module-NgSpeedTestModule-58d540754601d2b86140e79197f7798c"' :
+                                        'id="xs-injectables-links-module-NgSpeedTestModule-58d540754601d2b86140e79197f7798c"' }>
                                         <li class="link">
                                             <a href="injectables/SpeedTestService.html"
                                                 data-type="entity-link" data-context="sub-entity" data-context-id="modules" }>SpeedTestService</a>
