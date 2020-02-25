@@ -207,9 +207,9 @@
         // 4952221 // 5mb
         // 13848150 // 15mb
         function FileDetailsModel() {
-            this.path = 'https://ng-speed-test.jrquick.com/assets/1mb.jpg';
+            this.path = 'https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/5mb.jpg';
             this.shouldBustCache = true;
-            this.size = 1197292;
+            this.size = 4952221;
         }
         return FileDetailsModel;
     }());
@@ -234,12 +234,12 @@
         function SpeedTestService() {
             this._applyCacheBuster = function (path) { return path + '?nnn=' + Math.random(); };
         }
-        SpeedTestService.prototype._download = function (fileDetails, iterations, allDetails) {
+        SpeedTestService.prototype._download = function (iterations, fileDetails, allDetails) {
             var _this = this;
             return new rxjs.Observable(function (observer) {
                 var newSpeedDetails = new SpeedDetailsModel(fileDetails.size);
                 var download = new Image();
-                download.onload = function (a) {
+                download.onload = function () {
                     newSpeedDetails.end();
                     observer.next(newSpeedDetails);
                     observer.complete();
@@ -277,11 +277,11 @@
                     return rxjs.of(speedBps);
                 }
                 else {
-                    return _this._download(fileDetails, --iterations, allDetails);
+                    return _this._download(--iterations, fileDetails, allDetails);
                 }
             }));
         };
-        SpeedTestService.prototype.getBps = function (fileDetails, iterations, previousSpeed) {
+        SpeedTestService.prototype.getBps = function (iterations, fileDetails) {
             var _this = this;
             return new rxjs.Observable(function (observer) {
                 window.setTimeout(function () {
@@ -304,20 +304,20 @@
                             fileDetails.shouldBustCache = fileDetails.shouldBustCache === true;
                         }
                     }
-                    _this._download(fileDetails, iterations).subscribe(function (speedBps) {
+                    _this._download(iterations, fileDetails).subscribe(function (speedBps) {
                         observer.next(speedBps);
                         observer.complete();
                     });
                 }, 1);
             });
         };
-        SpeedTestService.prototype.getKbps = function () {
-            return this.getBps().pipe(operators.map(function (bps) {
+        SpeedTestService.prototype.getKbps = function (iterations, fileDetails) {
+            return this.getBps(iterations, fileDetails).pipe(operators.map(function (bps) {
                 return bps / 1024;
             }));
         };
-        SpeedTestService.prototype.getMbps = function () {
-            return this.getKbps().pipe(operators.map(function (kpbs) {
+        SpeedTestService.prototype.getMbps = function (iterations, fileDetails) {
+            return this.getKbps(iterations, fileDetails).pipe(operators.map(function (kpbs) {
                 return kpbs / 1024;
             }));
         };

@@ -9,9 +9,9 @@ class FileDetailsModel {
     // 4952221 // 5mb
     // 13848150 // 15mb
     constructor() {
-        this.path = 'https://ng-speed-test.jrquick.com/assets/1mb.jpg';
+        this.path = 'https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/5mb.jpg';
         this.shouldBustCache = true;
-        this.size = 1197292;
+        this.size = 4952221;
     }
 }
 
@@ -34,11 +34,11 @@ let SpeedTestService = class SpeedTestService {
     constructor() {
         this._applyCacheBuster = (path) => path + '?nnn=' + Math.random();
     }
-    _download(fileDetails, iterations, allDetails) {
+    _download(iterations, fileDetails, allDetails) {
         return new Observable((observer) => {
             const newSpeedDetails = new SpeedDetailsModel(fileDetails.size);
             const download = new Image();
-            download.onload = (a) => {
+            download.onload = () => {
                 newSpeedDetails.end();
                 observer.next(newSpeedDetails);
                 observer.complete();
@@ -76,11 +76,11 @@ let SpeedTestService = class SpeedTestService {
                 return of(speedBps);
             }
             else {
-                return this._download(fileDetails, --iterations, allDetails);
+                return this._download(--iterations, fileDetails, allDetails);
             }
         }));
     }
-    getBps(fileDetails, iterations, previousSpeed) {
+    getBps(iterations, fileDetails) {
         return new Observable((observer) => {
             window.setTimeout(() => {
                 if (typeof fileDetails === 'undefined') {
@@ -102,20 +102,20 @@ let SpeedTestService = class SpeedTestService {
                         fileDetails.shouldBustCache = fileDetails.shouldBustCache === true;
                     }
                 }
-                this._download(fileDetails, iterations).subscribe((speedBps) => {
+                this._download(iterations, fileDetails).subscribe((speedBps) => {
                     observer.next(speedBps);
                     observer.complete();
                 });
             }, 1);
         });
     }
-    getKbps() {
-        return this.getBps().pipe(map((bps) => {
+    getKbps(iterations, fileDetails) {
+        return this.getBps(iterations, fileDetails).pipe(map((bps) => {
             return bps / 1024;
         }));
     }
-    getMbps() {
-        return this.getKbps().pipe(map((kpbs) => {
+    getMbps(iterations, fileDetails) {
+        return this.getKbps(iterations, fileDetails).pipe(map((kpbs) => {
             return kpbs / 1024;
         }));
     }

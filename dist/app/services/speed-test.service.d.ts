@@ -4,7 +4,7 @@ export declare class SpeedTestService {
     constructor();
     private _applyCacheBuster;
     private _download;
-    getBps(fileDetails?: FileDetailsModel, iterations?: number, previousSpeed?: number): Observable<number | null>;
-    getKbps(): Observable<number>;
-    getMbps(): Observable<number>;
+    getBps(iterations?: number, fileDetails?: FileDetailsModel): Observable<number | null>;
+    getKbps(iterations?: number, fileDetails?: FileDetailsModel): Observable<number>;
+    getMbps(iterations?: number, fileDetails?: FileDetailsModel): Observable<number>;
 }
