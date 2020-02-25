@@ -3,6 +3,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {FileDetailsModel} from '../models/file-details.model';
+import {SpeedDetailsModel} from '../models/speed-details.model';
 
 @Injectable()
 export class SpeedTestService {
@@ -20,6 +21,7 @@ export class SpeedTestService {
             let filePath = 'https://ng-speed-test.jrquick.com/assets/5mb.jpg';
             let fileSize = 4952221;
             let shouldBustCache = true;
+
             // 408949 // 500kb
             // 1197292 // 1mb
             // 4952221 // 5mb
@@ -47,20 +49,14 @@ export class SpeedTestService {
               filePath = this._applyCacheBuster(filePath);
             }
 
-            let startTime, endTime;
+            const speedDetails = new SpeedDetailsModel(fileSize);
 
             const download = new Image();
 
             download.onload = (a) => {
-              endTime = (new Date()).getTime();
+              speedDetails.end();
 
-              const duration = (endTime - startTime) / 1000;
-
-              const bitsLoaded = fileSize * 8;
-
-              const speedBps = bitsLoaded / duration;
-
-              observer.next(speedBps);
+              observer.next(speedDetails.speedBps);
               observer.complete();
             };
 
@@ -69,7 +65,7 @@ export class SpeedTestService {
               observer.complete();
             };
 
-            startTime = (new Date()).getTime();
+            speedDetails.start();
 
             download.src = filePath;
           },

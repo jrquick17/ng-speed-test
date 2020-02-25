@@ -17,7 +17,7 @@
 
 ## About ## 
 
-Simple Angular 2+ service for checking internet speed  
+A light weight Angular 2+ service for checking internet speed  
 
 * Try out [the demo](https://ng-speed-test.jrquick.com) to see it in action!
 * Visit [my website](https://jrquick.com) for other cool projects!

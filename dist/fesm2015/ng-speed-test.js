@@ -3,31 +3,77 @@ import { Injectable, NgModule } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+class FileDetailsModel {
+    constructor() {
+        this.shouldBustCache = true;
+    }
+}
+
+class SpeedDetailsModel {
+    constructor(fileSize) {
+        this.fileSize = fileSize;
+    }
+    end() {
+        this.endTime = (new Date()).getTime();
+        this.duration = (this.endTime - this.startTime) / 1000;
+        const bitsLoaded = this.fileSize * 8;
+        this.speedBps = bitsLoaded / this.duration;
+    }
+    start() {
+        this.startTime = (new Date()).getTime();
+    }
+}
+
 let SpeedTestService = class SpeedTestService {
     constructor() {
+        this._applyCacheBuster = (path) => path + '?nnn=' + Math.random();
     }
-    getBps() {
+    getBps(fileDetails, iterations) {
         return new Observable((observer) => {
             window.setTimeout(() => {
-                const imageAddr = 'https://ng-speed-test.jrquick.com/assets/internet-speed-image.jpg';
-                let startTime, endTime;
+                let filePath = 'https://ng-speed-test.jrquick.com/assets/1mb.jpg';
+                let fileSize = 1197292;
+                let shouldBustCache = true;
+                // 408949 // 500kb
+                // 1197292 // 1mb
+                // 4952221 // 5mb
+                // 13848150 // 15mb
+                if (typeof fileDetails !== 'undefined') {
+                    if (typeof fileDetails.path === 'undefined') {
+                        console.error('ng-speed-test: File path is missing.');
+                    }
+                    else {
+                        filePath = fileDetails.path;
+                    }
+                    if (typeof fileDetails.shouldBustCache !== 'undefined') {
+                        shouldBustCache = fileDetails.shouldBustCache === true;
+                    }
+                    if (typeof fileDetails.size === 'undefined') {
+                        console.error('ng-speed-test: File size is missing.');
+                    }
+                    else {
+                        fileSize = fileDetails.size;
+                    }
+                }
+                if (shouldBustCache) {
+                    filePath = this._applyCacheBuster(filePath);
+                }
+                if (typeof iterations === 'undefined') {
+                    iterations = 1;
+                }
+                const speedDetails = new SpeedDetailsModel(fileSize);
                 const download = new Image();
                 download.onload = (a) => {
-                    endTime = (new Date()).getTime();
-                    const downloadSize = 4995374;
-                    const duration = (endTime - startTime) / 1000;
-                    const bitsLoaded = downloadSize * 8;
-                    const speedBps = bitsLoaded / duration;
-                    observer.next(speedBps);
+                    speedDetails.end();
+                    observer.next(speedDetails.speedBps);
                     observer.complete();
                 };
                 download.onerror = () => {
-                    observer.next(-1);
+                    observer.next(null);
                     observer.complete();
                 };
-                startTime = (new Date()).getTime();
-                const cacheBuster = '?nnn=' + startTime;
-                download.src = imageAddr + cacheBuster;
+                speedDetails.start();
+                download.src = filePath;
             }, 1);
         });
     }
@@ -60,5 +106,5 @@ SpeedTestModule = __decorate([
  * Generated bundle index. Do not edit.
  */
 
-export { SpeedTestModule, SpeedTestService };
+export { FileDetailsModel, SpeedTestModule, SpeedTestService };
 //# sourceMappingURL=ng-speed-test.js.map
