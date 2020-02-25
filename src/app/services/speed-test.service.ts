@@ -12,7 +12,7 @@ export class SpeedTestService {
 
   private _applyCacheBuster = (path:string): string => path + '?nnn=' + Math.random();
 
-  getBps(fileDetails?:FileDetailsModel):Observable<number> {
+  getBps(fileDetails?:FileDetailsModel):Observable<number|null> {
     return new Observable(
       (observer) => {
         window.setTimeout(
@@ -65,7 +65,7 @@ export class SpeedTestService {
             };
 
             download.onerror = () => {
-              observer.next(-1);
+              observer.next(null);
               observer.complete();
             };
 
