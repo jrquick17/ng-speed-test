@@ -13,7 +13,7 @@ export class SpeedTestService {
 
   private _applyCacheBuster = (path:string): string => path + '?nnn=' + Math.random();
 
-  private _download(fileDetails:FileDetailsModel, iterations?:number, allDetails?:SpeedDetailsModel[]):Observable<number> {
+  private _download(iterations?:number, fileDetails?:FileDetailsModel, allDetails?:SpeedDetailsModel[]):Observable<number> {
     return new Observable<SpeedDetailsModel>(
       (observer) => {
         const newSpeedDetails = new SpeedDetailsModel(fileDetails.size);
@@ -70,14 +70,14 @@ export class SpeedTestService {
 
             return of(speedBps);
           } else {
-            return this._download(fileDetails, --iterations, allDetails);
+            return this._download(--iterations, fileDetails, allDetails);
           }
         }
       )
     );
   }
 
-  getBps(fileDetails?:FileDetailsModel, iterations?:number):Observable<number|null> {
+  getBps(iterations?:number, fileDetails?:FileDetailsModel):Observable<number|null> {
     return new Observable(
       (observer) => {
         window.setTimeout(
@@ -104,7 +104,7 @@ export class SpeedTestService {
               }
             }
 
-            this._download(fileDetails, iterations).subscribe(
+            this._download(iterations, fileDetails).subscribe(
               (speedBps) => {
                 observer.next(speedBps);
                 observer.complete();
@@ -117,8 +117,8 @@ export class SpeedTestService {
     );
   }
 
-  getKbps():Observable<number> {
-    return this.getBps().pipe(
+  getKbps(iterations?:number, fileDetails?:FileDetailsModel):Observable<number> {
+    return this.getBps(iterations, fileDetails).pipe(
       map(
         (bps) => {
           return bps / 1024;
@@ -127,8 +127,8 @@ export class SpeedTestService {
     );
   }
 
-  getMbps():Observable<number> {
-    return this.getKbps().pipe(
+  getMbps(iterations?:number, fileDetails?:FileDetailsModel):Observable<number> {
+    return this.getKbps(iterations, fileDetails).pipe(
       map(
         (kpbs) => {
           return kpbs / 1024;
