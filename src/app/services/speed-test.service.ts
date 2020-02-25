@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {Observable, of} from 'rxjs';
+import {flatMap, map} from 'rxjs/operators';
 import {FileDetailsModel} from '../models/file-details.model';
 import {SpeedDetailsModel} from '../models/speed-details.model';
 
@@ -13,7 +13,71 @@ export class SpeedTestService {
 
   private _applyCacheBuster = (path:string): string => path + '?nnn=' + Math.random();
 
-  getBps(fileDetails?:FileDetailsModel):Observable<number|null> {
+  private _download(fileDetails:FileDetailsModel, iterations?:number, allDetails?:SpeedDetailsModel[]):Observable<number> {
+    return new Observable<SpeedDetailsModel>(
+      (observer) => {
+        const newSpeedDetails = new SpeedDetailsModel(fileDetails.size);
+
+        const download = new Image();
+
+        download.onload = () => {
+          newSpeedDetails.end();
+
+          observer.next(newSpeedDetails);
+          observer.complete();
+        };
+
+        download.onerror = () => {
+          observer.next(null);
+          observer.complete();
+        };
+
+        let filePath = fileDetails.path;
+        if (fileDetails.shouldBustCache) {
+          filePath = this._applyCacheBuster(filePath);
+        }
+
+        newSpeedDetails.start();
+
+        download.src = filePath;
+      }
+    ).pipe(
+      flatMap(
+        (newSpeedDetails:SpeedDetailsModel|null) => {
+          if (newSpeedDetails === null) {
+            console.error('ng-speed-test: Error downloading file.');
+          } else {
+            if (typeof allDetails === 'undefined') {
+              allDetails = [];
+            }
+
+            allDetails.push(newSpeedDetails);
+          }
+
+          if (typeof iterations === 'undefined') {
+            iterations = 3;
+          }
+
+          if (iterations === 1) {
+            const count = allDetails.length;
+            let total = 0;
+
+            for (let i = 0; i < count; i++) {
+              total += allDetails[i].speedBps;
+            }
+
+            const speedBps = total / count;
+
+            return of(speedBps);
+          } else {
+            return this._download(fileDetails, --iterations, allDetails);
+          }
+        }
+      )
+    );
+  }
+
+  getBps(fileDetails?:FileDetailsModel, iterations?:number):Observable<number|null> {
     return new Observable(
       (observer) => {
         window.setTimeout(
@@ -40,29 +104,12 @@ export class SpeedTestService {
               }
             }
 
-            if (shouldBustCache) {
-              filePath = this._applyCacheBuster(filePath);
-            }
-
-            const speedDetails = new SpeedDetailsModel(fileSize);
-
-            const download = new Image();
-
-            download.onload = (a) => {
-              speedDetails.end();
-
-              observer.next(speedDetails.speedBps);
-              observer.complete();
-            };
-
-            download.onerror = () => {
-              observer.next(null);
-              observer.complete();
-            };
-
-            speedDetails.start();
-
-            download.src = filePath;
+            this._download(fileDetails, iterations).subscribe(
+              (speedBps) => {
+                observer.next(speedBps);
+                observer.complete();
+              }
+            );
           },
           1
         );
