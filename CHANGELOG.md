@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [1.1.0]
+### Changed
+* Image route to use GitHub by [jrquick17](https://github.com/jrquick17)
+
 ## [0.0.6]
 ### Added
 * Demo by [jrquick17](https://github.com/jrquick17)

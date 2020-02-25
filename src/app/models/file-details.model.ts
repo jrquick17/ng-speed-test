@@ -1,7 +1,7 @@
 export class FileDetailsModel {
-  public path:string = 'https://ng-speed-test.jrquick.com/assets/1mb.jpg';
+  public path:string = 'https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/5mb.jpg';
   public shouldBustCache:boolean = true;
-  public size:number = 1197292;
+  public size:number = 4952221;
 
   // 408949 // 500kb
   // 1197292 // 1mb
