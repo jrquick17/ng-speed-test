@@ -72,7 +72,7 @@ export class AppComponent {
             speed.toFixed(2)
           );
 
-          if (this.speeds.length < 10) {
+          if (this.speeds.length < 5) {
             this.trackSpeed();
           } else {
             this.isTracking = false;
