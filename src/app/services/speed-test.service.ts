@@ -14,7 +14,7 @@ export class SpeedTestService {
       (observer) => {
         window.setTimeout(
           () => {
-            const imageAddr = 'https://ng-speed-test.jrquick.com/assets/internet-speed-image.jpg';
+            const imageAddr = 'https://ng-speed-test.jrquick.com/assets/5mb.jpg';
 
             let startTime, endTime;
             const download = new Image();
@@ -22,7 +22,11 @@ export class SpeedTestService {
             download.onload = (a) => {
               endTime = (new Date()).getTime();
 
-              const downloadSize = 4995374;
+              const downloadSize = 4952221; // internet-speed-image
+              // 408949 // 500kb
+              // 1197292 // 1mb
+              // 4952221 // 5mb
+              // 13848150 // 15mb
 
               const duration = (endTime - startTime) / 1000;
 
