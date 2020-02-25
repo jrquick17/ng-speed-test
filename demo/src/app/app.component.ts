@@ -19,6 +19,7 @@ export class AppComponent {
   public hasTracked:boolean = false;
   public isChecking:boolean = false;
   public isTracking:boolean = false;
+  public iterations:number = 1;
   public speeds:string[] = [];
 
   constructor(
@@ -62,7 +63,7 @@ export class AppComponent {
 
     this.isTracking = true;
 
-    this.speedTestService.getMbps().subscribe(
+    this.speedTestService.getMbps(this.iterations).subscribe(
       (speed) => {
         this.hasError = speed === -1;
 

@@ -14,6 +14,15 @@
     </p>
   </div>
 
+  <label>
+    Iterations:
+    <input type="number"
+           [(ngModel)]="iterations"
+           [disabled]="isChecking || isTracking"/>
+  </label>
+
+  <br/>
+
   <input type="button"
          value="{{ isChecking ? 'Testing' : 'Test' }}"
          (click)="getSpeed()"
