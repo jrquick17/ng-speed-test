@@ -18,30 +18,25 @@ export class SpeedTestService {
       (observer) => {
         window.setTimeout(
           () => {
-            let filePath = 'https://ng-speed-test.jrquick.com/assets/5mb.jpg';
-            let fileSize = 4952221;
-            let shouldBustCache = true;
-
-            // 408949 // 500kb
-            // 1197292 // 1mb
-            // 4952221 // 5mb
-            // 13848150 // 15mb
-
-            if (typeof fileDetails !== 'undefined') {
+            if (typeof fileDetails === 'undefined') {
+              fileDetails = new FileDetailsModel();
+            } else {
               if (typeof fileDetails.path === 'undefined') {
                 console.error('ng-speed-test: File path is missing.');
-              } else {
-                filePath = fileDetails.path;
-              }
 
-              if (typeof fileDetails.shouldBustCache !== 'undefined') {
-                shouldBustCache = fileDetails.shouldBustCache === true;
+                return null;
               }
 
               if (typeof fileDetails.size === 'undefined') {
                 console.error('ng-speed-test: File size is missing.');
+
+                return null;
+              }
+
+              if (typeof fileDetails.shouldBustCache === 'undefined') {
+                fileDetails.shouldBustCache = true;
               } else {
-                fileSize = fileDetails.size;
+                fileDetails.shouldBustCache = fileDetails.shouldBustCache === true;
               }
             }
 
