@@ -1,9 +1,9 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { SpeedTestModule } from 'ng-speed-test';
+import {AppRoutingModule} from './app-routing.module';
+import {AppComponent} from './app.component';
+import {SpeedTestModule} from 'ng-speed-test';
 
 @NgModule({
   declarations: [
@@ -15,6 +15,8 @@ import { SpeedTestModule } from 'ng-speed-test';
     SpeedTestModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [
+    AppComponent
+  ]
 })
 export class AppModule { }

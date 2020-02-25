@@ -5,9 +5,11 @@ import {finalize} from 'rxjs/operators';
 import {SpeedTestService} from 'ng-speed-test';
 
 @Component({
-  selector: 'app-root',
+  selector:    'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: [
+    './app.component.scss'
+  ]
 })
 export class AppComponent {
   title = 'ng-speed-test-demo';
