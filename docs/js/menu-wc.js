@@ -65,13 +65,13 @@ customElements.define('compodoc-menu', class extends HTMLElement {
                                 <a href="modules/AppModule.html" data-type="entity-link">AppModule</a>
                                     <li class="chapter inner">
                                         <div class="simple menu-toggler" data-toggle="collapse" ${ isNormalMode ?
-                                            'data-target="#components-links-module-AppModule-6d7400cab35abd0d0e61cb2a3f1ec4ce"' : 'data-target="#xs-components-links-module-AppModule-6d7400cab35abd0d0e61cb2a3f1ec4ce"' }>
+                                            'data-target="#components-links-module-AppModule-4fc73c046689d22dba0af985a9cbf314"' : 'data-target="#xs-components-links-module-AppModule-4fc73c046689d22dba0af985a9cbf314"' }>
                                             <span class="icon ion-md-cog"></span>
                                             <span>Components</span>
                                             <span class="icon ion-ios-arrow-down"></span>
                                         </div>
-                                        <ul class="links collapse" ${ isNormalMode ? 'id="components-links-module-AppModule-6d7400cab35abd0d0e61cb2a3f1ec4ce"' :
-                                            'id="xs-components-links-module-AppModule-6d7400cab35abd0d0e61cb2a3f1ec4ce"' }>
+                                        <ul class="links collapse" ${ isNormalMode ? 'id="components-links-module-AppModule-4fc73c046689d22dba0af985a9cbf314"' :
+                                            'id="xs-components-links-module-AppModule-4fc73c046689d22dba0af985a9cbf314"' }>
                                             <li class="link">
                                                 <a href="components/AppComponent.html"
                                                     data-type="entity-link" data-context="sub-entity" data-context-id="modules">AppComponent</a>
@@ -112,6 +112,12 @@ customElements.define('compodoc-menu', class extends HTMLElement {
                         <ul class="links collapse " ${ isNormalMode ? 'id="classes-links"' : 'id="xs-classes-links"' }>
                             <li class="link">
                                 <a href="classes/AppPage.html" data-type="entity-link">AppPage</a>
+                            </li>
+                            <li class="link">
+                                <a href="classes/FileDetailsModel.html" data-type="entity-link">FileDetailsModel</a>
+                            </li>
+                            <li class="link">
+                                <a href="classes/SpeedDetailsModel.html" data-type="entity-link">SpeedDetailsModel</a>
                             </li>
                         </ul>
                     </li>

@@ -66,6 +66,21 @@
     <h3 id="index">Index</h3>
     <table class="table table-sm table-bordered index-table">
         <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Properties</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#_applyCacheBuster">_applyCacheBuster</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
 
                 <tr>
                     <td class="col-md-4">
@@ -75,6 +90,10 @@
                 <tr>
                     <td class="col-md-4">
                         <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#_download">_download</a>
+                            </li>
                             <li>
                                 <a href="#getBps">getBps</a>
                             </li>
@@ -107,7 +126,7 @@
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="7" class="link-to-prism">src/app/services/speed-test.service.ts:7</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="9" class="link-to-prism">src/app/services/speed-test.service.ts:9</a></div>
                             </td>
                         </tr>
 
@@ -124,6 +143,102 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
+                    <a name="_download"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Private</span>
+                            _download
+                        </b>
+                        <a href="#_download"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>_download(iterations?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>, fileDetails?: <a href="../classes/FileDetailsModel.html">FileDetailsModel</a>, allDetails?: <a href="../classes/SpeedDetailsModel.html">SpeedDetailsModel[]</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="16"
+                            class="link-to-prism">src/app/services/speed-test.service.ts:16</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>iterations</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        Yes
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>fileDetails</td>
+                                    <td>
+                                                <code><a href="../classes/FileDetailsModel.html" target="_self" >FileDetailsModel</a></code>
+                                    </td>
+
+                                    <td>
+                                        Yes
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>allDetails</td>
+                                    <td>
+                                                <code><a href="../classes/SpeedDetailsModel.html" target="_self" >SpeedDetailsModel[]</a></code>
+                                    </td>
+
+                                    <td>
+                                        Yes
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>Observable&lt;number&gt;</code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
                     <a name="getBps"></a>
                     <span class="name">
                         <b>
@@ -135,15 +250,15 @@
             </tr>
             <tr>
                 <td class="col-md-4">
-<code>getBps()</code>
+<code>getBps(iterations?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>, fileDetails?: <a href="../classes/FileDetailsModel.html">FileDetailsModel</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="12"
-                            class="link-to-prism">src/app/services/speed-test.service.ts:12</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="80"
+                            class="link-to-prism">src/app/services/speed-test.service.ts:80</a></div>
                 </td>
             </tr>
 
@@ -152,8 +267,51 @@
                 <td class="col-md-4">
 
                     <div class="io-description">
-                        <b>Returns : </b>    <code>Observable&lt;number&gt;</code>
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>iterations</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
 
+                                    <td>
+                                        Yes
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>fileDetails</td>
+                                    <td>
+                                                <code><a href="../classes/FileDetailsModel.html" target="_self" >FileDetailsModel</a></code>
+                                    </td>
+
+                                    <td>
+                                        Yes
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>Observable&lt;number | null&gt;</code>
+
+                    </div>
+                    <div class="io-description">
+                        
                     </div>
                 </td>
             </tr>
@@ -174,15 +332,15 @@
             </tr>
             <tr>
                 <td class="col-md-4">
-<code>getKbps()</code>
+<code>getKbps(iterations?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>, fileDetails?: <a href="../classes/FileDetailsModel.html">FileDetailsModel</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="53"
-                            class="link-to-prism">src/app/services/speed-test.service.ts:53</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="120"
+                            class="link-to-prism">src/app/services/speed-test.service.ts:120</a></div>
                 </td>
             </tr>
 
@@ -191,8 +349,51 @@
                 <td class="col-md-4">
 
                     <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>iterations</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        Yes
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>fileDetails</td>
+                                    <td>
+                                                <code><a href="../classes/FileDetailsModel.html" target="_self" >FileDetailsModel</a></code>
+                                    </td>
+
+                                    <td>
+                                        Yes
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
                         <b>Returns : </b>    <code>Observable&lt;number&gt;</code>
 
+                    </div>
+                    <div class="io-description">
+                        
                     </div>
                 </td>
             </tr>
@@ -213,15 +414,15 @@
             </tr>
             <tr>
                 <td class="col-md-4">
-<code>getMbps()</code>
+<code>getMbps(iterations?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>, fileDetails?: <a href="../classes/FileDetailsModel.html">FileDetailsModel</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="63"
-                            class="link-to-prism">src/app/services/speed-test.service.ts:63</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="130"
+                            class="link-to-prism">src/app/services/speed-test.service.ts:130</a></div>
                 </td>
             </tr>
 
@@ -230,13 +431,89 @@
                 <td class="col-md-4">
 
                     <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>iterations</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        Yes
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>fileDetails</td>
+                                    <td>
+                                                <code><a href="../classes/FileDetailsModel.html" target="_self" >FileDetailsModel</a></code>
+                                    </td>
+
+                                    <td>
+                                        Yes
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
                         <b>Returns : </b>    <code>Observable&lt;number&gt;</code>
 
+                    </div>
+                    <div class="io-description">
+                        
                     </div>
                 </td>
             </tr>
         </tbody>
     </table>
+</section>
+            <section>
+    
+        <h3 id="inputs">
+            Properties
+        </h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="_applyCacheBuster"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Private</span>
+                            _applyCacheBuster</b>
+                            <a href="#_applyCacheBuster"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>() &#x3D;&gt; {...}</code>
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="14" class="link-to-prism">src/app/services/speed-test.service.ts:14</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
 </section>
 
     </div>
@@ -245,8 +522,10 @@
     <div class="tab-pane fade  tab-source-code" id="c-source">
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import {Injectable} from &#x27;@angular/core&#x27;;
 
-import {Observable} from &#x27;rxjs&#x27;;
-import {map} from &#x27;rxjs/operators&#x27;;
+import {Observable, of} from &#x27;rxjs&#x27;;
+import {flatMap, map} from &#x27;rxjs/operators&#x27;;
+import {FileDetailsModel} from &#x27;../models/file-details.model&#x27;;
+import {SpeedDetailsModel} from &#x27;../models/speed-details.model&#x27;;
 
 @Injectable()
 export class SpeedTestService {
@@ -254,40 +533,105 @@ export class SpeedTestService {
 
   }
 
-  getBps():Observable&lt;number&gt; {
+  private _applyCacheBuster &#x3D; (path:string): string &#x3D;&gt; path + &#x27;?nnn&#x3D;&#x27; + Math.random();
+
+  private _download(iterations?:number, fileDetails?:FileDetailsModel, allDetails?:SpeedDetailsModel[]):Observable&lt;number&gt; {
+    return new Observable&lt;SpeedDetailsModel&gt;(
+      (observer) &#x3D;&gt; {
+        const newSpeedDetails &#x3D; new SpeedDetailsModel(fileDetails.size);
+
+        const download &#x3D; new Image();
+
+        download.onload &#x3D; () &#x3D;&gt; {
+          newSpeedDetails.end();
+
+          observer.next(newSpeedDetails);
+          observer.complete();
+        };
+
+        download.onerror &#x3D; () &#x3D;&gt; {
+          observer.next(null);
+          observer.complete();
+        };
+
+        let filePath &#x3D; fileDetails.path;
+        if (fileDetails.shouldBustCache) {
+          filePath &#x3D; this._applyCacheBuster(filePath);
+        }
+
+        newSpeedDetails.start();
+
+        download.src &#x3D; filePath;
+      }
+    ).pipe(
+      flatMap(
+        (newSpeedDetails:SpeedDetailsModel|null) &#x3D;&gt; {
+          if (newSpeedDetails &#x3D;&#x3D;&#x3D; null) {
+            console.error(&#x27;ng-speed-test: Error downloading file.&#x27;);
+          } else {
+            if (typeof allDetails &#x3D;&#x3D;&#x3D; &#x27;undefined&#x27;) {
+              allDetails &#x3D; [];
+            }
+
+            allDetails.push(newSpeedDetails);
+          }
+
+          if (typeof iterations &#x3D;&#x3D;&#x3D; &#x27;undefined&#x27;) {
+            iterations &#x3D; 3;
+          }
+
+          if (iterations &#x3D;&#x3D;&#x3D; 1) {
+            const count &#x3D; allDetails.length;
+            let total &#x3D; 0;
+
+            for (let i &#x3D; 0; i &lt; count; i++) {
+              total +&#x3D; allDetails[i].speedBps;
+            }
+
+            const speedBps &#x3D; total / count;
+
+            return of(speedBps);
+          } else {
+            return this._download(--iterations, fileDetails, allDetails);
+          }
+        }
+      )
+    );
+  }
+
+  getBps(iterations?:number, fileDetails?:FileDetailsModel):Observable&lt;number|null&gt; {
     return new Observable(
       (observer) &#x3D;&gt; {
         window.setTimeout(
           () &#x3D;&gt; {
-            const imageAddr &#x3D; &#x27;https://ng-speed-test.jrquick.com/assets/internet-speed-image.jpg&#x27;;
+            if (typeof fileDetails &#x3D;&#x3D;&#x3D; &#x27;undefined&#x27;) {
+              fileDetails &#x3D; new FileDetailsModel();
+            } else {
+              if (typeof fileDetails.path &#x3D;&#x3D;&#x3D; &#x27;undefined&#x27;) {
+                console.error(&#x27;ng-speed-test: File path is missing.&#x27;);
 
-            let startTime, endTime;
-            const download &#x3D; new Image();
+                return null;
+              }
 
-            download.onload &#x3D; (a) &#x3D;&gt; {
-              endTime &#x3D; (new Date()).getTime();
+              if (typeof fileDetails.size &#x3D;&#x3D;&#x3D; &#x27;undefined&#x27;) {
+                console.error(&#x27;ng-speed-test: File size is missing.&#x27;);
 
-              const downloadSize &#x3D; 4995374;
+                return null;
+              }
 
-              const duration &#x3D; (endTime - startTime) / 1000;
+              if (typeof fileDetails.shouldBustCache &#x3D;&#x3D;&#x3D; &#x27;undefined&#x27;) {
+                fileDetails.shouldBustCache &#x3D; true;
+              } else {
+                fileDetails.shouldBustCache &#x3D; fileDetails.shouldBustCache &#x3D;&#x3D;&#x3D; true;
+              }
+            }
 
-              const bitsLoaded &#x3D; downloadSize * 8;
-
-              const speedBps &#x3D; bitsLoaded / duration;
-
-              observer.next(speedBps);
-              observer.complete();
-            };
-
-            download.onerror &#x3D; () &#x3D;&gt; {
-              observer.next(-1);
-              observer.complete();
-            };
-
-            startTime &#x3D; (new Date()).getTime();
-
-            const cacheBuster &#x3D; &#x27;?nnn&#x3D;&#x27; + startTime;
-            download.src &#x3D; imageAddr + cacheBuster;
+            this._download(iterations, fileDetails).subscribe(
+              (speedBps) &#x3D;&gt; {
+                observer.next(speedBps);
+                observer.complete();
+              }
+            );
           },
           1
         );
@@ -295,8 +639,8 @@ export class SpeedTestService {
     );
   }
 
-  getKbps():Observable&lt;number&gt; {
-    return this.getBps().pipe(
+  getKbps(iterations?:number, fileDetails?:FileDetailsModel):Observable&lt;number&gt; {
+    return this.getBps(iterations, fileDetails).pipe(
       map(
         (bps) &#x3D;&gt; {
           return bps / 1024;
@@ -305,8 +649,8 @@ export class SpeedTestService {
     );
   }
 
-  getMbps():Observable&lt;number&gt; {
-    return this.getKbps().pipe(
+  getMbps(iterations?:number, fileDetails?:FileDetailsModel):Observable&lt;number&gt; {
+    return this.getKbps(iterations, fileDetails).pipe(
       map(
         (kpbs) &#x3D;&gt; {
           return kpbs / 1024;
