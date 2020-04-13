@@ -3,7 +3,6 @@
 [![npm](https://img.shields.io/npm/l/ng-speed-test.svg)](https://www.npmjs.com/package/ng-speed-test/)
 [![npm](https://img.shields.io/npm/dt/ng-speed-test.svg)](https://www.npmjs.com/package/ng-speed-test)
 [![npm](https://img.shields.io/npm/dm/ng-speed-test.svg)](https://www.npmjs.com/package/ng-speed-test)
-[![](https://data.jsdelivr.com/v1/package/gh/jrquick17/ng-speed-test/badge)](https://www.jsdelivr.com/package/gh/jrquick17/ng-speed-test)
 
 ![](example.gif)
 
