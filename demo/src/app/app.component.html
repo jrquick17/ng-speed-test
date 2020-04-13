@@ -1,11 +1,13 @@
 <div>
   <h1>ng-speed-test</h1>
 
-  <p *ngIf="!hasChecked && !hasError">Click a button below to test your internet speed.</p>
+  <p *ngIf="!isTracking && !isChecking && !hasChecked && !hasError">
+    Click a button below to test your internet speed.
+  </p>
 
   <p *ngIf="hasError">Something went wrong. Try again.</p>
 
-  <div *ngIf="hasChecked && !hasError">
+  <div *ngIf="isChecking || isTracking || (hasChecked && !hasError)">
     Your internet speed is:
     <p *ngFor="let speed of speeds; let i = index">
       ({{ i + 1 }}) {{ speed }} MBPS
