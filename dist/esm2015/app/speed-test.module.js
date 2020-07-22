@@ -1,14 +1,12 @@
-import * as tslib_1 from "tslib";
 import { NgModule } from '@angular/core';
 import { SpeedTestService } from './services/speed-test.service';
-let SpeedTestModule = class SpeedTestModule {
-};
-SpeedTestModule = tslib_1.__decorate([
-    NgModule({
-        providers: [
-            SpeedTestService
-        ]
-    })
-], SpeedTestModule);
-export { SpeedTestModule };
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic3BlZWQtdGVzdC5tb2R1bGUuanMiLCJzb3VyY2VSb290Ijoibmc6Ly9uZy1zcGVlZC10ZXN0LyIsInNvdXJjZXMiOlsiYXBwL3NwZWVkLXRlc3QubW9kdWxlLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7QUFBQSxPQUFPLEVBQUMsUUFBUSxFQUFDLE1BQU0sZUFBZSxDQUFDO0FBRXZDLE9BQU8sRUFBQyxnQkFBZ0IsRUFBQyxNQUFNLCtCQUErQixDQUFDO0FBTy9ELElBQWEsZUFBZSxHQUE1QixNQUFhLGVBQWU7Q0FBRyxDQUFBO0FBQWxCLGVBQWU7SUFMM0IsUUFBUSxDQUFDO1FBQ1IsU0FBUyxFQUFFO1lBQ1QsZ0JBQWdCO1NBQ2pCO0tBQ0YsQ0FBQztHQUNXLGVBQWUsQ0FBRztTQUFsQixlQUFlIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHtOZ01vZHVsZX0gZnJvbSAnQGFuZ3VsYXIvY29yZSc7XG5cbmltcG9ydCB7U3BlZWRUZXN0U2VydmljZX0gZnJvbSAnLi9zZXJ2aWNlcy9zcGVlZC10ZXN0LnNlcnZpY2UnO1xuXG5ATmdNb2R1bGUoe1xuICBwcm92aWRlcnM6IFtcbiAgICBTcGVlZFRlc3RTZXJ2aWNlXG4gIF1cbn0pXG5leHBvcnQgY2xhc3MgU3BlZWRUZXN0TW9kdWxlIHt9XG4iXX0=
+export class SpeedTestModule {
+}
+SpeedTestModule.decorators = [
+    { type: NgModule, args: [{
+                providers: [
+                    SpeedTestService
+                ]
+            },] }
+];
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic3BlZWQtdGVzdC5tb2R1bGUuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi9zcmMvYXBwL3NwZWVkLXRlc3QubW9kdWxlLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLE9BQU8sRUFBQyxRQUFRLEVBQUMsTUFBTSxlQUFlLENBQUM7QUFFdkMsT0FBTyxFQUFDLGdCQUFnQixFQUFDLE1BQU0sK0JBQStCLENBQUM7QUFPL0QsTUFBTSxPQUFPLGVBQWU7OztZQUwzQixRQUFRLFNBQUM7Z0JBQ1IsU0FBUyxFQUFFO29CQUNULGdCQUFnQjtpQkFDakI7YUFDRiIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7TmdNb2R1bGV9IGZyb20gJ0Bhbmd1bGFyL2NvcmUnO1xuXG5pbXBvcnQge1NwZWVkVGVzdFNlcnZpY2V9IGZyb20gJy4vc2VydmljZXMvc3BlZWQtdGVzdC5zZXJ2aWNlJztcblxuQE5nTW9kdWxlKHtcbiAgcHJvdmlkZXJzOiBbXG4gICAgU3BlZWRUZXN0U2VydmljZVxuICBdXG59KVxuZXhwb3J0IGNsYXNzIFNwZWVkVGVzdE1vZHVsZSB7fVxuIl19

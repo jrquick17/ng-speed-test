@@ -1,7 +1,6 @@
-import { __decorate } from 'tslib';
 import { Injectable, NgModule } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { flatMap, map } from 'rxjs/operators';
+import { mergeMap, map } from 'rxjs/operators';
 
 class FileDetailsModel {
     // 408949 // 500kb
@@ -30,7 +29,7 @@ class SpeedDetailsModel {
     }
 }
 
-let SpeedTestService = class SpeedTestService {
+class SpeedTestService {
     constructor() {
         this._applyCacheBuster = (path) => path + '?nnn=' + Math.random();
     }
@@ -53,7 +52,7 @@ let SpeedTestService = class SpeedTestService {
             }
             newSpeedDetails.start();
             download.src = filePath;
-        }).pipe(flatMap((newSpeedDetails) => {
+        }).pipe(mergeMap((newSpeedDetails) => {
             if (newSpeedDetails === null) {
                 console.error('ng-speed-test: Error downloading file.');
             }
@@ -119,20 +118,21 @@ let SpeedTestService = class SpeedTestService {
             return kpbs / 1024;
         }));
     }
-};
-SpeedTestService = __decorate([
-    Injectable()
-], SpeedTestService);
+}
+SpeedTestService.decorators = [
+    { type: Injectable }
+];
+SpeedTestService.ctorParameters = () => [];
 
-let SpeedTestModule = class SpeedTestModule {
-};
-SpeedTestModule = __decorate([
-    NgModule({
-        providers: [
-            SpeedTestService
-        ]
-    })
-], SpeedTestModule);
+class SpeedTestModule {
+}
+SpeedTestModule.decorators = [
+    { type: NgModule, args: [{
+                providers: [
+                    SpeedTestService
+                ]
+            },] }
+];
 
 /**
  * Generated bundle index. Do not edit.

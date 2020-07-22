@@ -115,6 +115,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "ng-speed-test"
+    }
+  },
+  "defaultProject": "ng-speed-test",
+  "cli": {
+    "analytics": false
+  }
 }
