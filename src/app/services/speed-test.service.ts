@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 
 import {Observable, of} from 'rxjs';
-import {flatMap, map} from 'rxjs/operators';
+import {mergeMap, map} from 'rxjs/operators';
 import {FileDetailsModel} from '../models/file-details.model';
 import {SpeedDetailsModel} from '../models/speed-details.model';
 
@@ -42,7 +42,7 @@ export class SpeedTestService {
         download.src = filePath;
       }
     ).pipe(
-      flatMap(
+      mergeMap(
         (newSpeedDetails:SpeedDetailsModel|null) => {
           if (newSpeedDetails === null) {
             console.error('ng-speed-test: Error downloading file.');

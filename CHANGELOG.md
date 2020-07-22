@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Support for Ivy by [jrquick17](https://github.com/jrquick17)
 * Support for Angular 9 and Angular 10 by [jrquick17](https://github.com/jrquick17)
 
+### Removed
+* Deprecated use of `flatMap by [jrquick17](https://github.com/jrquick17)``
+
 ## [1.1.0]
 ### Added
 * Ability to customize the downloaded image by [jrquick17](https://github.com/jrquick17)
