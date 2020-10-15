@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 
-import {Observable, of} from 'rxjs';
-import {mergeMap, map} from 'rxjs/operators';
+import {fromEvent, merge, Observable, Observer, of} from 'rxjs';
+import {mergeMap, map, switchMap} from 'rxjs/operators';
 import {FileDetailsModel} from '../models/file-details.model';
 import {SpeedDetailsModel} from '../models/speed-details.model';
 
@@ -132,6 +132,31 @@ export class SpeedTestService {
           return kpbs / 1024;
         }
       )
+    );
+  }
+
+   /**
+   * notifies when client goes offline
+   */
+  checkOnline(): Observable<boolean> {
+    return merge<boolean>(
+      fromEvent(window, 'offline').pipe(map(() => false)),
+      fromEvent(window, 'online').pipe(map(() => true)),
+      new Observable((sub: Observer<boolean>) => {
+        sub.next(navigator.onLine);
+        sub.complete();
+      })
+    );
+  }
+
+  getSpeed(iterations?:number, fileDetails?:FileDetailsModel): Observable<number> {
+    return this.checkOnline().pipe(
+      switchMap((isOnline: boolean) => {
+        if (!isOnline) {
+          return of(0);
+        }
+        return this.getMbps(iterations, fileDetails);
+      })
     );
   }
 }
