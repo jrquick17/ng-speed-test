@@ -6,7 +6,7 @@
   "scripts": {
     "build": "ng-packagr -p package.json",
     "demo": "cd demo && ng serve",
-    "demo:build": "cd demo && npm install && ng build --prod && cd ..",
+    "demo:build": "cd demo && ng build --prod && cd ..",
     "demo:test": "npm run build && cd demo && cp -fr ../dist/* node_modules/ng-speed-test/ && cd .. && npm run demo",
     "docs": "npm run docs:build",
     "docs:build": "compodoc -p tsconfig.json -n ng-speed-test -d docs --hideGenerator",
