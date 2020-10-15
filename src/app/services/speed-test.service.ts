@@ -91,13 +91,17 @@ export class SpeedTestService {
       (observer) => {
         window.setTimeout(
           () => {
+            const defaultSettings = new SpeedTestSettingsModel();
+
             if (typeof settings.iterations === 'undefined') {
-              settings.iterations = 3;
+              settings.iterations = defaultSettings.iterations;
             }
 
             if (typeof settings.file === 'undefined') {
-              settings.file = new SpeedTestFileModel();
+              settings.file = defaultSettings.file;
             } else {
+              const defaultFileSettings = new SpeedTestFileModel();
+
               if (typeof settings.file.path === 'undefined') {
                 console.error('ng-speed-test: File path is missing.');
 
@@ -111,13 +115,11 @@ export class SpeedTestService {
               }
 
               if (typeof settings.file.shouldBustCache === 'undefined') {
-                settings.file.shouldBustCache = true;
-              } else {
-                settings.file.shouldBustCache = settings.file.shouldBustCache === true;
+                settings.file.shouldBustCache = defaultFileSettings.shouldBustCache;
               }
 
               if (typeof settings.retryDelay === 'undefined') {
-                settings.retryDelay = 500;
+                settings.retryDelay = defaultSettings.retryDelay;
               }
             }
 
