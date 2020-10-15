@@ -143,6 +143,12 @@
                 return kpbs / 1024;
             }));
         };
+        SpeedTestService.prototype.isOnline = function () {
+            return rxjs.merge(rxjs.fromEvent(window, 'offline').pipe(operators.map(function () { return false; })), rxjs.fromEvent(window, 'online').pipe(operators.map(function () { return true; })), new rxjs.Observable(function (sub) {
+                sub.next(navigator.onLine);
+                sub.complete();
+            }));
+        };
         return SpeedTestService;
     }());
     SpeedTestService.decorators = [

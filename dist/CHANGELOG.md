@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [1.4.0]
+### Added
+* Add isOnline function by [sksaifuddin](https://github.com/sksaifuddin)
+
 ## [1.3.0]
 ### Added
 * Record when offline by [jrquick17](https://github.com/jrquick17)

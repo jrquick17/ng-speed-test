@@ -7,4 +7,5 @@ export declare class SpeedTestService {
     getBps(iterations?: number, fileDetails?: FileDetailsModel): Observable<number | null>;
     getKbps(iterations?: number, fileDetails?: FileDetailsModel): Observable<number>;
     getMbps(iterations?: number, fileDetails?: FileDetailsModel): Observable<number>;
+    isOnline(): Observable<boolean>;
 }

@@ -1,5 +1,5 @@
 import { Injectable, NgModule } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, merge, fromEvent } from 'rxjs';
 import { mergeMap, map } from 'rxjs/operators';
 
 class FileDetailsModel {
@@ -135,6 +135,12 @@ class SpeedTestService {
     getMbps(iterations, fileDetails) {
         return this.getKbps(iterations, fileDetails).pipe(map((kpbs) => {
             return kpbs / 1024;
+        }));
+    }
+    isOnline() {
+        return merge(fromEvent(window, 'offline').pipe(map(() => false)), fromEvent(window, 'online').pipe(map(() => true)), new Observable((sub) => {
+            sub.next(navigator.onLine);
+            sub.complete();
         }));
     }
 }

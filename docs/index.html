@@ -67,7 +67,7 @@
   })
   export class AppModule {}</code></pre></div></li>
 </ul>
-<h3 id="use-service">Use service</h3>
+<h3 id="check-internet-speed">Check internet speed</h3>
 <ul>
 <li>Checkout the demo and it&#39;s code for more examples.</li>
 </ul>
@@ -83,12 +83,30 @@ export class TechCheckService {
         console.log(&#39;Your speed is &#39; + speed);
       }
     );
-  }</code></pre></div><h2 id="documentation">Documentation</h2>
+  }
+}</code></pre></div><h3 id="check-if-network-is-available">Check if network is available</h3>
+<div><pre class="line-numbers"><code class="language-typescript">import {SpeedTestService} from &#39;ng-speed-test&#39;;
+
+&#64;Injectable()
+export class TechCheckService {
+  constructor(
+    private speedTestService:SpeedTestService
+  ) {
+    this.speedTestService.isOnline().subscribe(
+      (isOnline) =&gt; {
+        if (isOnline === false) {
+          console.log(&#39;Network unavailable.&#39;);
+        }
+      }
+    );
+  }
+}</code></pre></div><h2 id="documentation">Documentation</h2>
 <h3 id="functions">Functions</h3>
 <ul>
 <li><code>getBps()</code> Get the current internet speed in BPS (bytes per second).</li>
 <li><code>getKbps()</code> Get the current internet speed in KBPS (kilobytes per second).</li>
 <li><code>getMbps()</code> Get the current internet speed in MBPS (megabytes per second).</li>
+<li><code>isOnline()</code> Check if the network is available.</li>
 </ul>
 <h2 id="contributing">Contributing</h2>
 <h3 id="thanks">Thanks</h3>
