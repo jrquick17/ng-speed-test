@@ -48,7 +48,7 @@ npm install ng-speed-test --save
     export class AppModule {}
     ```
 
-### Use service ###
+### Check internet speed ###
 
 * Checkout the demo and it's code for more examples.
 
@@ -66,6 +66,28 @@ export class TechCheckService {
       }
     );
   }
+}
+```
+
+### Check if network is available ###
+
+```typescript
+import {SpeedTestService} from 'ng-speed-test';
+
+@Injectable()
+export class TechCheckService {
+  constructor(
+    private speedTestService:SpeedTestService
+  ) {
+    this.speedTestService.isOnline().subscribe(
+      (isOnline) => {
+        if (isOnline === false) {
+          console.log('Network unavailable.');
+        }
+      }
+    );
+  }
+}
 ```
 
 ## Documentation ##
