@@ -3,8 +3,8 @@ import {Injectable} from '@angular/core';
 import {fromEvent, merge, Observable, Observer, of} from 'rxjs';
 import {mergeMap, map} from 'rxjs/operators';
 
-import {FileDetailsModel} from '../models/file-details.model';
-import {SpeedDetailsModel} from '../models/speed-details.model';
+import {SpeedTestFileDetailsModel} from '../models/speed-test-file-details.model';
+import {SpeedTestDetailsModel} from '../models/speed-test-details.model';
 
 @Injectable()
 export class SpeedTestService {
@@ -14,10 +14,10 @@ export class SpeedTestService {
 
   private _applyCacheBuster = (path:string): string => path + '?nnn=' + Math.random();
 
-  private _download(iterations?:number, fileDetails?:FileDetailsModel, allDetails?:SpeedDetailsModel[]):Observable<number> {
-    return new Observable<SpeedDetailsModel>(
+  private _download(iterations?:number, fileDetails?:SpeedTestFileDetailsModel, allDetails?:SpeedTestDetailsModel[]):Observable<number> {
+    return new Observable<SpeedTestDetailsModel>(
       (observer) => {
-        const newSpeedDetails = new SpeedDetailsModel(fileDetails.size);
+        const newSpeedDetails = new SpeedTestDetailsModel(fileDetails.size);
 
         const download = new Image();
 
@@ -46,7 +46,7 @@ export class SpeedTestService {
       }
     ).pipe(
       mergeMap(
-        (newSpeedDetails:SpeedDetailsModel|null) => {
+        (newSpeedDetails:SpeedTestDetailsModel|null) => {
           if (typeof allDetails === 'undefined') {
             allDetails = [];
           }
@@ -76,13 +76,13 @@ export class SpeedTestService {
     );
   }
 
-  getBps(iterations?:number, fileDetails?:FileDetailsModel):Observable<number|null> {
+  getBps(iterations?:number, fileDetails?:SpeedTestFileDetailsModel):Observable<number|null> {
     return new Observable(
       (observer) => {
         window.setTimeout(
           () => {
             if (typeof fileDetails === 'undefined') {
-              fileDetails = new FileDetailsModel();
+              fileDetails = new SpeedTestFileDetailsModel();
             } else {
               if (typeof fileDetails.path === 'undefined') {
                 console.error('ng-speed-test: File path is missing.');
@@ -116,7 +116,7 @@ export class SpeedTestService {
     );
   }
 
-  getKbps(iterations?:number, fileDetails?:FileDetailsModel):Observable<number> {
+  getKbps(iterations?:number, fileDetails?:SpeedTestFileDetailsModel):Observable<number> {
     return this.getBps(iterations, fileDetails).pipe(
       map(
         (bps) => {
@@ -126,7 +126,7 @@ export class SpeedTestService {
     );
   }
 
-  getMbps(iterations?:number, fileDetails?:FileDetailsModel):Observable<number> {
+  getMbps(iterations?:number, fileDetails?:SpeedTestFileDetailsModel):Observable<number> {
     return this.getKbps(iterations, fileDetails).pipe(
       map(
         (kpbs) => {

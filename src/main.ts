@@ -1,4 +1,4 @@
-export * from './app/models/file-details.model';
+export * from './app/models/speed-test-file-details.model';
 
 export * from './app/services/speed-test.service';
 
