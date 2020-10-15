@@ -1,4 +1,4 @@
-export class SpeedTestDetailsModel {
+export class SpeedTestResultsModel {
   public duration:number  = 0;
   public hasEnded:boolean = false;
 

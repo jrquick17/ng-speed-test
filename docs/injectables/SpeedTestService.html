@@ -156,7 +156,7 @@
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>_download(iterations?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>, fileDetails?: <a href="../classes/FileDetailsModel.html">SpeedTestFileDetailsModel</a>, allDetails?: <a href="../classes/SpeedDetailsModel.html">SpeedTestDetailsModel[]</a>)</code>
+                    <code>_download(iterations?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>, fileDetails?: <a href="../classes/FileDetailsModel.html">SpeedTestFileModel</a>, allDetails?: <a href="../classes/SpeedDetailsModel.html">SpeedTestResultsModel[]</a>)</code>
                 </td>
             </tr>
 
@@ -198,7 +198,7 @@
                                 <tr>
                                     <td>fileDetails</td>
                                     <td>
-                                                <code><a href="../classes/FileDetailsModel.html" target="_self" >SpeedTestFileDetailsModel</a></code>
+                                                <code><a href="../classes/FileDetailsModel.html" target="_self" >SpeedTestFileModel</a></code>
                                     </td>
 
                                     <td>
@@ -210,7 +210,7 @@
                                 <tr>
                                     <td>allDetails</td>
                                     <td>
-                                                <code><a href="../classes/SpeedDetailsModel.html" target="_self" >SpeedTestDetailsModel[]</a></code>
+                                                <code><a href="../classes/SpeedDetailsModel.html" target="_self" >SpeedTestResultsModel[]</a></code>
                                     </td>
 
                                     <td>
@@ -250,7 +250,7 @@
             </tr>
             <tr>
                 <td class="col-md-4">
-<code>getBps(iterations?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>, fileDetails?: <a href="../classes/FileDetailsModel.html">SpeedTestFileDetailsModel</a>)</code>
+<code>getBps(iterations?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>, fileDetails?: <a href="../classes/FileDetailsModel.html">SpeedTestFileModel</a>)</code>
                 </td>
             </tr>
 
@@ -292,7 +292,7 @@
                                 <tr>
                                     <td>fileDetails</td>
                                     <td>
-                                                <code><a href="../classes/FileDetailsModel.html" target="_self" >SpeedTestFileDetailsModel</a></code>
+                                                <code><a href="../classes/FileDetailsModel.html" target="_self" >SpeedTestFileModel</a></code>
                                     </td>
 
                                     <td>
@@ -332,7 +332,7 @@
             </tr>
             <tr>
                 <td class="col-md-4">
-<code>getKbps(iterations?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>, fileDetails?: <a href="../classes/FileDetailsModel.html">SpeedTestFileDetailsModel</a>)</code>
+<code>getKbps(iterations?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>, fileDetails?: <a href="../classes/FileDetailsModel.html">SpeedTestFileModel</a>)</code>
                 </td>
             </tr>
 
@@ -374,7 +374,7 @@
                                 <tr>
                                     <td>fileDetails</td>
                                     <td>
-                                                <code><a href="../classes/FileDetailsModel.html" target="_self" >SpeedTestFileDetailsModel</a></code>
+                                                <code><a href="../classes/FileDetailsModel.html" target="_self" >SpeedTestFileModel</a></code>
                                     </td>
 
                                     <td>
@@ -414,7 +414,7 @@
             </tr>
             <tr>
                 <td class="col-md-4">
-<code>getMbps(iterations?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>, fileDetails?: <a href="../classes/FileDetailsModel.html">SpeedTestFileDetailsModel</a>)</code>
+<code>getMbps(iterations?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>, fileDetails?: <a href="../classes/FileDetailsModel.html">SpeedTestFileModel</a>)</code>
                 </td>
             </tr>
 
@@ -456,7 +456,7 @@
                                 <tr>
                                     <td>fileDetails</td>
                                     <td>
-                                                <code><a href="../classes/FileDetailsModel.html" target="_self" >SpeedTestFileDetailsModel</a></code>
+                                                <code><a href="../classes/FileDetailsModel.html" target="_self" >SpeedTestFileModel</a></code>
                                     </td>
 
                                     <td>
@@ -524,8 +524,8 @@
 
 import {Observable, of} from &#x27;rxjs&#x27;;
 import {flatMap, map} from &#x27;rxjs/operators&#x27;;
-import {SpeedTestFileDetailsModel} from &#x27;../models/file-details.model&#x27;;
-import {SpeedTestDetailsModel} from &#x27;../models/speed-details.model&#x27;;
+import {SpeedTestFileModel} from &#x27;../models/file-details.model&#x27;;
+import {SpeedTestResultsModel} from &#x27;../models/speed-details.model&#x27;;
 
 @Injectable()
 export class SpeedTestService {
@@ -535,10 +535,10 @@ export class SpeedTestService {
 
   private _applyCacheBuster &#x3D; (path:string): string &#x3D;&gt; path + &#x27;?nnn&#x3D;&#x27; + Math.random();
 
-  private _download(iterations?:number, fileDetails?:SpeedTestFileDetailsModel, allDetails?:SpeedTestDetailsModel[]):Observable&lt;number&gt; {
-    return new Observable&lt;SpeedTestDetailsModel&gt;(
+  private _download(iterations?:number, fileDetails?:SpeedTestFileModel, allDetails?:SpeedTestResultsModel[]):Observable&lt;number&gt; {
+    return new Observable&lt;SpeedTestResultsModel&gt;(
       (observer) &#x3D;&gt; {
-        const newSpeedDetails &#x3D; new SpeedTestDetailsModel(fileDetails.size);
+        const newSpeedDetails &#x3D; new SpeedTestResultsModel(fileDetails.size);
 
         const download &#x3D; new Image();
 
@@ -565,7 +565,7 @@ export class SpeedTestService {
       }
     ).pipe(
       flatMap(
-        (newSpeedDetails:SpeedTestDetailsModel|null) &#x3D;&gt; {
+        (newSpeedDetails:SpeedTestResultsModel|null) &#x3D;&gt; {
           if (newSpeedDetails &#x3D;&#x3D;&#x3D; null) {
             console.error(&#x27;ng-speed-test: Error downloading file.&#x27;);
           } else {
@@ -599,13 +599,13 @@ export class SpeedTestService {
     );
   }
 
-  getBps(iterations?:number, fileDetails?:SpeedTestFileDetailsModel):Observable&lt;number|null&gt; {
+  getBps(iterations?:number, fileDetails?:SpeedTestFileModel):Observable&lt;number|null&gt; {
     return new Observable(
       (observer) &#x3D;&gt; {
         window.setTimeout(
           () &#x3D;&gt; {
             if (typeof fileDetails &#x3D;&#x3D;&#x3D; &#x27;undefined&#x27;) {
-              fileDetails &#x3D; new SpeedTestFileDetailsModel();
+              fileDetails &#x3D; new SpeedTestFileModel();
             } else {
               if (typeof fileDetails.path &#x3D;&#x3D;&#x3D; &#x27;undefined&#x27;) {
                 console.error(&#x27;ng-speed-test: File path is missing.&#x27;);
@@ -639,7 +639,7 @@ export class SpeedTestService {
     );
   }
 
-  getKbps(iterations?:number, fileDetails?:SpeedTestFileDetailsModel):Observable&lt;number&gt; {
+  getKbps(iterations?:number, fileDetails?:SpeedTestFileModel):Observable&lt;number&gt; {
     return this.getBps(iterations, fileDetails).pipe(
       map(
         (bps) &#x3D;&gt; {
@@ -649,7 +649,7 @@ export class SpeedTestService {
     );
   }
 
-  getMbps(iterations?:number, fileDetails?:SpeedTestFileDetailsModel):Observable&lt;number&gt; {
+  getMbps(iterations?:number, fileDetails?:SpeedTestFileModel):Observable&lt;number&gt; {
     return this.getKbps(iterations, fileDetails).pipe(
       map(
         (kpbs) &#x3D;&gt; {

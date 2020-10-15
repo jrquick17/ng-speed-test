@@ -3,8 +3,10 @@ import {Injectable} from '@angular/core';
 import {fromEvent, merge, Observable, Observer, of} from 'rxjs';
 import {mergeMap, map} from 'rxjs/operators';
 
-import {SpeedTestFileDetailsModel} from '../models/speed-test-file-details.model';
-import {SpeedTestDetailsModel} from '../models/speed-test-details.model';
+import {SpeedTestFileModel} from '../models/speed-test-file.model';
+import {SpeedTestResultsModel} from '../models/speed-test-results.model';
+import {SpeedTestSettingsModel} from '../models/speed-test-settings.model';
+import {deepCopy} from '@angular-devkit/core';
 
 @Injectable()
 export class SpeedTestService {
@@ -14,10 +16,10 @@ export class SpeedTestService {
 
   private _applyCacheBuster = (path:string): string => path + '?nnn=' + Math.random();
 
-  private _download(iterations?:number, fileDetails?:SpeedTestFileDetailsModel, allDetails?:SpeedTestDetailsModel[]):Observable<number> {
-    return new Observable<SpeedTestDetailsModel>(
+  private _download(settings:SpeedTestSettingsModel, allDetails?:SpeedTestResultsModel[]):Observable<number> {
+    return new Observable<SpeedTestResultsModel>(
       (observer) => {
-        const newSpeedDetails = new SpeedTestDetailsModel(fileDetails.size);
+        const newSpeedDetails = new SpeedTestResultsModel(settings.file.size);
 
         const download = new Image();
 
@@ -35,8 +37,8 @@ export class SpeedTestService {
           observer.complete();
         };
 
-        let filePath = fileDetails.path;
-        if (fileDetails.shouldBustCache) {
+        let filePath = settings.file.path;
+        if (settings.file.shouldBustCache) {
           filePath = this._applyCacheBuster(filePath);
         }
 
@@ -46,18 +48,14 @@ export class SpeedTestService {
       }
     ).pipe(
       mergeMap(
-        (newSpeedDetails:SpeedTestDetailsModel|null) => {
+        (newSpeedDetails:SpeedTestResultsModel|null) => {
           if (typeof allDetails === 'undefined') {
             allDetails = [];
           }
 
           allDetails.push(newSpeedDetails);
 
-          if (typeof iterations === 'undefined') {
-            iterations = 3;
-          }
-
-          if (iterations === 1) {
+          if (settings.iterations === 1) {
             const count = allDetails.length;
             let total = 0;
 
@@ -69,41 +67,47 @@ export class SpeedTestService {
 
             return of(speedBps);
           } else {
-            return this._download(--iterations, fileDetails, allDetails);
+            settings.iterations--;
+
+            return this._download(settings, allDetails);
           }
         }
       )
     );
   }
 
-  getBps(iterations?:number, fileDetails?:SpeedTestFileDetailsModel):Observable<number|null> {
+  getBps(settings:SpeedTestSettingsModel):Observable<number|null> {
     return new Observable(
       (observer) => {
         window.setTimeout(
           () => {
-            if (typeof fileDetails === 'undefined') {
-              fileDetails = new SpeedTestFileDetailsModel();
+            if (typeof settings.iterations === 'undefined') {
+              settings.iterations = 3;
+            }
+
+            if (typeof settings.file === 'undefined') {
+              settings.file = new SpeedTestFileModel();
             } else {
-              if (typeof fileDetails.path === 'undefined') {
+              if (typeof settings.file.path === 'undefined') {
                 console.error('ng-speed-test: File path is missing.');
 
                 return null;
               }
 
-              if (typeof fileDetails.size === 'undefined') {
+              if (typeof settings.file.size === 'undefined') {
                 console.error('ng-speed-test: File size is missing.');
 
                 return null;
               }
 
-              if (typeof fileDetails.shouldBustCache === 'undefined') {
-                fileDetails.shouldBustCache = true;
+              if (typeof settings.file.shouldBustCache === 'undefined') {
+                settings.file.shouldBustCache = true;
               } else {
-                fileDetails.shouldBustCache = fileDetails.shouldBustCache === true;
+                settings.file.shouldBustCache = settings.file.shouldBustCache === true;
               }
             }
 
-            this._download(iterations, fileDetails).subscribe(
+            this._download(deepCopy(settings)).subscribe(
               (speedBps) => {
                 observer.next(speedBps);
                 observer.complete();
@@ -116,8 +120,8 @@ export class SpeedTestService {
     );
   }
 
-  getKbps(iterations?:number, fileDetails?:SpeedTestFileDetailsModel):Observable<number> {
-    return this.getBps(iterations, fileDetails).pipe(
+  getKbps(settings:SpeedTestSettingsModel):Observable<number> {
+    return this.getBps(settings).pipe(
       map(
         (bps) => {
           return bps / 1024;
@@ -126,8 +130,8 @@ export class SpeedTestService {
     );
   }
 
-  getMbps(iterations?:number, fileDetails?:SpeedTestFileDetailsModel):Observable<number> {
-    return this.getKbps(iterations, fileDetails).pipe(
+  getMbps(settings:SpeedTestSettingsModel):Observable<number> {
+    return this.getKbps(settings).pipe(
       map(
         (kpbs) => {
           return kpbs / 1024;

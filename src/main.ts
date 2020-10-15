@@ -1,4 +1,5 @@
-export * from './app/models/speed-test-file-details.model';
+export * from './app/models/speed-test-file.model';
+export * from './app/models/speed-test-settings.model';
 
 export * from './app/services/speed-test.service';
 
