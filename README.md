@@ -97,6 +97,7 @@ export class TechCheckService {
 * `getBps()` Get the current internet speed in BPS (bytes per second).
 * `getKbps()` Get the current internet speed in KBPS (kilobytes per second).
 * `getMbps()` Get the current internet speed in MBPS (megabytes per second).
+* `isOnline()` Check if the network is available.
 
 ## Contributing ##
 
