@@ -1,7 +1,7 @@
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('rxjs'), require('rxjs/operators')) :
     typeof define === 'function' && define.amd ? define('ng-speed-test', ['exports', '@angular/core', 'rxjs', 'rxjs/operators'], factory) :
-    (global = global || self, factory(global['ng-speed-test'] = {}, global.ng.core, global.rxjs, global.rxjs.operators));
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global['ng-speed-test'] = {}, global.ng.core, global.rxjs, global.rxjs.operators));
 }(this, (function (exports, core, rxjs, operators) { 'use strict';
 
     var FileDetailsModel = /** @class */ (function () {

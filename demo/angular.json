@@ -124,6 +124,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "ng-speed-test-demo"
+    }
+  },
+  "defaultProject": "ng-speed-test-demo",
+  "cli": {
+    "analytics": "ec2a53f6-838d-461d-b40a-ac6ba663493c"
+  }
 }
