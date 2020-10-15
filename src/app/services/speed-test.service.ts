@@ -33,8 +33,18 @@ export class SpeedTestService {
         download.onerror = () => {
           newSpeedDetails.error();
 
-          observer.next(newSpeedDetails);
-          observer.complete();
+          let delay = 0;
+          if (settings.iterations !== 1) {
+            delay = settings.retryDelay;
+          }
+
+          window.setTimeout(
+            () => {
+              observer.next(newSpeedDetails);
+              observer.complete();
+            },
+            delay
+          );
         };
 
         let filePath = settings.file.path;
@@ -104,6 +114,10 @@ export class SpeedTestService {
                 settings.file.shouldBustCache = true;
               } else {
                 settings.file.shouldBustCache = settings.file.shouldBustCache === true;
+              }
+
+              if (typeof settings.retryDelay === 'undefined') {
+                settings.retryDelay = 500;
               }
             }
 
