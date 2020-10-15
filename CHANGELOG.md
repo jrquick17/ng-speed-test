@@ -7,11 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [2.0.0]
-### Changed
+### Added
 * Model for handling custom settings by [jrquick17](https://github.com/jrquick17)
 
 ### Changed
 * Prefixed models with speed-test by [jrquick17](https://github.com/jrquick17)
+* Exposed SpeedTestResultsModel by [jrquick17](https://github.com/jrquick17)
 
 ## [Released]
 
