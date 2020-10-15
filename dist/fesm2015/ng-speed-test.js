@@ -17,12 +17,35 @@ class FileDetailsModel {
 class SpeedDetailsModel {
     constructor(fileSize) {
         this.fileSize = fileSize;
+        this.duration = 0;
+        this.hasEnded = false;
+        this.startTime = null;
+        this.endTime = null;
+        this.speedBps = 0;
+    }
+    _update() {
+        if (this.endTime !== null) {
+            const milliseconds = this.endTime - this.startTime;
+            if (milliseconds !== 0) {
+                this.duration = milliseconds / 1000;
+            }
+            const bitsLoaded = this.fileSize * 8;
+            this.speedBps = bitsLoaded / this.duration;
+        }
     }
     end() {
-        this.endTime = (new Date()).getTime();
-        this.duration = (this.endTime - this.startTime) / 1000;
-        const bitsLoaded = this.fileSize * 8;
-        this.speedBps = bitsLoaded / this.duration;
+        if (!this.hasEnded) {
+            this.hasEnded = true;
+            this.endTime = (new Date()).getTime();
+            this._update();
+        }
+    }
+    error() {
+        if (!this.hasEnded) {
+            this.hasEnded = true;
+            this.endTime = null;
+            this._update();
+        }
     }
     start() {
         this.startTime = (new Date()).getTime();
@@ -43,7 +66,8 @@ class SpeedTestService {
                 observer.complete();
             };
             download.onerror = () => {
-                observer.next(null);
+                newSpeedDetails.error();
+                observer.next(newSpeedDetails);
                 observer.complete();
             };
             let filePath = fileDetails.path;
@@ -53,15 +77,10 @@ class SpeedTestService {
             newSpeedDetails.start();
             download.src = filePath;
         }).pipe(mergeMap((newSpeedDetails) => {
-            if (newSpeedDetails === null) {
-                console.error('ng-speed-test: Error downloading file.');
+            if (typeof allDetails === 'undefined') {
+                allDetails = [];
             }
-            else {
-                if (typeof allDetails === 'undefined') {
-                    allDetails = [];
-                }
-                allDetails.push(newSpeedDetails);
-            }
+            allDetails.push(newSpeedDetails);
             if (typeof iterations === 'undefined') {
                 iterations = 3;
             }

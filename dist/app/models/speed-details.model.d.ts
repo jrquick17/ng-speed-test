@@ -1,10 +1,13 @@
 export declare class SpeedDetailsModel {
     private fileSize;
     duration: number;
+    hasEnded: boolean;
+    startTime: number;
     endTime: number;
     speedBps: number;
-    startTime: number;
     constructor(fileSize: number);
+    private _update;
     end(): void;
+    error(): void;
     start(): void;
 }

@@ -28,7 +28,9 @@ export class SpeedTestService {
         };
 
         download.onerror = () => {
-          observer.next(null);
+          newSpeedDetails.error();
+
+          observer.next(newSpeedDetails);
           observer.complete();
         };
 
@@ -44,15 +46,11 @@ export class SpeedTestService {
     ).pipe(
       mergeMap(
         (newSpeedDetails:SpeedDetailsModel|null) => {
-          if (newSpeedDetails === null) {
-            console.error('ng-speed-test: Error downloading file.');
-          } else {
-            if (typeof allDetails === 'undefined') {
-              allDetails = [];
-            }
-
-            allDetails.push(newSpeedDetails);
+          if (typeof allDetails === 'undefined') {
+            allDetails = [];
           }
+
+          allDetails.push(newSpeedDetails);
 
           if (typeof iterations === 'undefined') {
             iterations = 3;

@@ -20,12 +20,35 @@
     var SpeedDetailsModel = /** @class */ (function () {
         function SpeedDetailsModel(fileSize) {
             this.fileSize = fileSize;
+            this.duration = 0;
+            this.hasEnded = false;
+            this.startTime = null;
+            this.endTime = null;
+            this.speedBps = 0;
         }
+        SpeedDetailsModel.prototype._update = function () {
+            if (this.endTime !== null) {
+                var milliseconds = this.endTime - this.startTime;
+                if (milliseconds !== 0) {
+                    this.duration = milliseconds / 1000;
+                }
+                var bitsLoaded = this.fileSize * 8;
+                this.speedBps = bitsLoaded / this.duration;
+            }
+        };
         SpeedDetailsModel.prototype.end = function () {
-            this.endTime = (new Date()).getTime();
-            this.duration = (this.endTime - this.startTime) / 1000;
-            var bitsLoaded = this.fileSize * 8;
-            this.speedBps = bitsLoaded / this.duration;
+            if (!this.hasEnded) {
+                this.hasEnded = true;
+                this.endTime = (new Date()).getTime();
+                this._update();
+            }
+        };
+        SpeedDetailsModel.prototype.error = function () {
+            if (!this.hasEnded) {
+                this.hasEnded = true;
+                this.endTime = null;
+                this._update();
+            }
         };
         SpeedDetailsModel.prototype.start = function () {
             this.startTime = (new Date()).getTime();
@@ -48,7 +71,8 @@
                     observer.complete();
                 };
                 download.onerror = function () {
-                    observer.next(null);
+                    newSpeedDetails.error();
+                    observer.next(newSpeedDetails);
                     observer.complete();
                 };
                 var filePath = fileDetails.path;
@@ -58,15 +82,10 @@
                 newSpeedDetails.start();
                 download.src = filePath;
             }).pipe(operators.mergeMap(function (newSpeedDetails) {
-                if (newSpeedDetails === null) {
-                    console.error('ng-speed-test: Error downloading file.');
+                if (typeof allDetails === 'undefined') {
+                    allDetails = [];
                 }
-                else {
-                    if (typeof allDetails === 'undefined') {
-                        allDetails = [];
-                    }
-                    allDetails.push(newSpeedDetails);
-                }
+                allDetails.push(newSpeedDetails);
                 if (typeof iterations === 'undefined') {
                     iterations = 3;
                 }

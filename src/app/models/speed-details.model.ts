@@ -1,8 +1,11 @@
 export class SpeedDetailsModel {
-  public duration:number;
-  public endTime:number;
-  public speedBps:number;
-  public startTime:number;
+  public duration:number  = 0;
+  public hasEnded:boolean = false;
+
+  public startTime:number = null;
+  public endTime:number = null;
+
+  public speedBps:number = 0;
 
   constructor(
     private fileSize:number
@@ -10,14 +13,37 @@ export class SpeedDetailsModel {
 
   }
 
+  private _update():void {
+    if (this.endTime !== null) {
+      const milliseconds = this.endTime - this.startTime;
+      if (milliseconds !== 0) {
+        this.duration = milliseconds / 1000;
+      }
+
+      const bitsLoaded = this.fileSize * 8;
+
+      this.speedBps = bitsLoaded / this.duration;
+    }
+  }
+
   end():void {
-    this.endTime = (new Date()).getTime();
+    if (!this.hasEnded) {
+      this.hasEnded = true;
 
-    this.duration = (this.endTime - this.startTime) / 1000;
+      this.endTime = (new Date()).getTime();
 
-    const bitsLoaded = this.fileSize * 8;
+      this._update();
+    }
+  }
 
-    this.speedBps = bitsLoaded / this.duration;
+  error():void {
+    if (!this.hasEnded) {
+      this.hasEnded = true;
+
+      this.endTime = null;
+
+      this._update();
+    }
   }
 
   start():void {
