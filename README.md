@@ -10,6 +10,7 @@
 
 * [About](#about)
 * [Setup](#setup)
+* [Usage](#usage)
 * [Documentation](#documentation)
 * [Contributing](#contributing)
 * [Issues](#issues)
@@ -47,8 +48,10 @@ npm install ng-speed-test --save
     })
     export class AppModule {}
     ```
+  
+## Usage ##
 
-### Check internet speed ###
+### Check Internet Speed ###
 
 * Checkout the demo and it's code for more examples.
 
@@ -69,7 +72,35 @@ export class TechCheckService {
 }
 ```
 
-### Check if network is available ###
+### Check Internet Speed w/ Custom Settings
+
+```typescript
+import {SpeedTestService} from 'ng-speed-test';
+
+@Injectable()
+export class TechCheckService {
+  constructor(
+    private speedTestService:SpeedTestService
+  ) {
+    this.speedTestService.getMbps(
+      {
+        iterations: 10,
+        file: {
+          path: 'my-custom-image.png',
+          size: 2048
+        },
+        retryDelay: 1500,
+      }
+    ).subscribe(
+      (speed) => {
+        console.log('Your speed is ' + speed);
+      }
+    );
+  }
+}
+```
+
+### Check If Online ###
 
 ```typescript
 import {SpeedTestService} from 'ng-speed-test';
@@ -94,10 +125,23 @@ export class TechCheckService {
 
 ### Functions ###
 
-* `getBps()` Get the current internet speed in BPS (bytes per second).
-* `getKbps()` Get the current internet speed in KBPS (kilobytes per second).
-* `getMbps()` Get the current internet speed in MBPS (megabytes per second).
-* `isOnline()` Check if the network is available.
+* `getBps()` - Get the current internet speed in BPS (bytes per second).
+* `getKbps()` - Get the current internet speed in KBPS (kilobytes per second).
+* `getMbps()` - Get the current internet speed in MBPS (megabytes per second).
+* `isOnline()` - Check if the network is available.
+
+### Settings ###
+
+* `file` - see [File Settings (below)](#file)
+* `iterations` - (default: 3) The number of speed readings to take for the average. 
+Increase iterations the more accurate results, decrease iterations for faster results.
+* `retryDelay` - (default: 500) The number of milliseconds to wait before the next iteration after a network error
+
+#### File ####
+
+* `path` - (default: ~5mb image stored on GitHub) The URL where to download an image for determining internet speed
+* `size` - (default: ~5mb) The size of the image at the path (in bytes)
+* `shouldBustCache` (default: true) Append GET variable to bust browser cache
 
 ## Contributing ##
 
