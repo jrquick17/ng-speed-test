@@ -1,12 +1,11 @@
 import {Injectable} from '@angular/core';
 
 import {fromEvent, merge, Observable, Observer, of} from 'rxjs';
-import {mergeMap, map} from 'rxjs/operators';
+import {map, mergeMap} from 'rxjs/operators';
 
 import {SpeedTestFileModel} from '../models/speed-test-file.model';
 import {SpeedTestResultsModel} from '../models/speed-test-results.model';
 import {SpeedTestSettingsModel} from '../models/speed-test-settings.model';
-import {deepCopy} from '@angular-devkit/core';
 
 @Injectable()
 export class SpeedTestService {
@@ -123,7 +122,7 @@ export class SpeedTestService {
               }
             }
 
-            this._download(deepCopy(settings)).subscribe(
+            this._download({ ...settings }).subscribe(
               (speedBps) => {
                 observer.next(speedBps);
                 observer.complete();
