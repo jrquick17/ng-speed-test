@@ -1,7 +1,5 @@
 import {Component} from '@angular/core';
 
-import {finalize} from 'rxjs/operators';
-
 import {SpeedTestService} from 'ng-speed-test';
 
 @Component({
@@ -14,9 +12,7 @@ import {SpeedTestService} from 'ng-speed-test';
 export class AppComponent {
   title = 'ng-speed-test-demo';
 
-  public hasChecked:boolean = false;
-  public hasError:boolean = false;
-  public isChecking:boolean = false;
+  public hasTracked:boolean = false;
   public isTracking:boolean = false;
   public iterations:number = 1;
   public speeds:string[] = [];
@@ -27,60 +23,34 @@ export class AppComponent {
 
   }
 
-  getSpeed():void {
-    if (this.hasChecked) {
-      this.speeds = [];
-
-      this.hasChecked = false;
-    }
-
-    this.isChecking = true;
-
-    this.speedTestService.getMbps(this.iterations).pipe(
-      finalize(
-        () => {
-          this.isChecking = false;
-        }
-      )
-    ).subscribe(
-      (speed) => {
-        this.hasError = speed === -1;
-
-        if (!this.hasError) {
-          this.speeds = [
-            speed.toFixed(2)
-          ];
-        }
-
-        this.hasChecked = true;
-      }
-    )
+  goToGitHub():void {
+    window.location.href = 'https://github.com/jrquick17/ng-speed-test';
   }
 
   trackSpeed():void {
-    if (this.hasChecked) {
+    if (this.hasTracked) {
       this.speeds = [];
 
-      this.hasChecked = false;
+      this.hasTracked = false;
+    }
+
+    if (this.iterations > 100) {
+      this.iterations = 100;
     }
 
     this.isTracking = true;
 
-    this.speedTestService.getMbps(1).subscribe(
+    this.speedTestService.getMbps({ iterations: 1, retryDelay: 1500 }).subscribe(
       (speed) => {
-        this.hasError = speed === -1;
+        this.speeds.unshift(
+          speed.toFixed(2)
+        );
 
-        if (!this.hasError) {
-          this.speeds.push(
-            speed.toFixed(2)
-          );
-
-          if (this.speeds.length < this.iterations) {
-            this.trackSpeed();
-          } else {
-            this.isTracking = false;
-            this.hasChecked = true;
-          }
+        if (this.speeds.length < this.iterations) {
+          this.trackSpeed();
+        } else {
+          this.isTracking = false;
+          this.hasTracked = true;
         }
       }
     )

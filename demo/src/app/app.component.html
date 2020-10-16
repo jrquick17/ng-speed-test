@@ -1,37 +1,58 @@
-<div>
-  <h1>ng-speed-test</h1>
+<p>
+  <mat-toolbar color="primary">
+    <mat-toolbar-row>
+      <span (click)="goToGitHub()" style="cursor: pointer;">ng-speed-test</span>
 
-  <p *ngIf="!isTracking && !isChecking && !hasChecked && !hasError">
-    Click a button below to test your internet speed.
-  </p>
+      <button mat-icon-button
+              style="margin-left: 10px;"
+              aria-label="Go to GitHub"
+              (click)="goToGitHub()">
+        <mat-icon>home</mat-icon>
+      </button>
+    </mat-toolbar-row>
+  </mat-toolbar>
+</p>
 
-  <p *ngIf="hasError">Something went wrong. Try again.</p>
+<mat-card style="margin: 20px; padding: 20px;">
+  <mat-card-subtitle style="text-align: center; margin-top: 30px; margin-bottom: 30px;">
+    Test Your Internet Speed
+  </mat-card-subtitle>
 
-  <div *ngIf="isChecking || isTracking || (hasChecked && !hasError)">
-    Your internet speed is:
-    <p *ngFor="let speed of speeds; let i = index">
-      ({{ i + 1 }}) {{ speed }} MBPS
-    </p>
-  </div>
+  <mat-card-content>
+    <div style="
+            margin-left: auto;
+            margin-right: auto;
+            min-width: 1px;
+            max-width: 280px;
+         ">
+      <mat-form-field>
+        <mat-label>Iterations</mat-label>
 
-  <label>
-    Iterations:
-    <input type="number"
-           [min]="1"
-           [max]="10"
-           [(ngModel)]="iterations"
-           [disabled]="isChecking || isTracking"/>
-  </label>
+        <input matInput
+               type="number"
+               [min]="1"
+               [max]="100"
+               [(ngModel)]="iterations"
+               [disabled]="isTracking"/>
+      </mat-form-field>
 
-  <br/>
+      <button mat-raised-button
+              style="margin-left: 10px;"
+              (click)="trackSpeed()"
+              [disabled]="isTracking">
+        {{ isTracking ? 'Tracking' : 'Track' }}
+      </button>
+    </div>
 
-  <input type="button"
-         value="{{ isChecking ? 'Testing' : 'Test' }}"
-         (click)="getSpeed()"
-         [disabled]="isChecking || isTracking"/>
+    <div *ngIf="hasTracked || isTracking"
+         style="margin: 10px 10px 10px 20px;">
+      <p style="float: right; margin-bottom: 3px;">{{ speeds[0] }} MBPS</p>
 
-  <input type="button"
-         value="{{ isTracking ? 'Tracking' : 'Track' }}"
-         (click)="trackSpeed()"
-         [disabled]="isChecking || isTracking"/>
-</div>
+      <span *ngFor="let speedInstance of speeds">
+        <mat-progress-bar style="height: 10px;"
+                          mode="determinate"
+                          value="{{ speedInstance }}"></mat-progress-bar>
+      </span>
+    </div>
+  </mat-card-content>
+</mat-card>
