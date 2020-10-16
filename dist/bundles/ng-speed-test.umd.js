@@ -1,8 +1,8 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('rxjs'), require('rxjs/operators'), require('@angular-devkit/core')) :
-    typeof define === 'function' && define.amd ? define('ng-speed-test', ['exports', '@angular/core', 'rxjs', 'rxjs/operators', '@angular-devkit/core'], factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global['ng-speed-test'] = {}, global.ng.core, global.rxjs, global.rxjs.operators, global.core));
-}(this, (function (exports, core$1, rxjs, operators, core) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('rxjs'), require('rxjs/operators')) :
+    typeof define === 'function' && define.amd ? define('ng-speed-test', ['exports', '@angular/core', 'rxjs', 'rxjs/operators'], factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global['ng-speed-test'] = {}, global.ng.core, global.rxjs, global.rxjs.operators));
+}(this, (function (exports, core, rxjs, operators) { 'use strict';
 
     var SpeedTestFileModel = /** @class */ (function () {
         // 408949 // 500kb
@@ -144,7 +144,7 @@
                             settings.retryDelay = defaultSettings.retryDelay;
                         }
                     }
-                    _this._download(core.deepCopy(settings)).subscribe(function (speedBps) {
+                    _this._download(Object.assign({}, settings)).subscribe(function (speedBps) {
                         observer.next(speedBps);
                         observer.complete();
                     });
@@ -170,7 +170,7 @@
         return SpeedTestService;
     }());
     SpeedTestService.decorators = [
-        { type: core$1.Injectable }
+        { type: core.Injectable }
     ];
     SpeedTestService.ctorParameters = function () { return []; };
 
@@ -180,7 +180,7 @@
         return SpeedTestModule;
     }());
     SpeedTestModule.decorators = [
-        { type: core$1.NgModule, args: [{
+        { type: core.NgModule, args: [{
                     providers: [
                         SpeedTestService
                     ]

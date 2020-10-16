@@ -1,7 +1,6 @@
 import { Injectable, NgModule } from '@angular/core';
 import { Observable, of, merge, fromEvent } from 'rxjs';
 import { mergeMap, map } from 'rxjs/operators';
-import { deepCopy } from '@angular-devkit/core';
 
 class SpeedTestFileModel {
     // 408949 // 500kb
@@ -138,7 +137,7 @@ class SpeedTestService {
                         settings.retryDelay = defaultSettings.retryDelay;
                     }
                 }
-                this._download(deepCopy(settings)).subscribe((speedBps) => {
+                this._download(Object.assign({}, settings)).subscribe((speedBps) => {
                     observer.next(speedBps);
                     observer.complete();
                 });
