@@ -1,0 +1,9 @@
+import { SpeedTestFileModel } from './speed-test-file.model';
+export class SpeedTestSettingsModel {
+    constructor() {
+        this.iterations = 3;
+        this.file = new SpeedTestFileModel();
+        this.retryDelay = 500;
+    }
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic3BlZWQtdGVzdC1zZXR0aW5ncy5tb2RlbC5qcyIsInNvdXJjZVJvb3QiOiIvVXNlcnMvanJxdWljay9kZXZlbG9wbWVudC9lbmNvdW50aW5nL25nLXNwZWVkLXRlc3Qvc3JjLyIsInNvdXJjZXMiOlsiYXBwL21vZGVscy9zcGVlZC10ZXN0LXNldHRpbmdzLm1vZGVsLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLE9BQU8sRUFBQyxrQkFBa0IsRUFBQyxNQUFNLHlCQUF5QixDQUFDO0FBRTNELE1BQU0sT0FBTyxzQkFBc0I7SUFBbkM7UUFDUyxlQUFVLEdBQVcsQ0FBQyxDQUFDO1FBQ3ZCLFNBQUksR0FBdUIsSUFBSSxrQkFBa0IsRUFBRSxDQUFDO1FBQ3BELGVBQVUsR0FBVyxHQUFHLENBQUM7SUFDbEMsQ0FBQztDQUFBIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHtTcGVlZFRlc3RGaWxlTW9kZWx9IGZyb20gJy4vc3BlZWQtdGVzdC1maWxlLm1vZGVsJztcblxuZXhwb3J0IGNsYXNzIFNwZWVkVGVzdFNldHRpbmdzTW9kZWwge1xuICBwdWJsaWMgaXRlcmF0aW9ucz86bnVtYmVyID0gMztcbiAgcHVibGljIGZpbGU/OlNwZWVkVGVzdEZpbGVNb2RlbCA9IG5ldyBTcGVlZFRlc3RGaWxlTW9kZWwoKTtcbiAgcHVibGljIHJldHJ5RGVsYXk/Om51bWJlciA9IDUwMDtcbn1cbiJdfQ==

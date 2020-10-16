@@ -17,12 +17,6 @@
         return SpeedTestFileModel;
     }());
 
-    var SpeedTestSettingsModel = /** @class */ (function () {
-        function SpeedTestSettingsModel() {
-        }
-        return SpeedTestSettingsModel;
-    }());
-
     var SpeedTestResultsModel = /** @class */ (function () {
         function SpeedTestResultsModel(fileSize) {
             this.fileSize = fileSize;
@@ -62,6 +56,15 @@
         return SpeedTestResultsModel;
     }());
 
+    var SpeedTestSettingsModel = /** @class */ (function () {
+        function SpeedTestSettingsModel() {
+            this.iterations = 3;
+            this.file = new SpeedTestFileModel();
+            this.retryDelay = 500;
+        }
+        return SpeedTestSettingsModel;
+    }());
+
     var SpeedTestService = /** @class */ (function () {
         function SpeedTestService() {
             this._applyCacheBuster = function (path) { return path + '?nnn=' + Math.random(); };
@@ -78,8 +81,14 @@
                 };
                 download.onerror = function () {
                     newSpeedDetails.error();
-                    observer.next(newSpeedDetails);
-                    observer.complete();
+                    var delay = 0;
+                    if (settings.iterations !== 1) {
+                        delay = settings.retryDelay;
+                    }
+                    window.setTimeout(function () {
+                        observer.next(newSpeedDetails);
+                        observer.complete();
+                    }, delay);
                 };
                 var filePath = settings.file.path;
                 if (settings.file.shouldBustCache) {
@@ -111,13 +120,15 @@
             var _this = this;
             return new rxjs.Observable(function (observer) {
                 window.setTimeout(function () {
+                    var defaultSettings = new SpeedTestSettingsModel();
                     if (typeof settings.iterations === 'undefined') {
-                        settings.iterations = 3;
+                        settings.iterations = defaultSettings.iterations;
                     }
                     if (typeof settings.file === 'undefined') {
-                        settings.file = new SpeedTestFileModel();
+                        settings.file = defaultSettings.file;
                     }
                     else {
+                        var defaultFileSettings = new SpeedTestFileModel();
                         if (typeof settings.file.path === 'undefined') {
                             console.error('ng-speed-test: File path is missing.');
                             return null;
@@ -127,10 +138,10 @@
                             return null;
                         }
                         if (typeof settings.file.shouldBustCache === 'undefined') {
-                            settings.file.shouldBustCache = true;
+                            settings.file.shouldBustCache = defaultFileSettings.shouldBustCache;
                         }
-                        else {
-                            settings.file.shouldBustCache = settings.file.shouldBustCache === true;
+                        if (typeof settings.retryDelay === 'undefined') {
+                            settings.retryDelay = defaultSettings.retryDelay;
                         }
                     }
                     _this._download(core.deepCopy(settings)).subscribe(function (speedBps) {
@@ -182,6 +193,7 @@
 
     exports.SpeedTestFileModel = SpeedTestFileModel;
     exports.SpeedTestModule = SpeedTestModule;
+    exports.SpeedTestResultsModel = SpeedTestResultsModel;
     exports.SpeedTestService = SpeedTestService;
     exports.SpeedTestSettingsModel = SpeedTestSettingsModel;
 

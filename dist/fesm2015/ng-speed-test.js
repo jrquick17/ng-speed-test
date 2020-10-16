@@ -15,9 +15,6 @@ class SpeedTestFileModel {
     }
 }
 
-class SpeedTestSettingsModel {
-}
-
 class SpeedTestResultsModel {
     constructor(fileSize) {
         this.fileSize = fileSize;
@@ -56,6 +53,14 @@ class SpeedTestResultsModel {
     }
 }
 
+class SpeedTestSettingsModel {
+    constructor() {
+        this.iterations = 3;
+        this.file = new SpeedTestFileModel();
+        this.retryDelay = 500;
+    }
+}
+
 class SpeedTestService {
     constructor() {
         this._applyCacheBuster = (path) => path + '?nnn=' + Math.random();
@@ -71,8 +76,14 @@ class SpeedTestService {
             };
             download.onerror = () => {
                 newSpeedDetails.error();
-                observer.next(newSpeedDetails);
-                observer.complete();
+                let delay = 0;
+                if (settings.iterations !== 1) {
+                    delay = settings.retryDelay;
+                }
+                window.setTimeout(() => {
+                    observer.next(newSpeedDetails);
+                    observer.complete();
+                }, delay);
             };
             let filePath = settings.file.path;
             if (settings.file.shouldBustCache) {
@@ -103,13 +114,15 @@ class SpeedTestService {
     getBps(settings) {
         return new Observable((observer) => {
             window.setTimeout(() => {
+                const defaultSettings = new SpeedTestSettingsModel();
                 if (typeof settings.iterations === 'undefined') {
-                    settings.iterations = 3;
+                    settings.iterations = defaultSettings.iterations;
                 }
                 if (typeof settings.file === 'undefined') {
-                    settings.file = new SpeedTestFileModel();
+                    settings.file = defaultSettings.file;
                 }
                 else {
+                    const defaultFileSettings = new SpeedTestFileModel();
                     if (typeof settings.file.path === 'undefined') {
                         console.error('ng-speed-test: File path is missing.');
                         return null;
@@ -119,10 +132,10 @@ class SpeedTestService {
                         return null;
                     }
                     if (typeof settings.file.shouldBustCache === 'undefined') {
-                        settings.file.shouldBustCache = true;
+                        settings.file.shouldBustCache = defaultFileSettings.shouldBustCache;
                     }
-                    else {
-                        settings.file.shouldBustCache = settings.file.shouldBustCache === true;
+                    if (typeof settings.retryDelay === 'undefined') {
+                        settings.retryDelay = defaultSettings.retryDelay;
                     }
                 }
                 this._download(deepCopy(settings)).subscribe((speedBps) => {
@@ -168,5 +181,5 @@ SpeedTestModule.decorators = [
  * Generated bundle index. Do not edit.
  */
 
-export { SpeedTestFileModel, SpeedTestModule, SpeedTestService, SpeedTestSettingsModel };
+export { SpeedTestFileModel, SpeedTestModule, SpeedTestResultsModel, SpeedTestService, SpeedTestSettingsModel };
 //# sourceMappingURL=ng-speed-test.js.map

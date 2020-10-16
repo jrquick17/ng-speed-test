@@ -1,6 +1,6 @@
 {
   "name": "ng-speed-test",
-  "version": "2.0.0",
+  "version": "2.0.4",
   "readme": "README.md",
   "homepage": "https://ng-speed-test.jrquick.com",
   "repository": {
@@ -25,9 +25,6 @@
     "node": ">=6.0.0"
   },
   "peerDependencies": {},
-  "dependencies": {
-    "tslib": "^1.0.0 || ^2.0.0"
-  },
   "main": "bundles/ng-speed-test.umd.js",
   "module": "fesm2015/ng-speed-test.js",
   "es2015": "fesm2015/ng-speed-test.js",
@@ -35,5 +32,8 @@
   "fesm2015": "fesm2015/ng-speed-test.js",
   "typings": "ng-speed-test.d.ts",
   "metadata": "ng-speed-test.metadata.json",
-  "sideEffects": false
+  "sideEffects": false,
+  "dependencies": {
+    "tslib": "^2.0.0"
+  }
 }

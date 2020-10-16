@@ -39,6 +39,7 @@
 <ul>
 <li><a href="#about">About</a></li>
 <li><a href="#setup">Setup</a></li>
+<li><a href="#usage">Usage</a></li>
 <li><a href="#documentation">Documentation</a></li>
 <li><a href="#contributing">Contributing</a></li>
 <li><a href="#issues">Issues</a></li>
@@ -67,7 +68,8 @@
   })
   export class AppModule {}</code></pre></div></li>
 </ul>
-<h3 id="check-internet-speed">Check internet speed</h3>
+<h2 id="usage">Usage</h2>
+<h3 id="check-internet-speed">Check Internet Speed</h3>
 <ul>
 <li>Checkout the demo and it&#39;s code for more examples.</li>
 </ul>
@@ -84,7 +86,30 @@ export class TechCheckService {
       }
     );
   }
-}</code></pre></div><h3 id="check-if-network-is-available">Check if network is available</h3>
+}</code></pre></div><h3 id="check-internet-speed-w-custom-settings">Check Internet Speed w/ Custom Settings</h3>
+<div><pre class="line-numbers"><code class="language-typescript">import {SpeedTestService} from &#39;ng-speed-test&#39;;
+
+&#64;Injectable()
+export class TechCheckService {
+  constructor(
+    private speedTestService:SpeedTestService
+  ) {
+    this.speedTestService.getMbps(
+      {
+        iterations: 10,
+        file: {
+          path: &#39;my-custom-image.png&#39;,
+          size: 2048
+        },
+        retryDelay: 1500,
+      }
+    ).subscribe(
+      (speed) =&gt; {
+        console.log(&#39;Your speed is &#39; + speed);
+      }
+    );
+  }
+}</code></pre></div><h3 id="check-if-online">Check If Online</h3>
 <div><pre class="line-numbers"><code class="language-typescript">import {SpeedTestService} from &#39;ng-speed-test&#39;;
 
 &#64;Injectable()
@@ -103,10 +128,23 @@ export class TechCheckService {
 }</code></pre></div><h2 id="documentation">Documentation</h2>
 <h3 id="functions">Functions</h3>
 <ul>
-<li><code>getBps()</code> Get the current internet speed in BPS (bytes per second).</li>
-<li><code>getKbps()</code> Get the current internet speed in KBPS (kilobytes per second).</li>
-<li><code>getMbps()</code> Get the current internet speed in MBPS (megabytes per second).</li>
-<li><code>isOnline()</code> Check if the network is available.</li>
+<li><code>getBps()</code> - Get the current internet speed in BPS (bytes per second).</li>
+<li><code>getKbps()</code> - Get the current internet speed in KBPS (kilobytes per second).</li>
+<li><code>getMbps()</code> - Get the current internet speed in MBPS (megabytes per second).</li>
+<li><code>isOnline()</code> - Check if the network is available.</li>
+</ul>
+<h3 id="settings">Settings</h3>
+<ul>
+<li><code>file</code> - see <a href="#file">File Settings (below)</a></li>
+<li><code>iterations</code> - (default: 3) The number of speed readings to take for the average. 
+Increase iterations the more accurate results, decrease iterations for faster results.</li>
+<li><code>retryDelay</code> - (default: 500) The number of milliseconds to wait before the next iteration after a network error</li>
+</ul>
+<h4 id="file">File</h4>
+<ul>
+<li><code>path</code> - (default: ~5mb image stored on GitHub) The URL where to download an image for determining internet speed</li>
+<li><code>size</code> - (default: ~5mb) The size of the image at the path (in bytes)</li>
+<li><code>shouldBustCache</code> (default: true) Append GET variable to bust browser cache</li>
 </ul>
 <h2 id="contributing">Contributing</h2>
 <h3 id="thanks">Thanks</h3>
