@@ -85,40 +85,43 @@ export class SpeedTestService {
     );
   }
 
-  getBps(settings:SpeedTestSettingsModel):Observable<number|null> {
+  getBps(settings?:SpeedTestSettingsModel):Observable<number|null> {
     return new Observable(
       (observer) => {
         window.setTimeout(
           () => {
             const defaultSettings = new SpeedTestSettingsModel();
-
-            if (typeof settings.iterations === 'undefined') {
-              settings.iterations = defaultSettings.iterations;
-            }
-
-            if (typeof settings.file === 'undefined') {
-              settings.file = defaultSettings.file;
+            if (typeof settings === 'undefined') {
+              settings = { ...defaultSettings };
             } else {
-              const defaultFileSettings = new SpeedTestFileModel();
-
-              if (typeof settings.file.path === 'undefined') {
-                console.error('ng-speed-test: File path is missing.');
-
-                return null;
+              if (typeof settings.iterations === 'undefined') {
+                settings.iterations = defaultSettings.iterations;
               }
 
-              if (typeof settings.file.size === 'undefined') {
-                console.error('ng-speed-test: File size is missing.');
+              if (typeof settings.file === 'undefined') {
+                settings.file = defaultSettings.file;
+              } else {
+                const defaultFileSettings = new SpeedTestFileModel();
 
-                return null;
-              }
+                if (typeof settings.file.path === 'undefined') {
+                  console.error('ng-speed-test: File path is missing.');
 
-              if (typeof settings.file.shouldBustCache === 'undefined') {
-                settings.file.shouldBustCache = defaultFileSettings.shouldBustCache;
-              }
+                  return null;
+                }
 
-              if (typeof settings.retryDelay === 'undefined') {
-                settings.retryDelay = defaultSettings.retryDelay;
+                if (typeof settings.file.size === 'undefined') {
+                  console.error('ng-speed-test: File size is missing.');
+
+                  return null;
+                }
+
+                if (typeof settings.file.shouldBustCache === 'undefined') {
+                  settings.file.shouldBustCache = defaultFileSettings.shouldBustCache;
+                }
+
+                if (typeof settings.retryDelay === 'undefined') {
+                  settings.retryDelay = defaultSettings.retryDelay;
+                }
               }
             }
 
@@ -135,7 +138,7 @@ export class SpeedTestService {
     );
   }
 
-  getKbps(settings:SpeedTestSettingsModel):Observable<number> {
+  getKbps(settings?:SpeedTestSettingsModel):Observable<number> {
     return this.getBps(settings).pipe(
       map(
         (bps) => {
@@ -145,7 +148,7 @@ export class SpeedTestService {
     );
   }
 
-  getMbps(settings:SpeedTestSettingsModel):Observable<number> {
+  getMbps(settings?:SpeedTestSettingsModel):Observable<number> {
     return this.getKbps(settings).pipe(
       map(
         (kpbs) => {
