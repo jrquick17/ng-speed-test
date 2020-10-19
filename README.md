@@ -25,7 +25,7 @@ A light weight Angular 2+ service for checking internet speed
 
 ## Setup ##
 
-### Install Node ###
+### Install ###
 
 ```
 npm install ng-speed-test --save
