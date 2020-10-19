@@ -4,8 +4,8 @@ export declare class SpeedTestService {
     constructor();
     private _applyCacheBuster;
     private _download;
-    getBps(settings: SpeedTestSettingsModel): Observable<number | null>;
-    getKbps(settings: SpeedTestSettingsModel): Observable<number>;
-    getMbps(settings: SpeedTestSettingsModel): Observable<number>;
+    getBps(settings?: SpeedTestSettingsModel): Observable<number | null>;
+    getKbps(settings?: SpeedTestSettingsModel): Observable<number>;
+    getMbps(settings?: SpeedTestSettingsModel): Observable<number>;
     isOnline(): Observable<boolean>;
 }

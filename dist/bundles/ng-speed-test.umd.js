@@ -121,27 +121,32 @@
             return new rxjs.Observable(function (observer) {
                 window.setTimeout(function () {
                     var defaultSettings = new SpeedTestSettingsModel();
-                    if (typeof settings.iterations === 'undefined') {
-                        settings.iterations = defaultSettings.iterations;
-                    }
-                    if (typeof settings.file === 'undefined') {
-                        settings.file = defaultSettings.file;
+                    if (typeof settings === 'undefined') {
+                        settings = Object.assign({}, defaultSettings);
                     }
                     else {
-                        var defaultFileSettings = new SpeedTestFileModel();
-                        if (typeof settings.file.path === 'undefined') {
-                            console.error('ng-speed-test: File path is missing.');
-                            return null;
+                        if (typeof settings.iterations === 'undefined') {
+                            settings.iterations = defaultSettings.iterations;
                         }
-                        if (typeof settings.file.size === 'undefined') {
-                            console.error('ng-speed-test: File size is missing.');
-                            return null;
+                        if (typeof settings.file === 'undefined') {
+                            settings.file = defaultSettings.file;
                         }
-                        if (typeof settings.file.shouldBustCache === 'undefined') {
-                            settings.file.shouldBustCache = defaultFileSettings.shouldBustCache;
-                        }
-                        if (typeof settings.retryDelay === 'undefined') {
-                            settings.retryDelay = defaultSettings.retryDelay;
+                        else {
+                            var defaultFileSettings = new SpeedTestFileModel();
+                            if (typeof settings.file.path === 'undefined') {
+                                console.error('ng-speed-test: File path is missing.');
+                                return null;
+                            }
+                            if (typeof settings.file.size === 'undefined') {
+                                console.error('ng-speed-test: File size is missing.');
+                                return null;
+                            }
+                            if (typeof settings.file.shouldBustCache === 'undefined') {
+                                settings.file.shouldBustCache = defaultFileSettings.shouldBustCache;
+                            }
+                            if (typeof settings.retryDelay === 'undefined') {
+                                settings.retryDelay = defaultSettings.retryDelay;
+                            }
                         }
                     }
                     _this._download(Object.assign({}, settings)).subscribe(function (speedBps) {

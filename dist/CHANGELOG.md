@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.1.0]
+### Remove
+* Requirement for settings to get speed by [jrquick17](https://github.com/jrquick17)
+
 ## [2.0.0]
 ### Added
 * Model for handling custom settings by [jrquick17](https://github.com/jrquick17)
