@@ -46,13 +46,13 @@
 <li><a href="#deploy">Deploy</a></li>
 </ul>
 <h2 id="about">About</h2>
-<p>A light weight Angular 2+ service for checking internet speed  </p>
+<p>A lightweight Angular 2+ service for checking internet speed  </p>
 <ul>
 <li>Try out <a href="https://ng-speed-test.jrquick.com">the demo</a> to see it in action!</li>
 <li>Visit <a href="https://jrquick.com">my website</a> for other cool projects!</li>
 </ul>
 <h2 id="setup">Setup</h2>
-<h3 id="install-node">Install Node</h3>
+<h3 id="install">Install</h3>
 <div><pre class="line-numbers"><code class="language-none">npm install ng-speed-test --save</code></pre></div><h3 id="import-module">Import module</h3>
 <ul>
 <li><p>Import <code>SpeedTestModule</code> by adding the following to your parent module (i.e. <code>app.module.ts</code>):</p>
@@ -128,9 +128,9 @@ export class TechCheckService {
 }</code></pre></div><h2 id="documentation">Documentation</h2>
 <h3 id="functions">Functions</h3>
 <ul>
-<li><code>getBps()</code> - Get the current internet speed in BPS (bytes per second).</li>
-<li><code>getKbps()</code> - Get the current internet speed in KBPS (kilobytes per second).</li>
-<li><code>getMbps()</code> - Get the current internet speed in MBPS (megabytes per second).</li>
+<li><code>getBps()</code> - Get the current internet speed in Bps (bits per second).</li>
+<li><code>getKbps()</code> - Get the current internet speed in Kbps (kilobits per second).</li>
+<li><code>getMbps()</code> - Get the current internet speed in Mbps (megabits per second).</li>
 <li><code>isOnline()</code> - Check if the network is available.</li>
 </ul>
 <h3 id="settings">Settings</h3>
@@ -142,8 +142,8 @@ Increase iterations the more accurate results, decrease iterations for faster re
 </ul>
 <h4 id="file">File</h4>
 <ul>
-<li><code>path</code> - (default: ~5mb image stored on GitHub) The URL where to download an image for determining internet speed</li>
-<li><code>size</code> - (default: ~5mb) The size of the image at the path (in bytes)</li>
+<li><code>path</code> - (default: ~5Mb image stored on GitHub) The URL where to download an image for determining internet speed</li>
+<li><code>size</code> - (default: ~5Mb) The size of the image at the path (in bits)</li>
 <li><code>shouldBustCache</code> (default: true) Append GET variable to bust browser cache</li>
 </ul>
 <h2 id="contributing">Contributing</h2>
