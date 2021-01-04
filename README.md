@@ -125,9 +125,9 @@ export class TechCheckService {
 
 ### Functions ###
 
-* `getBps()` - Get the current internet speed in BPS (bytes per second).
-* `getKbps()` - Get the current internet speed in KBPS (kilobytes per second).
-* `getMbps()` - Get the current internet speed in MBPS (megabytes per second).
+* `getBps()` - Get the current internet speed in Bps (bits per second).
+* `getKbps()` - Get the current internet speed in Kbps (kilobits per second).
+* `getMbps()` - Get the current internet speed in Mbps (megabits per second).
 * `isOnline()` - Check if the network is available.
 
 ### Settings ###
@@ -139,8 +139,8 @@ Increase iterations the more accurate results, decrease iterations for faster re
 
 #### File ####
 
-* `path` - (default: ~5mb image stored on GitHub) The URL where to download an image for determining internet speed
-* `size` - (default: ~5mb) The size of the image at the path (in bytes)
+* `path` - (default: ~5Mb image stored on GitHub) The URL where to download an image for determining internet speed
+* `size` - (default: ~5Mb) The size of the image at the path (in bits)
 * `shouldBustCache` (default: true) Append GET variable to bust browser cache
 
 ## Contributing ##
