@@ -13,8 +13,9 @@
 * [Usage](#usage)
 * [Functionality](#functionality)
 * [Contributing](#contributing)
+* [Contributing](#contributing)
 * [Issues](#issues)
-* [Deploy](#deploy)
+* [Release](#release)
 
 ## About ## 
 
@@ -153,7 +154,7 @@ Increase iterations the more accurate results, decrease iterations for faster re
 
 If you find any issues feel free to open a request in [the Issues tab](https://github.com/jrquick17/ng-speed-test/issues). If I have the time I will try to solve any issues but cannot make any guarantees. Feel free to contribute yourself.
 
-## Deploy ##
+## Release ##
 
 ### Demo ###
     
