@@ -14,7 +14,6 @@
     "@angular/animations": "^10.0.14",
     "@angular/cdk": "^10.2.5",
     "@angular/common": "^10.0.14",
-    "@angular/compiler": "^10.0.14",
     "@angular/core": "^10.0.14",
     "@angular/forms": "^10.0.14",
     "@angular/material": "^10.2.5",
@@ -22,7 +21,7 @@
     "@angular/platform-browser-dynamic": "^10.0.14",
     "@angular/router": "^10.0.14",
     "@fortawesome/fontawesome-free": "^5.15.1",
-    "ng-speed-test": "^2.0.6",
+    "ng-speed-test": "^2.2.0",
     "rxjs": "^6.6.3",
     "tslib": "^2.0.3",
     "zone.js": "~0.10.3"
@@ -30,6 +29,7 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.1000.8",
     "@angular/cli": "^10.0.8",
+    "@angular/compiler": "^10.2.5",
     "@angular/compiler-cli": "^10.0.14",
     "@angular/language-service": "^10.0.14",
     "@types/jasmine": "^3.5.14",
