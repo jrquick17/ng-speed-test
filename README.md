@@ -11,7 +11,7 @@
 * [About](#about)
 * [Setup](#setup)
 * [Usage](#usage)
-* [Documentation](#documentation)
+* [Functionality](#functionality)
 * [Contributing](#contributing)
 * [Issues](#issues)
 * [Deploy](#deploy)
@@ -121,7 +121,7 @@ export class TechCheckService {
 }
 ```
 
-## Documentation ##
+## Functionality ##
 
 ### Functions ###
 
