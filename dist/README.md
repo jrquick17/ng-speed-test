@@ -11,10 +11,10 @@
 * [About](#about)
 * [Setup](#setup)
 * [Usage](#usage)
-* [Documentation](#documentation)
+* [Functionality](#functionality)
 * [Contributing](#contributing)
 * [Issues](#issues)
-* [Deploy](#deploy)
+* [Release](#release)
 
 ## About ## 
 
@@ -49,7 +49,7 @@ npm install ng-speed-test --save
     export class AppModule {}
     ```
   
-## Usage ##
+## Functionality ##
 
 ### Check Internet Speed ###
 
@@ -121,8 +121,6 @@ export class TechCheckService {
 }
 ```
 
-## Documentation ##
-
 ### Functions ###
 
 * `getBps()` - Get the current internet speed in Bps (bits per second).
@@ -132,16 +130,21 @@ export class TechCheckService {
 
 ### Settings ###
 
-* `file` - see [File Settings (below)](#file)
+* `file` - see [File Settings (below)](#file-settings)
 * `iterations` - (default: 3) The number of speed readings to take for the average. 
 Increase iterations the more accurate results, decrease iterations for faster results.
 * `retryDelay` - (default: 500) The number of milliseconds to wait before the next iteration after a network error
 
-#### File ####
+#### File Settings ####
 
-* `path` - (default: ~5Mb image stored on GitHub) The URL where to download an image for determining internet speed
-* `size` - (default: ~5Mb) The size of the image at the path (in bits)
-* `shouldBustCache` (default: true) Append GET variable to bust browser cache
+* `[path]` - *(default: ~5Mb image stored on GitHub)* The URL where to download an image for determining internet speed. 
+  * *Other Included Paths* 
+    * ~500 KB (408949 kb) - https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/500kb.jpg
+    * ~1 MB (1197292 kb)- https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/1mb.jpg
+    * ~5 MB (4952221 kb) *(default)* - https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/5mb.jpg
+    * ~13 MB (13848150 kb) - https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/13mb.jpg
+* `[size]` - (default: ~5Mb) The size of the image at the path (in bits)
+* `[shouldBustCache]` *(default: true)* Append GET variable to bust browser cache
 
 ## Contributing ##
 
@@ -153,7 +156,7 @@ Increase iterations the more accurate results, decrease iterations for faster re
 
 If you find any issues feel free to open a request in [the Issues tab](https://github.com/jrquick17/ng-speed-test/issues). If I have the time I will try to solve any issues but cannot make any guarantees. Feel free to contribute yourself.
 
-## Deploy ##
+## Release ##
 
 ### Demo ###
     

@@ -1,6 +1,6 @@
 {
   "name": "ng-speed-test",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "readme": "README.md",
   "homepage": "https://ng-speed-test.jrquick.com",
   "repository": {
@@ -34,6 +34,6 @@
   "metadata": "ng-speed-test.metadata.json",
   "sideEffects": false,
   "dependencies": {
-    "tslib": "^2.0.0"
+    "tslib": "^2.2.0"
   }
 }

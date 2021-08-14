@@ -5,10 +5,14 @@
 }(this, (function (exports, core, rxjs, operators) { 'use strict';
 
     var SpeedTestFileModel = /** @class */ (function () {
-        // 408949 // 500kb
-        // 1197292 // 1mb
-        // 4952221 // 5mb
-        // 13848150 // 15mb
+        // https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/500kb.jpg
+        // 500kb      // 408949 kb
+        // https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/1mb.jpg
+        // 1mb        // 1197292 kb
+        // https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/5mb.jpg
+        // 5mb        // 4952221 kb
+        // https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/13mb.jpg
+        // 13mb       // 13848150 kb
         function SpeedTestFileModel() {
             this.path = 'https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/5mb.jpg';
             this.shouldBustCache = true;

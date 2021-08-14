@@ -6,11 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [Released]
+
 ## [2.2.0]
 ### Update
 * Angular 12 by [jrquick17](https://github.com/jrquick17)
-
-## [Released]
 
 ## [2.1.0]
 ### Remove

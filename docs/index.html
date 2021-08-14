@@ -8,7 +8,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="icon" type="image/x-icon" href="./images/favicon.ico">
-	      <link rel="stylesheet" href="./styles/style.css">
+	   <link rel="stylesheet" href="./styles/style.css">
+        <link rel="stylesheet" href="./styles/dark.css" media="(prefers-color-scheme: dark)">
     </head>
     <body>
 
@@ -40,10 +41,10 @@
 <li><a href="#about">About</a></li>
 <li><a href="#setup">Setup</a></li>
 <li><a href="#usage">Usage</a></li>
-<li><a href="#documentation">Documentation</a></li>
+<li><a href="#functionality">Functionality</a></li>
 <li><a href="#contributing">Contributing</a></li>
 <li><a href="#issues">Issues</a></li>
-<li><a href="#deploy">Deploy</a></li>
+<li><a href="#release">Release</a></li>
 </ul>
 <h2 id="about">About</h2>
 <p>A lightweight Angular 2+ service for checking internet speed  </p>
@@ -56,19 +57,19 @@
 <div><pre class="line-numbers"><code class="language-none">npm install ng-speed-test --save</code></pre></div><h3 id="import-module">Import module</h3>
 <ul>
 <li><p>Import <code>SpeedTestModule</code> by adding the following to your parent module (i.e. <code>app.module.ts</code>):</p>
-<div><pre class="line-numbers"><code class="language-none">  import { SpeedTestModule } from &#39;ng-speed-test&#39;;
+<div><pre class="line-numbers"><code class="language-none">import { SpeedTestModule } from &#39;ng-speed-test&#39;;
 
-  &#64;NgModule({
+&#64;NgModule({
+  ...
+  imports: [
+    SpeedTestModule,
     ...
-    imports: [
-      SpeedTestModule,
-      ...
-    ],
-    ...
-  })
-  export class AppModule {}</code></pre></div></li>
+  ],
+  ...
+})
+export class AppModule {}</code></pre></div></li>
 </ul>
-<h2 id="usage">Usage</h2>
+<h2 id="functionality">Functionality</h2>
 <h3 id="check-internet-speed">Check Internet Speed</h3>
 <ul>
 <li>Checkout the demo and it&#39;s code for more examples.</li>
@@ -125,8 +126,7 @@ export class TechCheckService {
       }
     );
   }
-}</code></pre></div><h2 id="documentation">Documentation</h2>
-<h3 id="functions">Functions</h3>
+}</code></pre></div><h3 id="functions">Functions</h3>
 <ul>
 <li><code>getBps()</code> - Get the current internet speed in Bps (bits per second).</li>
 <li><code>getKbps()</code> - Get the current internet speed in Kbps (kilobits per second).</li>
@@ -135,16 +135,25 @@ export class TechCheckService {
 </ul>
 <h3 id="settings">Settings</h3>
 <ul>
-<li><code>file</code> - see <a href="#file">File Settings (below)</a></li>
+<li><code>file</code> - see <a href="#file-settings">File Settings (below)</a></li>
 <li><code>iterations</code> - (default: 3) The number of speed readings to take for the average. 
 Increase iterations the more accurate results, decrease iterations for faster results.</li>
 <li><code>retryDelay</code> - (default: 500) The number of milliseconds to wait before the next iteration after a network error</li>
 </ul>
-<h4 id="file">File</h4>
+<h4 id="file-settings">File Settings</h4>
 <ul>
-<li><code>path</code> - (default: ~5Mb image stored on GitHub) The URL where to download an image for determining internet speed</li>
-<li><code>size</code> - (default: ~5Mb) The size of the image at the path (in bits)</li>
-<li><code>shouldBustCache</code> (default: true) Append GET variable to bust browser cache</li>
+<li><code>[path]</code> - <em>(default: ~5Mb image stored on GitHub)</em> The URL where to download an image for determining internet speed. <ul>
+<li><em>Other Included Paths</em> <ul>
+<li>~500 KB (408949 kb) - <a href="https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/500kb.jpg">https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/500kb.jpg</a></li>
+<li>~1 MB (1197292 kb)- <a href="https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/1mb.jpg">https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/1mb.jpg</a></li>
+<li>~5 MB (4952221 kb) <em>(default)</em> - <a href="https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/5mb.jpg">https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/5mb.jpg</a></li>
+<li>~13 MB (13848150 kb) - <a href="https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/13mb.jpg">https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/13mb.jpg</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>[size]</code> - (default: ~5Mb) The size of the image at the path (in bits)</li>
+<li><code>[shouldBustCache]</code> <em>(default: true)</em> Append GET variable to bust browser cache</li>
 </ul>
 <h2 id="contributing">Contributing</h2>
 <h3 id="thanks">Thanks</h3>
@@ -153,7 +162,7 @@ Increase iterations the more accurate results, decrease iterations for faster re
 </ul>
 <h2 id="issues">Issues</h2>
 <p>If you find any issues feel free to open a request in <a href="https://github.com/jrquick17/ng-speed-test/issues">the Issues tab</a>. If I have the time I will try to solve any issues but cannot make any guarantees. Feel free to contribute yourself.</p>
-<h2 id="deploy">Deploy</h2>
+<h2 id="release">Release</h2>
 <h3 id="demo">Demo</h3>
 <ul>
 <li>Run <code>npm install</code> to get packages required for the demo and then run <code>npm run demo</code> to run locally.</li>
@@ -229,9 +238,9 @@ Increase iterations the more accurate results, decrease iterations for faster re
 
        <script src="./js/libs/custom-elements.min.js"></script>
        <script src="./js/libs/lit-html.js"></script>
-       <!-- Required to polyfill modern browsers as code is ES5 for IE... -->
-       <script src="./js/libs/custom-elements-es5-adapter.js" charset="utf-8" defer></script>
-       <script src="./js/menu-wc.js" defer></script>
+       
+       <script type="module" src="./js/menu-wc.js" defer></script>
+       <script nomodule src="./js/menu-wc_es5.js" defer></script>
 
        <script src="./js/libs/bootstrap-native.js"></script>
 
