@@ -1,6 +1,6 @@
 {
   "name": "ng-speed-test",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "readme": "README.md",
   "homepage": "https://ng-speed-test.jrquick.com",
   "repository": {
@@ -25,6 +25,9 @@
     "node": ">=6.0.0"
   },
   "peerDependencies": {},
+  "optionalDependencies": {
+    "fsevents": "^2.3.2"
+  },
   "main": "bundles/ng-speed-test.umd.js",
   "module": "fesm2015/ng-speed-test.js",
   "es2015": "fesm2015/ng-speed-test.js",

@@ -544,14 +544,14 @@ export class AppComponent {
         <pre class="line-numbers"><code class="language-html">&lt;p&gt;
   &lt;mat-toolbar color&#x3D;&quot;primary&quot;&gt;
     &lt;mat-toolbar-row&gt;
-      &lt;span (click)&#x3D;&quot;goToGitHub()&quot; style&#x3D;&quot;cursor: pointer;&quot;&gt;ng-speed-test&lt;/span&gt;
-
       &lt;button mat-icon-button
               style&#x3D;&quot;margin-left: 10px;&quot;
               aria-label&#x3D;&quot;Go to GitHub&quot;
               (click)&#x3D;&quot;goToGitHub()&quot;&gt;
         &lt;mat-icon&gt;home&lt;/mat-icon&gt;
       &lt;/button&gt;
+
+      &lt;span (click)&#x3D;&quot;goToGitHub()&quot; style&#x3D;&quot;cursor: pointer;&quot;&gt;ng-speed-test&lt;/span&gt;
     &lt;/mat-toolbar-row&gt;
   &lt;/mat-toolbar&gt;
 &lt;/p&gt;
@@ -634,7 +634,7 @@ export class AppComponent {
 <script src="../js/libs/htmlparser.js"></script>
 <script src="../js/libs/deep-iterator.js"></script>
 <script>
-        var COMPONENT_TEMPLATE = '<div><p>  <mat-toolbar color="primary">    <mat-toolbar-row>      <span (click)="goToGitHub()" style="cursor: pointer;">ng-speed-test</span>      <button mat-icon-button              style="margin-left: 10px;"              aria-label="Go to GitHub"              (click)="goToGitHub()">        <mat-icon>home</mat-icon>      </button>    </mat-toolbar-row>  </mat-toolbar></p><mat-card style="margin: 20px; padding: 20px;">  <mat-card-subtitle style="text-align: center; margin-top: 30px; margin-bottom: 30px;">    Test Your Internet Speed  </mat-card-subtitle>  <mat-card-content>    <div style="            margin-left: auto;            margin-right: auto;            min-width: 1px;            max-width: 280px;         ">      <mat-form-field>        <mat-label>Iterations</mat-label>        <input matInput               type="number"               [min]="1"               [max]="100"               [(ngModel)]="iterations"               [disabled]="isTracking"/>      </mat-form-field>      <button mat-raised-button              style="margin-left: 10px;"              (click)="trackSpeed()"              [disabled]="isTracking">        {{ isTracking ? \'Tracking\' : \'Track\' }}      </button>    </div>    <div *ngIf="hasTracked || isTracking"         style="margin: 10px 10px 10px 20px;">      <p style="float: right; margin-bottom: 3px;">{{ speeds[0] }} MBPS</p>      <span *ngFor="let speedInstance of speeds">        <mat-progress-bar style="height: 10px;"                          mode="determinate"                          value="{{ speedInstance }}"></mat-progress-bar>      </span>    </div>  </mat-card-content></mat-card></div>'
+        var COMPONENT_TEMPLATE = '<div><p>  <mat-toolbar color="primary">    <mat-toolbar-row>      <button mat-icon-button              style="margin-left: 10px;"              aria-label="Go to GitHub"              (click)="goToGitHub()">        <mat-icon>home</mat-icon>      </button>      <span (click)="goToGitHub()" style="cursor: pointer;">ng-speed-test</span>    </mat-toolbar-row>  </mat-toolbar></p><mat-card style="margin: 20px; padding: 20px;">  <mat-card-subtitle style="text-align: center; margin-top: 30px; margin-bottom: 30px;">    Test Your Internet Speed  </mat-card-subtitle>  <mat-card-content>    <div style="            margin-left: auto;            margin-right: auto;            min-width: 1px;            max-width: 280px;         ">      <mat-form-field>        <mat-label>Iterations</mat-label>        <input matInput               type="number"               [min]="1"               [max]="100"               [(ngModel)]="iterations"               [disabled]="isTracking"/>      </mat-form-field>      <button mat-raised-button              style="margin-left: 10px;"              (click)="trackSpeed()"              [disabled]="isTracking">        {{ isTracking ? \'Tracking\' : \'Track\' }}      </button>    </div>    <div *ngIf="hasTracked || isTracking"         style="margin: 10px 10px 10px 20px;">      <p style="float: right; margin-bottom: 3px;">{{ speeds[0] }} MBPS</p>      <span *ngFor="let speedInstance of speeds">        <mat-progress-bar style="height: 10px;"                          mode="determinate"                          value="{{ speedInstance }}"></mat-progress-bar>      </span>    </div>  </mat-card-content></mat-card></div>'
     var COMPONENTS = [{'name': 'AppComponent', 'selector': 'app-root'}];
     var DIRECTIVES = [];
     var ACTUAL_COMPONENT = {'name': 'AppComponent'};
@@ -650,14 +650,14 @@ export class AppComponent {
 
 
 
-                   
+
 
 
 
 
                    </div><div class="search-results">
     <div class="has-results">
-        <h1 class="search-results-title"><span class='search-results-count'></span> result-matching "<span class='search-query'></span>"</h1>
+        <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
         <ul class="search-results-list"></ul>
     </div>
     <div class="no-results">
@@ -678,8 +678,8 @@ export class AppComponent {
 
        <script src="../js/libs/custom-elements.min.js"></script>
        <script src="../js/libs/lit-html.js"></script>
-       
-       <script type="module" src="../js/menu-wc.js" defer></script>
+
+       <script src="../js/menu-wc.js" defer></script>
        <script nomodule src="../js/menu-wc_es5.js" defer></script>
 
        <script src="../js/libs/bootstrap-native.js"></script>

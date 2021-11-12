@@ -1,8 +1,8 @@
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('rxjs'), require('rxjs/operators')) :
     typeof define === 'function' && define.amd ? define('ng-speed-test', ['exports', '@angular/core', 'rxjs', 'rxjs/operators'], factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global['ng-speed-test'] = {}, global.ng.core, global.rxjs, global.rxjs.operators));
-}(this, (function (exports, core, rxjs, operators) { 'use strict';
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global["ng-speed-test"] = {}, global.ng.core, global.rxjs, global.rxjs.operators));
+})(this, (function (exports, core, rxjs, operators) { 'use strict';
 
     var SpeedTestFileModel = /** @class */ (function () {
         // https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/500kb.jpg
@@ -208,5 +208,5 @@
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
-})));
+}));
 //# sourceMappingURL=ng-speed-test.umd.js.map
