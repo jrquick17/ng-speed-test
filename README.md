@@ -176,10 +176,10 @@ If you find any issues feel free to open a request in [the Issues tab](https://g
 
 #### Test ####
 
-* Copy `dist/` contents into `demo/node_modules/ng-speed-test/`
-    * Run from root:  `cp -fr dist/* demo/node_modules/ng-speed-test/`
-* Run `ng serve` from `demo/`
-* Run `ng build --prod` from `demo/`
+* Run `npm run build:link` in root directory
+* Run `npm link ng-speed-test` or `demo/` or any external project
+* Run Demo [See: Demo](#demo)
+* When done, run `npm unlink` in `demo/` or other project
 
 #### NPM Release ####
 

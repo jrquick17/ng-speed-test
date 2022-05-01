@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.3.1]
 ### Update
+* Test documentation by [jrquick17](https://github.com/jrquick17)
 * Dependencies by [jrquick17](https://github.com/jrquick17)
 
 ## [Released]
