@@ -183,7 +183,7 @@ If you find any issues feel free to open a request in [the Issues tab](https://g
 
 #### NPM Release ####
 
-* Run `npm publish` from `dist/` directory.
+* Run `npm run shipit`
 
 #### Update Changelog ####
 
