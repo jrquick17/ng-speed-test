@@ -9,7 +9,7 @@
 
         <link rel="icon" type="image/x-icon" href="./images/favicon.ico">
 	   <link rel="stylesheet" href="./styles/style.css">
-        <link rel="stylesheet" href="./styles/dark.css" media="(prefers-color-scheme: dark)">
+        <link rel="stylesheet" href="./styles/dark.css">
     </head>
     <body>
 
@@ -181,21 +181,21 @@ Increase iterations the more accurate results, decrease iterations for faster re
 </ul>
 <h4 id="test">Test</h4>
 <ul>
-<li>Copy <code>dist/</code> contents into <code>demo/node_modules/ng-speed-test/</code><ul>
-<li>Run from root:  <code>cp -fr dist/* demo/node_modules/ng-speed-test/</code></li>
-</ul>
-</li>
-<li>Run <code>ng serve</code> from <code>demo/</code></li>
-<li>Run <code>ng build --prod</code> from <code>demo/</code></li>
+<li>Run <code>npm run build:link</code> in root directory</li>
+<li>Run <code>npm link ng-speed-test</code> in <code>demo/</code> or any external project</li>
+<li>Run Demo <a href="#demo">See: Demo</a></li>
+<li>When done, run <code>npm unlink</code> in <code>demo/</code> or any external project</li>
 </ul>
 <h4 id="npm-release">NPM Release</h4>
 <ul>
-<li>Run <code>npm publish</code> from <code>dist/</code> directory.</li>
+<li>Run <code>npm run shipit</code></li>
 </ul>
 <h4 id="update-changelog">Update Changelog</h4>
 <ul>
 <li>Add updates to <code>CHANGELOG.md</code> in root.</li>
 </ul>
+
+
 
 
 
@@ -228,6 +228,15 @@ Increase iterations the more accurate results, decrease iterations for faster re
                <!-- END CONTENT -->
            </div>
        </div>
+
+          <label class="dark-mode-switch">
+               <input type="checkbox">
+               <span class="slider">
+                    <svg class="slider-icon" viewBox="0 0 24 24" fill="none" height="20" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+                    </svg>
+               </span>
+          </label>
 
        <script>
             var COMPODOC_CURRENT_PAGE_DEPTH = 0;
