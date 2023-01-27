@@ -5,7 +5,7 @@
   "homepage": "https://ng-speed-test.jrquick.com",
   "scripts": {
     "build": "ng-packagr -p package.json",
-    "build:link": "npm run build",
+    "build:link": "npm run build && cd dist/ && npm link",
     "demo": "cd demo && ng serve",
     "demo:build": "cd demo && ng build --configuration production && cd ..",
     "docs": "npm run docs:build",
