@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.2]
+### Update
+* Dependencies by [jrquick17](https://github.com/jrquick17)
+
 ## [2.3.1]
 ### Update
 * Test documentation by [jrquick17](https://github.com/jrquick17)
