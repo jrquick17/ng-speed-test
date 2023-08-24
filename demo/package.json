@@ -36,7 +36,7 @@
     "font-awesome": "^4.7.0",
     "jquery": "^3.5.1",
     "moment": "^2.24.0",
-    "ng-speed-test": "^2.3.3",
+    "ng-speed-test": "^2.6.0",
     "ngx-toastr": "^17.0.2",
     "popper.js": "^1.16.0",
     "rxjs": "^6.6.3",
