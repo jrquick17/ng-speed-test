@@ -177,13 +177,13 @@ If you find any issues feel free to open a request in [the Issues tab](https://g
 #### Test ####
 
 * Run `npm run build:link` in root directory
-* Run `npm link ng-speed-test` or `demo/` or any external project
+* Run `npm link ng-speed-test` in `demo/` or any external project
 * Run Demo [See: Demo](#demo)
-* When done, run `npm unlink` in `demo/` or other project
+* When done, run `npm unlink` in `demo/` or any external project
 
 #### NPM Release ####
 
-* Run `npm publish` from `dist/` directory.
+* Run `npm run shipit`
 
 #### Update Changelog ####
 

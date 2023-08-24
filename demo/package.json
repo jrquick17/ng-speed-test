@@ -8,6 +8,7 @@
     "node_modules"
   ],
   "dependencies": {
+<<<<<<< HEAD
     "@angular/animations": "9.1.11",
     "@angular/common": "9.1.11",
     "@angular/compiler": "9.1.11",
@@ -113,5 +114,43 @@
   "jestSonar": {
     "reportPath": "build/test-results/jest",
     "reportFile": "TESTS-results-sonar.xml"
+=======
+    "@angular/animations": "^13.3.12",
+    "@angular/cdk": "^13.3.9",
+    "@angular/common": "^13.3.12",
+    "@angular/core": "^13.3.12",
+    "@angular/forms": "^13.3.12",
+    "@angular/material": "^13.3.9",
+    "@angular/platform-browser": "^13.3.12",
+    "@angular/platform-browser-dynamic": "^13.3.12",
+    "@angular/router": "^13.3.12",
+    "@fortawesome/fontawesome-free": "^5.15.1",
+    "ng-speed-test": "^2.3.2",
+    "rxjs": "^6.6.3",
+    "tslib": "^2.5.0",
+    "zone.js": "^0.11.8"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^13.3.11",
+    "@angular/cli": "^13.3.10",
+    "@angular/compiler": "^13.3.12",
+    "@angular/compiler-cli": "^13.3.12",
+    "@angular/language-service": "^13.3.12",
+    "@babel/core": "^7.20.12",
+    "@types/jasmine": "~3.6.0",
+    "@types/jasminewd2": "^2.0.10",
+    "@types/node": "^14.18.36",
+    "jasmine-core": "^3.99.1",
+    "jasmine-spec-reporter": "~5.0.0",
+    "karma": "^6.4.1",
+    "karma-chrome-launcher": "^3.1.1",
+    "karma-coverage-istanbul-reporter": "~3.0.3",
+    "karma-jasmine": "^4.0.2",
+    "karma-jasmine-html-reporter": "^1.7.0",
+    "protractor": "~7.0.0",
+    "ts-node": "~8.10.2",
+    "tslint": "^6.1.3",
+    "typescript": "~4.4.4"
+>>>>>>> 9d255c96789de9d9afd26b18e6c362514c6da5ae
   }
 }
