@@ -137,7 +137,6 @@
       }
     }
   },
-  "defaultProject": "ng-speed-test-demo",
   "cli": {
     "analytics": false
   }
