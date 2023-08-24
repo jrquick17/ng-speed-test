@@ -13,7 +13,7 @@
     </head>
     <body>
 
-        <div class="navbar navbar-default navbar-fixed-top visible-xs">
+        <div class="navbar navbar-default navbar-fixed-top d-block d-sm-none">
             <a href="./" class="navbar-brand">ng-speed-test</a>
             <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
         </div>
@@ -31,12 +31,12 @@
                <div class="content getting-started">
                    <div class="content-data">
 
-<h1 id="ng-speed-test">ng-speed-test</h1>
+<h1>ng-speed-test</h1>
 <p><a href="https://www.npmjs.com/package/ng-speed-test/"><img src="https://img.shields.io/npm/l/ng-speed-test.svg" alt="npm" class="img-responsive"></a>
 <a href="https://www.npmjs.com/package/ng-speed-test"><img src="https://img.shields.io/npm/dt/ng-speed-test.svg" alt="npm" class="img-responsive"></a>
 <a href="https://www.npmjs.com/package/ng-speed-test"><img src="https://img.shields.io/npm/dm/ng-speed-test.svg" alt="npm" class="img-responsive"></a></p>
 <p><img src="example.gif" alt="" class="img-responsive"></p>
-<h2 id="index">Index</h2>
+<h2>Index</h2>
 <ul>
 <li><a href="#about">About</a></li>
 <li><a href="#setup">Setup</a></li>
@@ -46,15 +46,15 @@
 <li><a href="#issues">Issues</a></li>
 <li><a href="#release">Release</a></li>
 </ul>
-<h2 id="about">About</h2>
+<h2>About</h2>
 <p>A lightweight Angular 2+ service for checking internet speed  </p>
 <ul>
 <li>Try out <a href="https://ng-speed-test.jrquick.com">the demo</a> to see it in action!</li>
 <li>Visit <a href="https://jrquick.com">my website</a> for other cool projects!</li>
 </ul>
-<h2 id="setup">Setup</h2>
-<h3 id="install">Install</h3>
-<div><pre class="line-numbers"><code class="language-none">npm install ng-speed-test --save</code></pre></div><h3 id="import-module">Import module</h3>
+<h2>Setup</h2>
+<h3>Install</h3>
+<div><pre class="line-numbers"><code class="language-none">npm install ng-speed-test --save</code></pre></div><h3>Import module</h3>
 <ul>
 <li><p>Import <code>SpeedTestModule</code> by adding the following to your parent module (i.e. <code>app.module.ts</code>):</p>
 <div><pre class="line-numbers"><code class="language-none">import { SpeedTestModule } from &#39;ng-speed-test&#39;;
@@ -69,8 +69,8 @@
 })
 export class AppModule {}</code></pre></div></li>
 </ul>
-<h2 id="functionality">Functionality</h2>
-<h3 id="check-internet-speed">Check Internet Speed</h3>
+<h2>Functionality</h2>
+<h3>Check Internet Speed</h3>
 <ul>
 <li>Checkout the demo and it&#39;s code for more examples.</li>
 </ul>
@@ -87,7 +87,7 @@ export class TechCheckService {
       }
     );
   }
-}</code></pre></div><h3 id="check-internet-speed-w-custom-settings">Check Internet Speed w/ Custom Settings</h3>
+}</code></pre></div><h3>Check Internet Speed w/ Custom Settings</h3>
 <div><pre class="line-numbers"><code class="language-typescript">import {SpeedTestService} from &#39;ng-speed-test&#39;;
 
 &#64;Injectable()
@@ -110,7 +110,7 @@ export class TechCheckService {
       }
     );
   }
-}</code></pre></div><h3 id="check-if-online">Check If Online</h3>
+}</code></pre></div><h3>Check If Online</h3>
 <div><pre class="line-numbers"><code class="language-typescript">import {SpeedTestService} from &#39;ng-speed-test&#39;;
 
 &#64;Injectable()
@@ -126,21 +126,21 @@ export class TechCheckService {
       }
     );
   }
-}</code></pre></div><h3 id="functions">Functions</h3>
+}</code></pre></div><h3>Functions</h3>
 <ul>
 <li><code>getBps()</code> - Get the current internet speed in Bps (bits per second).</li>
 <li><code>getKbps()</code> - Get the current internet speed in Kbps (kilobits per second).</li>
 <li><code>getMbps()</code> - Get the current internet speed in Mbps (megabits per second).</li>
 <li><code>isOnline()</code> - Check if the network is available.</li>
 </ul>
-<h3 id="settings">Settings</h3>
+<h3>Settings</h3>
 <ul>
 <li><code>file</code> - see <a href="#file-settings">File Settings (below)</a></li>
 <li><code>iterations</code> - (default: 3) The number of speed readings to take for the average. 
 Increase iterations the more accurate results, decrease iterations for faster results.</li>
 <li><code>retryDelay</code> - (default: 500) The number of milliseconds to wait before the next iteration after a network error</li>
 </ul>
-<h4 id="file-settings">File Settings</h4>
+<h4>File Settings</h4>
 <ul>
 <li><code>[path]</code> - <em>(default: ~5Mb image stored on GitHub)</em> The URL where to download an image for determining internet speed. <ul>
 <li><em>Other Included Paths</em> <ul>
@@ -155,42 +155,42 @@ Increase iterations the more accurate results, decrease iterations for faster re
 <li><code>[size]</code> - (default: ~5Mb) The size of the image at the path (in bits)</li>
 <li><code>[shouldBustCache]</code> <em>(default: true)</em> Append GET variable to bust browser cache</li>
 </ul>
-<h2 id="contributing">Contributing</h2>
-<h3 id="thanks">Thanks</h3>
+<h2>Contributing</h2>
+<h3>Thanks</h3>
 <ul>
 <li><a href="https://github.com/jrquick17">jrquick17</a></li>
 </ul>
-<h2 id="issues">Issues</h2>
+<h2>Issues</h2>
 <p>If you find any issues feel free to open a request in <a href="https://github.com/jrquick17/ng-speed-test/issues">the Issues tab</a>. If I have the time I will try to solve any issues but cannot make any guarantees. Feel free to contribute yourself.</p>
-<h2 id="release">Release</h2>
-<h3 id="demo">Demo</h3>
+<h2>Release</h2>
+<h3>Demo</h3>
 <ul>
 <li>Run <code>npm install</code> to get packages required for the demo and then run <code>npm run demo</code> to run locally.</li>
 </ul>
-<h3 id="generate-docs">Generate Docs</h3>
+<h3>Generate Docs</h3>
 <ul>
 <li>Run <code>npm run docs:build</code></li>
 </ul>
-<h4 id="update-version">Update Version</h4>
+<h4>Update Version</h4>
 <ul>
 <li>Update version <code>package.json</code> files in both the root and <code>dist/</code> directory following <a href="https://semver.org/">Semantic Versioning (2.0.0)</a>.</li>
 </ul>
-<h3 id="build">Build</h3>
+<h3>Build</h3>
 <ul>
 <li>Run <code>npm run build</code> from root.</li>
 </ul>
-<h4 id="test">Test</h4>
+<h4>Test</h4>
 <ul>
 <li>Run <code>npm run build:link</code> in root directory</li>
 <li>Run <code>npm link ng-speed-test</code> in <code>demo/</code> or any external project</li>
 <li>Run Demo <a href="#demo">See: Demo</a></li>
 <li>When done, run <code>npm unlink</code> in <code>demo/</code> or any external project</li>
 </ul>
-<h4 id="npm-release">NPM Release</h4>
+<h4>NPM Release</h4>
 <ul>
 <li>Run <code>npm run shipit</code></li>
 </ul>
-<h4 id="update-changelog">Update Changelog</h4>
+<h4>Update Changelog</h4>
 <ul>
 <li>Add updates to <code>CHANGELOG.md</code> in root.</li>
 </ul>
