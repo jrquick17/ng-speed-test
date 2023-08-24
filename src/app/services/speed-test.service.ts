@@ -37,6 +37,11 @@ export class SpeedTestService {
             delay = settings.retryDelay;
           }
 
+          if (typeof window === 'undefined') {
+            console.error("ng-speed-test: window is not defined.");
+            return;
+          }
+
           window.setTimeout(
             () => {
               observer.next(newSpeedDetails);

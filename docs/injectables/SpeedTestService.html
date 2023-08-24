@@ -254,8 +254,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="88"
-                            class="link-to-prism">src/app/services/speed-test.service.ts:88</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="93"
+                            class="link-to-prism">src/app/services/speed-test.service.ts:93</a></div>
                 </td>
             </tr>
 
@@ -323,8 +323,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="141"
-                            class="link-to-prism">src/app/services/speed-test.service.ts:141</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="146"
+                            class="link-to-prism">src/app/services/speed-test.service.ts:146</a></div>
                 </td>
             </tr>
 
@@ -392,8 +392,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="151"
-                            class="link-to-prism">src/app/services/speed-test.service.ts:151</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="156"
+                            class="link-to-prism">src/app/services/speed-test.service.ts:156</a></div>
                 </td>
             </tr>
 
@@ -461,8 +461,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="161"
-                            class="link-to-prism">src/app/services/speed-test.service.ts:161</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="166"
+                            class="link-to-prism">src/app/services/speed-test.service.ts:166</a></div>
                 </td>
             </tr>
 
@@ -553,6 +553,11 @@ export class SpeedTestService {
           let delay &#x3D; 0;
           if (settings.iterations !&#x3D;&#x3D; 1) {
             delay &#x3D; settings.retryDelay;
+          }
+
+          if (typeof window &#x3D;&#x3D;&#x3D; &#x27;undefined&#x27;) {
+            console.error(&quot;ng-speed-test: window is not defined.&quot;);
+            return;
           }
 
           window.setTimeout(
