@@ -4,6 +4,9 @@ import { Observable, of, merge, fromEvent } from 'rxjs';
 import { mergeMap, map } from 'rxjs/operators';
 
 class SpeedTestFileModel {
+    path = 'https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/5mb.jpg';
+    shouldBustCache = true;
+    size = 4952221;
     // https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/500kb.jpg
     // 500kb      // 408949 kb
     // https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/1mb.jpg
@@ -13,20 +16,18 @@ class SpeedTestFileModel {
     // https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/13mb.jpg
     // 13mb       // 13848150 kb
     constructor() {
-        this.path = 'https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/5mb.jpg';
-        this.shouldBustCache = true;
-        this.size = 4952221;
     }
 }
 
 class SpeedTestResultsModel {
+    fileSize;
+    duration = 0;
+    hasEnded = false;
+    startTime = null;
+    endTime = null;
+    speedBps = 0;
     constructor(fileSize) {
         this.fileSize = fileSize;
-        this.duration = 0;
-        this.hasEnded = false;
-        this.startTime = null;
-        this.endTime = null;
-        this.speedBps = 0;
     }
     _update() {
         if (this.endTime !== null) {
@@ -58,17 +59,15 @@ class SpeedTestResultsModel {
 }
 
 class SpeedTestSettingsModel {
-    constructor() {
-        this.iterations = 3;
-        this.file = new SpeedTestFileModel();
-        this.retryDelay = 500;
-    }
+    iterations = 3;
+    file = new SpeedTestFileModel();
+    retryDelay = 500;
 }
 
 class SpeedTestService {
     constructor() {
-        this._applyCacheBuster = (path) => path + '?nnn=' + Math.random();
     }
+    _applyCacheBuster = (path) => path + '?nnn=' + Math.random();
     _download(settings, allDetails) {
         return new Observable((observer) => {
             const newSpeedDetails = new SpeedTestResultsModel(settings.file.size);
@@ -170,21 +169,21 @@ class SpeedTestService {
             sub.complete();
         }));
     }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "16.2.2", ngImport: i0, type: SpeedTestService, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
+    static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "16.2.2", ngImport: i0, type: SpeedTestService });
 }
-SpeedTestService.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "15.2.9", ngImport: i0, type: SpeedTestService, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
-SpeedTestService.ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "15.2.9", ngImport: i0, type: SpeedTestService });
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "15.2.9", ngImport: i0, type: SpeedTestService, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "16.2.2", ngImport: i0, type: SpeedTestService, decorators: [{
             type: Injectable
         }], ctorParameters: function () { return []; } });
 
 class SpeedTestModule {
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "16.2.2", ngImport: i0, type: SpeedTestModule, deps: [], target: i0.ɵɵFactoryTarget.NgModule });
+    static ɵmod = i0.ɵɵngDeclareNgModule({ minVersion: "14.0.0", version: "16.2.2", ngImport: i0, type: SpeedTestModule });
+    static ɵinj = i0.ɵɵngDeclareInjector({ minVersion: "12.0.0", version: "16.2.2", ngImport: i0, type: SpeedTestModule, providers: [
+            SpeedTestService
+        ] });
 }
-SpeedTestModule.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "15.2.9", ngImport: i0, type: SpeedTestModule, deps: [], target: i0.ɵɵFactoryTarget.NgModule });
-SpeedTestModule.ɵmod = i0.ɵɵngDeclareNgModule({ minVersion: "14.0.0", version: "15.2.9", ngImport: i0, type: SpeedTestModule });
-SpeedTestModule.ɵinj = i0.ɵɵngDeclareInjector({ minVersion: "12.0.0", version: "15.2.9", ngImport: i0, type: SpeedTestModule, providers: [
-        SpeedTestService
-    ] });
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "15.2.9", ngImport: i0, type: SpeedTestModule, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "16.2.2", ngImport: i0, type: SpeedTestModule, decorators: [{
             type: NgModule,
             args: [{
                     providers: [
