@@ -24,7 +24,6 @@
   "engines": {
     "node": ">=6.0.0"
   },
-  "peerDependencies": {},
   "optionalDependencies": {
     "fsevents": "^2.3.2"
   },
