@@ -13,7 +13,7 @@
     "docs:serve": "npm run docs:build -- -s",
     "docs:watch": "npm run docs:build -- -s -w",
     "lint": "tslint --project tsconfig.json src/**/*.ts",
-    "publish": "npm publish dist",
+    "publish": "cd dist && npm publish",
     "shipit": "npm run test && npm run build && npm run docs:build && npm run publish",
     "test": "ng test --browsers PhantomJS --progress --watch false"
   },
