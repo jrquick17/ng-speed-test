@@ -4,7 +4,7 @@
   "readme": "README.md",
   "homepage": "https://ng-speed-test.jrquick.com",
   "scripts": {
-    "build": "ng-packagr -p package.json",
+    "build": "ng-packagr -p ng-package.json",
     "build:link": "npm run build && cd dist/ && npm link",
     "demo": "cd demo && ng serve",
     "demo:build": "cd demo && ng build --configuration production && cd ..",
@@ -34,11 +34,6 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/jrquick17/ng-speed-test/issues"
-  },
-  "ngPackage": {
-    "lib": {
-      "entryFile": "src/main.ts"
-    }
   },
   "devDependencies": {
     "@angular-devkit/architect": "^0.1402.12",

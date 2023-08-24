@@ -1,6 +1,6 @@
 {
   "name": "ng-speed-test",
-  "version": "2.3.3",
+  "version": "2.4.0",
   "readme": "README.md",
   "homepage": "https://ng-speed-test.jrquick.com",
   "repository": {
@@ -33,13 +33,13 @@
   "esm2020": "esm2020/ng-speed-test.mjs",
   "fesm2020": "fesm2020/ng-speed-test.mjs",
   "fesm2015": "fesm2015/ng-speed-test.mjs",
-  "typings": "ng-speed-test.d.ts",
+  "typings": "index.d.ts",
   "exports": {
     "./package.json": {
       "default": "./package.json"
     },
     ".": {
-      "types": "./ng-speed-test.d.ts",
+      "types": "./index.d.ts",
       "esm2020": "./esm2020/ng-speed-test.mjs",
       "es2020": "./fesm2020/ng-speed-test.mjs",
       "es2015": "./fesm2015/ng-speed-test.mjs",
