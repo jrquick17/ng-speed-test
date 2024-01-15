@@ -31,7 +31,7 @@
     "angular-animations": "0.0.10",
     "angular2-text-mask": "^9.0.0",
     "bootstrap": "4.5.2",
-    "crypto-js": "^4.1.1",
+    "crypto-js": "^4.2.0",
     "file-saver": "^2.0.2",
     "font-awesome": "^4.7.0",
     "jquery": "^3.5.1",
