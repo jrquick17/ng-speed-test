@@ -1,89 +1,69 @@
 {
   "name": "ng-speed-test",
-  "version": "2.6.1",
-  "readme": "README.md",
-  "homepage": "https://ng-speed-test.jrquick.com",
+  "version": "2.0.0",
+  "description": "Angular library for testing internet connection speed",
+  "main": "bundles/ng-speed-test.umd.js",
+  "module": "fesm2022/ng-speed-test.mjs",
+  "es2020": "fesm2020/ng-speed-test.mjs",
+  "esm2020": "esm2020/ng-speed-test.mjs",
+  "fesm2020": "fesm2020/ng-speed-test.mjs",
+  "fesm2022": "fesm2022/ng-speed-test.mjs",
+  "typings": "index.d.ts",
+  "exports": {
+    "./package.json": {
+      "default": "./package.json"
+    },
+    ".": {
+      "types": "./index.d.ts",
+      "esm2022": "./esm2022/ng-speed-test.mjs",
+      "esm2020": "./esm2020/ng-speed-test.mjs",
+      "es2020": "./fesm2020/ng-speed-test.mjs",
+      "es2015": "./fesm2015/ng-speed-test.mjs",
+      "node": "./fesm2022/ng-speed-test.mjs",
+      "default": "./fesm2022/ng-speed-test.mjs"
+    }
+  },
+  "sideEffects": false,
   "scripts": {
-    "build": "ng-packagr -p ng-package.json",
-    "build:link": "npm run build && cd dist/ && npm link",
-    "demo": "cd demo && ng serve",
-    "demo:build": "cd demo && ng build --configuration production && cd ..",
-    "docs": "npm run docs:build",
-    "docs:build": "compodoc -p tsconfig.json -n ng-speed-test -d docs --hideGenerator",
-    "docs:serve": "npm run docs:build -- -s",
-    "docs:watch": "npm run docs:build -- -s -w",
-    "lint": "tslint --project tsconfig.json src/**/*.ts",
-    "publish": "cd dist && npm publish",
-    "shipit": "npm run test && npm run build && npm run docs:build && npm run publish",
-    "test": "ng test --browsers PhantomJS --progress --watch false"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/jrquick17/ng-speed-test"
-  },
-  "author": {
-    "name": "Jeremy Quick",
-    "email": "me@jrquick.com",
-    "url": "https://jrquick.com"
+    "build": "ng build",
+    "test": "ng test",
+    "lint": "ng lint"
   },
   "keywords": [
     "angular",
+    "speed-test",
     "internet-speed",
-    "speed-test"
+    "network-test",
+    "bandwidth",
+    "connection-speed"
   ],
+  "author": "Your Name",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/jrquick17/ng-speed-test/issues"
+  "peerDependencies": {
+    "@angular/common": "^17.0.0 || ^18.0.0",
+    "@angular/core": "^17.0.0 || ^18.0.0",
+    "rxjs": "^7.5.0",
+    "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular-devkit/architect": "^0.1602.0",
-    "@angular-devkit/build-angular": "^16.2.0",
-    "@angular-devkit/core": "^16.2.0",
-    "@angular-devkit/schematics": "^16.2.0",
-    "@angular/animations": "^16.2.2",
-    "@angular/cdk": "^16.2.1",
-    "@angular/cli": "^16.2.0",
-    "@angular/common": "^16.2.2",
-    "@angular/compiler": "^16.2.2",
-    "@angular/compiler-cli": "^16.2.2",
-    "@angular/core": "^16.2.2",
-    "@angular/forms": "^16.2.2",
-    "@angular/language-service": "^16.2.2",
-    "@angular/platform-browser": "^16.2.2",
-    "@angular/platform-browser-dynamic": "^16.2.2",
-    "@angular/router": "^16.2.2",
-    "@angular/service-worker": "^16.2.2",
-    "@compodoc/compodoc": "^1.1.19",
-    "@types/core-js": "^2.5.5",
-    "@types/jasmine": "^3.10.7",
-    "@types/node": "^12.20.55",
-    "acorn": "^8.8.2",
-    "hammerjs": "^2.0.8",
-    "intl": "^1.2.5",
-    "jasmine-core": "^3.99.1",
-    "jasmine-spec-reporter": "~5.0.0",
-    "karma": "^6.4.1",
-    "karma-chrome-launcher": "^3.1.1",
-    "karma-cli": "~2.0.0",
-    "karma-coverage-istanbul-reporter": "~3.0.2",
-    "karma-jasmine": "^4.0.2",
-    "karma-jasmine-html-reporter": "^1.7.0",
-    "karma-phantomjs-launcher": "^1.0.4",
-    "ng-packagr": "^16.2.1",
-    "protractor": "~7.0.0",
-    "rollup": "^2.79.1",
-    "rxjs": "^6.6.7",
-    "ts-node": "^8.10.2",
-    "tslib": "^2.5.0",
-    "tslint": "~6.1.0",
-    "typescript": "~4.9.5",
-    "webpack": "^5.94.0",
-    "zone.js": "^0.13.1"
+    "@angular/cli": "^18.0.0",
+    "@angular/common": "^18.0.0",
+    "@angular/core": "^18.0.0",
+    "@angular/platform-browser": "^18.0.0",
+    "@angular/platform-browser-dynamic": "^18.0.0",
+    "@types/node": "^20.0.0",
+    "ng-packagr": "^18.0.0",
+    "rxjs": "^7.8.0",
+    "tslib": "^2.6.0",
+    "typescript": "~5.4.0",
+    "zone.js": "~0.14.0"
   },
-  "engines": {
-    "node": ">=6.0.0"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/ng-speed-test.git"
   },
-  "optionalDependencies": {
-    "fsevents": "^2.3.2"
-  }
+  "bugs": {
+    "url": "https://github.com/yourusername/ng-speed-test/issues"
+  },
+  "homepage": "https://github.com/yourusername/ng-speed-test#readme"
 }
