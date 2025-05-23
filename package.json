@@ -81,7 +81,7 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^18.2.19",
+    "@angular-devkit/build-angular": "^19.2.13",
     "@angular/animations": "^18.2.13",
     "@angular/cdk": "~18.2.14",
     "@angular/cli": "^18.2.19",
@@ -105,7 +105,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "ng-packagr": "^18.2.1",
+    "ng-packagr": "^19.2.2",
     "rimraf": "^6.0.0",
     "rxjs": "^7.8.0",
     "typescript": "~5.5.4",
