@@ -44,15 +44,14 @@
       </button>
     </div>
 
-    <div *ngIf="hasTracked || isTracking"
-         style="margin: 10px 10px 10px 20px;">
-      <p style="float: right; margin-bottom: 3px;">{{ speeds[0] }} MBPS</p>
+      <div *ngIf="hasTracked || isTracking" style="margin: 10px 10px 10px 20px;">
+          <p style="float: right; margin-bottom: 3px;">{{ getFormattedSpeed(speeds[0]) }} MBPS</p>
 
-      <span *ngFor="let speedInstance of speeds">
-        <mat-progress-bar style="height: 10px;"
-                          mode="determinate"
-                          value="{{ speedInstance }}"></mat-progress-bar>
-      </span>
-    </div>
+          <span *ngFor="let speedInstance of speeds">
+    <mat-progress-bar style="height: 10px;"
+                      mode="determinate"
+                      [value]="speedInstance"></mat-progress-bar>
+          </span>
+      </div>
   </mat-card-content>
 </mat-card>
