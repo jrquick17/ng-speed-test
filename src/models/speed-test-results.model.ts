@@ -1,12 +1,4 @@
-export interface SpeedTestResults {
-  duration: number;
-  hasEnded: boolean;
-  startTime: number | null;
-  endTime: number | null;
-  speedBps: number;
-  speedKbps: number;
-  speedMbps: number;
-}
+import {SpeedTestResults} from './speed-test-result.model';
 
 export class SpeedTestResultsModel implements SpeedTestResults {
   public duration: number = 0;
