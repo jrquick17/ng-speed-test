@@ -1,9 +1,7 @@
-/* projects/demo/src/app/app.component.scss */
+/* projects/demo/src/app/app.component.scss - Ultra Optimized */
 
-// Toolbar styles
-.spacer {
-  flex: 1 1 auto;
-}
+// Core styles only
+.spacer { flex: 1 1 auto; }
 
 .network-status-toolbar {
   display: flex;
@@ -12,30 +10,13 @@
   padding: 8px 12px;
   border-radius: 16px;
   font-size: 14px;
-  transition: all 0.3s ease;
 
-  &.online {
-    background-color: rgba(76, 175, 80, 0.2);
-    color: #4caf50;
-  }
+  &.online { background-color: rgba(76, 175, 80, 0.2); color: #4caf50; }
+  &.offline { background-color: rgba(244, 67, 54, 0.2); color: #f44336; }
 
-  &.offline {
-    background-color: rgba(244, 67, 54, 0.2);
-    color: #f44336;
-  }
-
-  .refresh-btn {
-    width: 32px;
-    height: 32px;
-    line-height: 32px;
-
-    mat-icon {
-      font-size: 18px;
-    }
-  }
+  .refresh-btn { width: 32px; height: 32px; }
 }
 
-// Connection status card
 .connection-status-card {
   display: flex;
   align-items: center;
@@ -43,96 +24,25 @@
   gap: 16px;
   padding: 16px;
   border-radius: 12px;
-  transition: all 0.3s ease;
 
-  &.online {
-    background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
-    border: 2px solid #4caf50;
-  }
+  &.online { background: linear-gradient(135deg, #e8f5e8, #c8e6c9); border: 2px solid #4caf50; }
+  &.offline { background: linear-gradient(135deg, #ffebee, #ffcdd2); border: 2px solid #f44336; }
 
-  &.offline {
-    background: linear-gradient(135deg, #ffebee, #ffcdd2);
-    border: 2px solid #f44336;
-  }
-
-  .status-icon {
-    font-size: 32px;
-    animation: pulse 2s infinite;
-  }
-
-  .status-text {
-    text-align: center;
-
-    .status-details {
-      margin-top: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-
-      small {
-        opacity: 0.8;
-        font-size: 12px;
-      }
-    }
-  }
+  .status-icon { font-size: 32px; }
+  .status-text { text-align: center; }
+  .status-details { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+  .status-details small { opacity: 0.8; font-size: 12px; }
 }
 
-// Warning card
-.offline-warning {
+.offline-warning, .error-message {
   margin-bottom: 24px;
-
-  .warning-card {
-    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
-    border-left: 4px solid #ff9800;
-  }
-
-  .warning-content {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-
-    mat-icon {
-      font-size: 32px;
-      color: #ff9800;
-    }
-
-    div {
-      flex: 1;
-
-      p {
-        margin: 8px 0;
-        color: #666;
-      }
-    }
-  }
+  .warning-card, .error-card { border-left: 4px solid #ff9800; }
+  .warning-content, .error-content { display: flex; align-items: center; gap: 16px; }
+  mat-icon { font-size: 32px; color: #ff9800; }
+  div { flex: 1; }
+  p { margin: 8px 0; color: #666; }
 }
 
-// Error messages
-.error-message {
-  margin-bottom: 24px;
-
-  .error-card {
-    background: linear-gradient(135deg, #ffebee, #ffcdd2);
-    border-left: 4px solid #f44336;
-  }
-
-  .error-content {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-
-    mat-icon {
-      color: #f44336;
-    }
-
-    span {
-      flex: 1;
-      font-weight: 500;
-    }
-  }
-}
-
-// Test controls
 .test-controls {
   display: flex;
   align-items: end;
@@ -141,29 +51,12 @@
   max-width: 400px;
   flex-wrap: wrap;
 
-  mat-form-field {
-    flex: 1;
-    min-width: 120px;
-  }
-
-  .test-button {
-    height: 56px;
-    padding: 0 24px;
-    font-size: 16px;
-    font-weight: 500;
-    min-width: 180px;
-
-    mat-icon {
-      margin-right: 8px;
-    }
-
-    &:disabled {
-      opacity: 0.6;
-    }
-  }
+  mat-form-field { flex: 1; min-width: 120px; }
+  .test-button { height: 56px; padding: 0 24px; font-size: 16px; min-width: 180px; }
+  .test-button mat-icon { margin-right: 8px; }
+  .test-button:disabled { opacity: 0.6; }
 }
 
-// Progress section
 .progress-section {
   margin: 32px 0;
   padding: 24px;
@@ -171,43 +64,13 @@
   border-radius: 12px;
   border: 2px solid #9c27b0;
 
-  .progress-info {
-    text-align: center;
-    margin-bottom: 16px;
-
-    h3 {
-      margin: 0 0 8px 0;
-      color: #7b1fa2;
-    }
-
-    .progress-stats {
-      display: flex;
-      justify-content: space-between;
-      font-size: 14px;
-      color: #666;
-    }
-  }
-
-  .main-progress-bar {
-    height: 12px;
-    border-radius: 6px;
-    margin-bottom: 16px;
-
-    ::ng-deep .mat-progress-bar-fill::after {
-      background: linear-gradient(90deg, #9c27b0, #e91e63);
-    }
-  }
-
-  .test-progress {
-    display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-    color: #666;
-    font-weight: 500;
-  }
+  .progress-info { text-align: center; margin-bottom: 16px; }
+  h3 { margin: 0 0 8px 0; color: #7b1fa2; }
+  .progress-stats { display: flex; justify-content: space-between; font-size: 14px; color: #666; }
+  .main-progress-bar { height: 12px; border-radius: 6px; margin-bottom: 16px; }
+  .test-progress { display: flex; justify-content: space-between; font-size: 14px; color: #666; }
 }
 
-// Results section
 .results-section {
   margin: 32px 0;
   padding: 24px;
@@ -215,56 +78,16 @@
   border-radius: 12px;
   border: 2px solid #2196f3;
 
-  .results-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-
-    h3 {
-      margin: 0;
-      color: #1976d2;
-    }
-
-    .average-speed {
-      font-size: 18px;
-      font-weight: bold;
-      color: #1976d2;
-      padding: 8px 16px;
-      background: rgba(33, 150, 243, 0.1);
-      border-radius: 20px;
-    }
-  }
+  .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  h3 { margin: 0; color: #1976d2; }
+  .average-speed { font-size: 18px; font-weight: bold; color: #1976d2; padding: 8px 16px; background: rgba(33, 150, 243, 0.1); border-radius: 20px; }
 }
 
-// Speed visualization
-.speed-visualization {
-  margin: 20px 0;
+.speed-visualization { margin: 20px 0; }
+.speed-bar-container { margin-bottom: 16px; }
+.speed-label { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 14px; font-weight: 500; color: #333; }
+.speed-bar { height: 8px; border-radius: 4px; }
 
-  .speed-bar-container {
-    margin-bottom: 16px;
-
-    .speed-label {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 4px;
-      font-size: 14px;
-      font-weight: 500;
-      color: #333;
-    }
-
-    .speed-bar {
-      height: 8px;
-      border-radius: 4px;
-
-      ::ng-deep .mat-progress-bar-fill::after {
-        background: linear-gradient(90deg, #4caf50, #8bc34a);
-      }
-    }
-  }
-}
-
-// Speed statistics
 .speed-stats {
   display: flex;
   justify-content: space-around;
@@ -275,161 +98,40 @@
   border-radius: 8px;
   flex-wrap: wrap;
 
-  .stat-item {
-    text-align: center;
-    font-size: 14px;
-
-    strong {
-      display: block;
-      color: #1976d2;
-      margin-bottom: 4px;
-    }
-  }
+  .stat-item { text-align: center; font-size: 14px; }
+  strong { display: block; color: #1976d2; margin-bottom: 4px; }
 }
 
-// Connection quality
-.connection-quality {
-  margin: 24px 0;
+.connection-quality { margin: 24px 0; }
+.quality-indicator {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 12px;
 
-  .quality-indicator {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 20px;
-    border-radius: 12px;
-    transition: all 0.3s ease;
+  &[data-quality="excellent"] { background: linear-gradient(135deg, #e8f5e8, #c8e6c9); border: 2px solid #4caf50; }
+  &[data-quality="good"] { background: linear-gradient(135deg, #e3f2fd, #bbdefb); border: 2px solid #2196f3; }
+  &[data-quality="fair"] { background: linear-gradient(135deg, #fff8e1, #ffecb3); border: 2px solid #ffc107; }
+  &[data-quality="poor"], &[data-quality="very poor"] { background: linear-gradient(135deg, #fff3e0, #ffe0b2); border: 2px solid #ff9800; }
 
-    &[data-quality="excellent"] {
-      background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
-      border: 2px solid #4caf50;
-    }
-
-    &[data-quality="good"] {
-      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-      border: 2px solid #2196f3;
-    }
-
-    &[data-quality="fair"] {
-      background: linear-gradient(135deg, #fff8e1, #ffecb3);
-      border: 2px solid #ffc107;
-    }
-
-    &[data-quality="poor"], &[data-quality="very poor"] {
-      background: linear-gradient(135deg, #fff3e0, #ffe0b2);
-      border: 2px solid #ff9800;
-    }
-
-    &[data-quality="offline"] {
-      background: linear-gradient(135deg, #ffebee, #ffcdd2);
-      border: 2px solid #f44336;
-    }
-
-    .quality-icon {
-      font-size: 28px;
-    }
-
-    .quality-text {
-      flex: 1;
-
-      strong {
-        display: block;
-        margin-bottom: 4px;
-      }
-
-      small {
-        color: #666;
-        font-size: 12px;
-      }
-    }
-  }
+  .quality-icon { font-size: 28px; }
+  .quality-text { flex: 1; }
+  .quality-text strong { display: block; margin-bottom: 4px; }
+  .quality-text small { color: #666; font-size: 12px; }
 }
 
-// Tips section
-.tips-section {
-  margin-top: 32px;
+.tips-section { margin-top: 32px; }
+.tips-content ul { padding-left: 0; list-style: none; }
+.tips-content li { padding: 8px 0 8px 24px; position: relative; }
+.tips-content li::before { content: "💡"; position: absolute; left: 0; top: 8px; }
+.tips-content strong { color: #1976d2; }
 
-  .tips-content {
-    ul {
-      padding-left: 0;
-      list-style: none;
-
-      li {
-        padding: 8px 0;
-        padding-left: 24px;
-        position: relative;
-
-        &::before {
-          content: "💡";
-          position: absolute;
-          left: 0;
-          top: 8px;
-        }
-
-        strong {
-          color: #1976d2;
-        }
-      }
-    }
-  }
-}
-
-// Animations
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-// Responsive design
 @media (max-width: 768px) {
-  .test-controls {
-    flex-direction: column;
-    align-items: stretch;
-
-    .test-button {
-      min-width: auto;
-    }
-  }
-
-  .results-header {
-    flex-direction: column;
-    gap: 12px;
-    text-align: center;
-  }
-
-  .speed-stats {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .network-status-toolbar {
-    font-size: 12px;
-
-    span:not(.mat-icon) {
-      display: none;
-    }
-  }
-
-  .connection-status-card {
-    flex-direction: column;
-    text-align: center;
-  }
-}
-
-// Material expansion panel custom styling
-::ng-deep .tips-section {
-  .mat-expansion-panel-header {
-    font-weight: 500;
-
-    .mat-expansion-panel-header-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-  }
+  .test-controls { flex-direction: column; align-items: stretch; }
+  .test-button { min-width: auto; }
+  .results-header { flex-direction: column; gap: 12px; text-align: center; }
+  .speed-stats { flex-direction: column; gap: 8px; }
+  .network-status-toolbar span:not(.mat-icon) { display: none; }
+  .connection-status-card { flex-direction: column; text-align: center; }
 }
