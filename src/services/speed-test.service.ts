@@ -3,8 +3,8 @@ import { fromEvent, merge, Observable, of, throwError } from 'rxjs';
 import { map, mergeMap, catchError, timeout, switchMap, startWith } from 'rxjs/operators';
 
 import { SpeedTestFileModel } from '../models/speed-test-file.model';
-import { SpeedTestResultsModel } from '../models/speed-test-results.model';
 import { SpeedTestSettingsModel } from '../models/speed-test-settings.model';
+import { SpeedTestResultsModel } from '../models/speed-test-results.model';
 
 export interface SpeedTestResult {
     bps: number;
