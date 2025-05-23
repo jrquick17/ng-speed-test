@@ -19,7 +19,7 @@
           "options": {
             "outputPath": "dist/ng-speed-test-demo",
             "index": "src/index.html",
-            "main": "src/main.ts",
+            "main": "src/public-api.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "aot": false,

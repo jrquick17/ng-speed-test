@@ -5,21 +5,21 @@
   "projects": {
     "ng-speed-test": {
       "projectType": "library",
-      "root": "projects/ng-speed-test",
-      "sourceRoot": "projects/ng-speed-test/src",
+      "root": "",
+      "sourceRoot": "src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "project": "projects/ng-speed-test/ng-package.json"
+            "project": "ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/ng-speed-test/tsconfig.lib.prod.json"
+              "tsConfig": "tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/ng-speed-test/tsconfig.lib.json"
+              "tsConfig": "tsconfig.lib.json"
             }
           },
           "defaultConfiguration": "production"
@@ -27,19 +27,10 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "tsConfig": "projects/ng-speed-test/tsconfig.spec.json",
+            "tsConfig": "tsconfig.spec.json",
             "polyfills": [
               "zone.js",
               "zone.js/testing"
-            ]
-          }
-        },
-        "lint": {
-          "builder": "@angular-eslint/builder:lint",
-          "options": {
-            "lintFilePatterns": [
-              "projects/ng-speed-test/**/*.ts",
-              "projects/ng-speed-test/**/*.html"
             ]
           }
         }
@@ -47,6 +38,6 @@
     }
   },
   "cli": {
-    "analytics": "03c14186-2310-4329-ac30-eee7694c2f45"
+    "analytics": "a902ec01-4ed5-46f2-98fd-5428a3fdc012"
   }
 }

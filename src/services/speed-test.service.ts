@@ -4,13 +4,7 @@ import { map, mergeMap, catchError, timeout } from 'rxjs/operators';
 
 import { SpeedTestResultsModel } from '../models/speed-test-results.model';
 import { SpeedTestSettingsModel } from '../models/speed-test-settings.model';
-
-export interface SpeedTestResult {
-    bps: number;
-    kbps: number;
-    mbps: number;
-    duration: number;
-}
+import {SpeedTestResult} from '../models/speed-test-result.model';
 
 @Injectable({
     providedIn: 'root'

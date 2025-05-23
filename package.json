@@ -3,27 +3,12 @@
   "version": "2.0.0",
   "description": "Angular library for testing internet connection speed",
   "main": "bundles/ng-speed-test.umd.js",
-  "module": "fesm2022/ng-speed-test.mjs",
-  "es2020": "fesm2020/ng-speed-test.mjs",
-  "esm2020": "esm2020/ng-speed-test.mjs",
-  "fesm2020": "fesm2020/ng-speed-test.mjs",
-  "fesm2022": "fesm2022/ng-speed-test.mjs",
+  "module": "fesm2015/ng-speed-test.js",
+  "es2020": "fesm2020/ng-speed-test.js",
+  "esm2020": "esm2020/ng-speed-test.js",
+  "fesm2020": "fesm2020/ng-speed-test.js",
+  "fesm2015": "fesm2015/ng-speed-test.js",
   "typings": "index.d.ts",
-  "exports": {
-    "./package.json": {
-      "default": "./package.json"
-    },
-    ".": {
-      "types": "./index.d.ts",
-      "esm2022": "./esm2022/ng-speed-test.mjs",
-      "esm2020": "./esm2020/ng-speed-test.mjs",
-      "es2020": "./fesm2020/ng-speed-test.mjs",
-      "es2015": "./fesm2015/ng-speed-test.mjs",
-      "node": "./fesm2022/ng-speed-test.mjs",
-      "default": "./fesm2022/ng-speed-test.mjs"
-    }
-  },
-  "sideEffects": false,
   "scripts": {
     "build": "ng build",
     "test": "ng test",
@@ -37,33 +22,33 @@
     "bandwidth",
     "connection-speed"
   ],
-  "author": "Your Name",
+  "author": "Jeremy Quick",
   "license": "MIT",
   "peerDependencies": {
-    "@angular/common": "^17.0.0 || ^18.0.0",
-    "@angular/core": "^17.0.0 || ^18.0.0",
+    "@angular/common": "^17.0.0",
+    "@angular/core": "^17.0.0",
     "rxjs": "^7.5.0",
     "tslib": "^2.3.0"
   },
-  "devDependencies": {
-    "@angular/cli": "^18.0.0",
-    "@angular/common": "^18.0.0",
-    "@angular/core": "^18.0.0",
-    "@angular/platform-browser": "^18.0.0",
-    "@angular/platform-browser-dynamic": "^18.0.0",
-    "@types/node": "^20.0.0",
-    "ng-packagr": "^18.0.0",
-    "rxjs": "^7.8.0",
+  "dependencies": {
+    "@angular/animations": "^17.3.12",
+    "@angular/common": "^17.3.12",
+    "@angular/compiler": "^17.3.12",
+    "@angular/core": "^17.3.12",
+    "@angular/forms": "^17.3.12",
+    "@angular/platform-browser": "^17.3.12",
+    "@angular/platform-browser-dynamic": "^17.3.12",
+    "@angular/router": "^17.3.12",
+    "rxjs": "~7.8.0",
     "tslib": "^2.6.0",
-    "typescript": "~5.4.0",
-    "zone.js": "~0.14.0"
+    "zone.js": "~0.14.10"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yourusername/ng-speed-test.git"
-  },
-  "bugs": {
-    "url": "https://github.com/yourusername/ng-speed-test/issues"
-  },
-  "homepage": "https://github.com/yourusername/ng-speed-test#readme"
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^17.3.17",
+    "@angular/cli": "^17.3.17",
+    "@angular/compiler-cli": "^17.3.12",
+    "@types/node": "^18.19.0",
+    "ng-packagr": "^17.3.0",
+    "typescript": "~5.2.2"
+  }
 }
