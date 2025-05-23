@@ -1,0 +1,57 @@
+<p>
+  <mat-toolbar color="primary">
+    <mat-toolbar-row>
+      <button mat-icon-button
+              style="margin-left: 10px;"
+              aria-label="Go to GitHub"
+              (click)="goToGitHub()">
+        <mat-icon>home</mat-icon>
+      </button>
+
+      <span (click)="goToGitHub()" style="cursor: pointer;">ng-speed-test</span>
+    </mat-toolbar-row>
+  </mat-toolbar>
+</p>
+
+<mat-card style="margin: 20px; padding: 20px;">
+  <mat-card-subtitle style="text-align: center; margin-top: 30px; margin-bottom: 30px;">
+    Test Your Internet Speed
+  </mat-card-subtitle>
+
+  <mat-card-content>
+    <div style="
+            margin-left: auto;
+            margin-right: auto;
+            min-width: 1px;
+            max-width: 280px;
+         ">
+      <mat-form-field>
+        <mat-label>Iterations</mat-label>
+
+        <input matInput
+               type="number"
+               [min]="1"
+               [max]="100"
+               [(ngModel)]="iterations"
+               [disabled]="isTracking"/>
+      </mat-form-field>
+
+      <button mat-raised-button
+              style="margin-left: 10px;"
+              (click)="trackSpeed()"
+              [disabled]="isTracking">
+        {{ isTracking ? 'Tracking' : 'Track' }}
+      </button>
+    </div>
+
+      <div *ngIf="hasTracked || isTracking" style="margin: 10px 10px 10px 20px;">
+          <p style="float: right; margin-bottom: 3px;">{{ getFormattedSpeed(speeds[0]) }} MBPS</p>
+
+          <span *ngFor="let speedInstance of speeds">
+    <mat-progress-bar style="height: 10px;"
+                      mode="determinate"
+                      [value]="speedInstance"></mat-progress-bar>
+          </span>
+      </div>
+  </mat-card-content>
+</mat-card>

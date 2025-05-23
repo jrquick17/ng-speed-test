@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "ng-speed-test": ["../../dist/ng-speed-test/public-api"]
+    }
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
+}
