@@ -12,10 +12,61 @@
         <link rel="stylesheet" href="../styles/dark.css">
     </head>
     <body>
+          <script>
+               // Blocking script to avoid flickering dark mode
+               // Dark mode toggle button
+               var useDark = window.matchMedia('(prefers-color-scheme: dark)');
+               var darkModeState = useDark.matches;
+               var $darkModeToggleSwitchers = document.querySelectorAll('.dark-mode-switch input');
+               var $darkModeToggles = document.querySelectorAll('.dark-mode-switch');
+               var darkModeStateLocal = localStorage.getItem('compodoc_darkmode-state');
 
-        <div class="navbar navbar-default navbar-fixed-top d-block d-sm-none">
-            <a href="../" class="navbar-brand">ng-speed-test</a>
-            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+               function checkToggle(check) {
+                    for (var i = 0; i < $darkModeToggleSwitchers.length; i++) {
+                         $darkModeToggleSwitchers[i].checked = check;
+                    }
+               }
+
+               function toggleDarkMode(state) {
+                    if (window.localStorage) {
+                         localStorage.setItem('compodoc_darkmode-state', state);
+                    }
+
+                    checkToggle(state);
+
+                    const hasClass = document.body.classList.contains('dark');
+
+                    if (state) {
+                         for (var i = 0; i < $darkModeToggles.length; i++) {
+                              $darkModeToggles[i].classList.add('dark');
+                         }
+                         if (!hasClass) {
+                              document.body.classList.add('dark');
+                         }
+                    } else {
+                         for (var i = 0; i < $darkModeToggles.length; i++) {
+                              $darkModeToggles[i].classList.remove('dark');
+                         }
+                         if (hasClass) {
+                              document.body.classList.remove('dark');
+                         }
+                    }
+               }
+
+               useDark.addEventListener('change', function (evt) {
+                    toggleDarkMode(evt.matches);
+               });
+               if (darkModeStateLocal) {
+                    darkModeState = darkModeStateLocal === 'true';
+               }
+               toggleDarkMode(darkModeState);
+          </script>
+
+        <div class="navbar navbar-default navbar-fixed-top d-md-none p-0">
+               <div class="d-flex">
+                    <a href="../" class="navbar-brand">ng-speed-test</a>
+                    <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+               </div>
         </div>
 
         <div class="xs-menu menu" id="mobile-menu">
@@ -24,7 +75,7 @@
 
         <div class="container-fluid main">
            <div class="row main">
-               <div class="hidden-xs menu">
+               <div class="d-none d-md-block menu">
                    <compodoc-menu mode="normal"></compodoc-menu>
                </div>
                <!-- START CONTENT -->
@@ -168,7 +219,7 @@
             <h3>File</h3>
         </p>
         <p class="comment">
-            <code>demo/src/app/app.module.ts</code>
+            <code>projects/demo/src/app/app.module.ts</code>
         </p>
 
 
@@ -216,25 +267,25 @@
 
 
     <div class="tab-pane fade  tab-source-code" id="source">
-        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import {NgModule} from &#x27;@angular/core&#x27;;
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { NgModule } from &#x27;@angular/core&#x27;;
+import { BrowserModule } from &#x27;@angular/platform-browser&#x27;;
+import { FormsModule } from &#x27;@angular/forms&#x27;;
+import { BrowserAnimationsModule } from &#x27;@angular/platform-browser/animations&#x27;;
 
-import {BrowserModule} from &#x27;@angular/platform-browser&#x27;;
-import {FormsModule} from &#x27;@angular/forms&#x27;;
+// Angular Material imports
+import { MatToolbarModule } from &#x27;@angular/material/toolbar&#x27;;
+import { MatIconModule } from &#x27;@angular/material/icon&#x27;;
+import { MatCardModule } from &#x27;@angular/material/card&#x27;;
+import { MatFormFieldModule } from &#x27;@angular/material/form-field&#x27;;
+import { MatInputModule } from &#x27;@angular/material/input&#x27;;
+import { MatProgressBarModule } from &#x27;@angular/material/progress-bar&#x27;;
+import { MatButtonModule } from &#x27;@angular/material/button&#x27;;
 
-import {BrowserAnimationsModule} from &#x27;@angular/platform-browser/animations&#x27;;
+// Import from source instead of package
+import { SpeedTestModule } from &#x27;../../../../src/speed-test.module&#x27;;
 
-import {MatCardModule} from &#x27;@angular/material/card&#x27;;
-import {MatIconModule} from &#x27;@angular/material/icon&#x27;;
-import {MatInputModule} from &#x27;@angular/material/input&#x27;;
-import {MatFormFieldModule} from &#x27;@angular/material/form-field&#x27;;
-import {MatProgressBarModule} from &#x27;@angular/material/progress-bar&#x27;;
-import {MatToolbarModule} from &#x27;@angular/material/toolbar&#x27;;
-import {MatButtonModule} from &#x27;@angular/material/button&#x27;;
-
-import {SpeedTestModule} from &#x27;ng-speed-test&#x27;;
-
-import {AppRoutingModule} from &#x27;./app-routing.module&#x27;;
-import {AppComponent} from &#x27;./app.component&#x27;;
+import { AppRoutingModule } from &#x27;./app-routing.module&#x27;;
+import { AppComponent } from &#x27;./app.component&#x27;;
 
 @NgModule({
   declarations: [
@@ -244,7 +295,7 @@ import {AppComponent} from &#x27;./app.component&#x27;;
     AppRoutingModule,
     BrowserModule,
     FormsModule,
-    SpeedTestModule,
+    SpeedTestModule,  // This will now work
     BrowserAnimationsModule,
     MatCardModule,
     MatIconModule,
@@ -310,6 +361,19 @@ export class AppModule {}
             var MAX_SEARCH_RESULTS = 15;
        </script>
 
+       <script>
+               $darkModeToggleSwitchers = document.querySelectorAll('.dark-mode-switch input');
+               checkToggle(darkModeState);
+               if ($darkModeToggleSwitchers.length > 0) {
+                    for (var i = 0; i < $darkModeToggleSwitchers.length; i++) {
+                         $darkModeToggleSwitchers[i].addEventListener('change', function (event) {
+                              darkModeState = !darkModeState;
+                              toggleDarkMode(darkModeState);
+                         });
+                    }
+               }
+          </script>
+
        <script src="../js/libs/custom-elements.min.js"></script>
        <script src="../js/libs/lit-html.js"></script>
 
@@ -321,7 +385,6 @@ export class AppModule {}
        <script src="../js/libs/es6-shim.min.js"></script>
        <script src="../js/libs/EventDispatcher.js"></script>
        <script src="../js/libs/promise.min.js"></script>
-       <script src="../js/libs/zepto.min.js"></script>
 
        <script src="../js/compodoc.js"></script>
 

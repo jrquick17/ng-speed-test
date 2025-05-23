@@ -12,10 +12,61 @@
         <link rel="stylesheet" href="./styles/dark.css">
     </head>
     <body>
+          <script>
+               // Blocking script to avoid flickering dark mode
+               // Dark mode toggle button
+               var useDark = window.matchMedia('(prefers-color-scheme: dark)');
+               var darkModeState = useDark.matches;
+               var $darkModeToggleSwitchers = document.querySelectorAll('.dark-mode-switch input');
+               var $darkModeToggles = document.querySelectorAll('.dark-mode-switch');
+               var darkModeStateLocal = localStorage.getItem('compodoc_darkmode-state');
 
-        <div class="navbar navbar-default navbar-fixed-top d-block d-sm-none">
-            <a href="./" class="navbar-brand">ng-speed-test</a>
-            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+               function checkToggle(check) {
+                    for (var i = 0; i < $darkModeToggleSwitchers.length; i++) {
+                         $darkModeToggleSwitchers[i].checked = check;
+                    }
+               }
+
+               function toggleDarkMode(state) {
+                    if (window.localStorage) {
+                         localStorage.setItem('compodoc_darkmode-state', state);
+                    }
+
+                    checkToggle(state);
+
+                    const hasClass = document.body.classList.contains('dark');
+
+                    if (state) {
+                         for (var i = 0; i < $darkModeToggles.length; i++) {
+                              $darkModeToggles[i].classList.add('dark');
+                         }
+                         if (!hasClass) {
+                              document.body.classList.add('dark');
+                         }
+                    } else {
+                         for (var i = 0; i < $darkModeToggles.length; i++) {
+                              $darkModeToggles[i].classList.remove('dark');
+                         }
+                         if (hasClass) {
+                              document.body.classList.remove('dark');
+                         }
+                    }
+               }
+
+               useDark.addEventListener('change', function (evt) {
+                    toggleDarkMode(evt.matches);
+               });
+               if (darkModeStateLocal) {
+                    darkModeState = darkModeStateLocal === 'true';
+               }
+               toggleDarkMode(darkModeState);
+          </script>
+
+        <div class="navbar navbar-default navbar-fixed-top d-md-none p-0">
+               <div class="d-flex">
+                    <a href="./" class="navbar-brand">ng-speed-test</a>
+                    <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+               </div>
         </div>
 
         <div class="xs-menu menu" id="mobile-menu">
@@ -24,7 +75,7 @@
 
         <div class="container-fluid main">
            <div class="row main">
-               <div class="hidden-xs menu">
+               <div class="d-none d-md-block menu">
                    <compodoc-menu mode="normal"></compodoc-menu>
                </div>
                <!-- START CONTENT -->
@@ -32,168 +83,442 @@
                    <div class="content-data">
 
 <h1>ng-speed-test</h1>
-<p><a href="https://www.npmjs.com/package/ng-speed-test/"><img src="https://img.shields.io/npm/l/ng-speed-test.svg" alt="npm" class="img-responsive"></a>
-<a href="https://www.npmjs.com/package/ng-speed-test"><img src="https://img.shields.io/npm/dt/ng-speed-test.svg" alt="npm" class="img-responsive"></a>
-<a href="https://www.npmjs.com/package/ng-speed-test"><img src="https://img.shields.io/npm/dm/ng-speed-test.svg" alt="npm" class="img-responsive"></a></p>
-<p><img src="example.gif" alt="" class="img-responsive"></p>
-<h2>Index</h2>
+<p><a href="https://www.npmjs.com/package/ng-speed-test"><img src="https://img.shields.io/npm/v/ng-speed-test.svg" alt="npm version" class="img-responsive"></a>
+<a href="https://www.npmjs.com/package/ng-speed-test/"><img src="https://img.shields.io/npm/l/ng-speed-test.svg" alt="npm license" class="img-responsive"></a>
+<a href="https://www.npmjs.com/package/ng-speed-test"><img src="https://img.shields.io/npm/dt/ng-speed-test.svg" alt="npm downloads" class="img-responsive"></a>
+<a href="https://www.npmjs.com/package/ng-speed-test"><img src="https://img.shields.io/npm/dm/ng-speed-test.svg" alt="npm monthly downloads" class="img-responsive"></a>
+<a href="https://angular.io/"><img src="https://img.shields.io/badge/Angular-16%2B-red.svg" alt="Angular" class="img-responsive"></a></p>
+<p>A modern, lightweight Angular library for testing internet connection speed with built-in network monitoring.</p>
+<p>🚀 <strong><a href="https://ng-speed-test.jrquick.com">Try the Live Demo</a></strong></p>
+<p><img src="example.gif" alt="Speed Test Demo" class="img-responsive"></p>
+<h2>✨ Features</h2>
 <ul>
-<li><a href="#about">About</a></li>
-<li><a href="#setup">Setup</a></li>
-<li><a href="#usage">Usage</a></li>
-<li><a href="#functionality">Functionality</a></li>
-<li><a href="#contributing">Contributing</a></li>
-<li><a href="#issues">Issues</a></li>
-<li><a href="#release">Release</a></li>
+<li>🎯 <strong>Accurate Speed Testing</strong> - Uses multiple iterations for reliable results</li>
+<li>🔄 <strong>Network Status Monitoring</strong> - Real-time online/offline detection</li>
+<li>⚡ <strong>Modern Fetch API</strong> - Better performance and error handling</li>
+<li>🎨 <strong>TypeScript Support</strong> - Full type definitions included</li>
+<li>📱 <strong>Mobile Friendly</strong> - Works on all devices and browsers</li>
+<li>🔧 <strong>Highly Configurable</strong> - Customize file sizes, iterations, and retry logic</li>
+<li>🆕 <strong>Angular 16-18 Compatible</strong> - Works with latest Angular versions</li>
 </ul>
-<h2>About</h2>
-<p>A lightweight Angular 2+ service for checking internet speed  </p>
+<h2>📋 Table of Contents</h2>
 <ul>
-<li>Try out <a href="https://ng-speed-test.jrquick.com">the demo</a> to see it in action!</li>
-<li>Visit <a href="https://jrquick.com">my website</a> for other cool projects!</li>
+<li><a href="#-installation">Installation</a></li>
+<li><a href="#-quick-start">Quick Start</a></li>
+<li><a href="#-configuration">Configuration</a></li>
+<li><a href="#-api-reference">API Reference</a></li>
+<li><a href="#-examples">Examples</a></li>
+<li><a href="#-browser-support">Browser Support</a></li>
+<li><a href="#-contributing">Contributing</a></li>
 </ul>
-<h2>Setup</h2>
-<h3>Install</h3>
-<div><pre class="line-numbers"><code class="language-none">npm install ng-speed-test --save</code></pre></div><h3>Import module</h3>
-<ul>
-<li><p>Import <code>SpeedTestModule</code> by adding the following to your parent module (i.e. <code>app.module.ts</code>):</p>
-<div><pre class="line-numbers"><code class="language-none">import { SpeedTestModule } from &#39;ng-speed-test&#39;;
+<h2>🚀 Installation</h2>
+<b>Example :</b><div><pre class="line-numbers"><code class="language-bash">npm install ng-speed-test --save</code></pre></div><h2>⚡ Quick Start</h2>
+<h3>1. Import the Module</h3>
+<p>Add <code>SpeedTestModule</code> to your app module:</p>
+<b>Example :</b><div><pre class="line-numbers"><code class="language-typescript">import { SpeedTestModule } from &#39;ng-speed-test&#39;;
 
 &#64;NgModule({
-  ...
   imports: [
-    SpeedTestModule,
-    ...
+    SpeedTestModule
   ],
-  ...
 })
-export class AppModule {}</code></pre></div></li>
-</ul>
-<h2>Functionality</h2>
-<h3>Check Internet Speed</h3>
-<ul>
-<li>Checkout the demo and it&#39;s code for more examples.</li>
-</ul>
-<div><pre class="line-numbers"><code class="language-typescript">import {SpeedTestService} from &#39;ng-speed-test&#39;;
+export class AppModule { }</code></pre></div><h3>2. Inject the Service</h3>
+<b>Example :</b><div><pre class="line-numbers"><code class="language-typescript">import { Component } from &#39;&#64;angular/core&#39;;
+import { SpeedTestService } from &#39;ng-speed-test&#39;;
 
-&#64;Injectable()
-export class TechCheckService {
-  constructor(
-    private speedTestService:SpeedTestService
-  ) {
-    this.speedTestService.getMbps().subscribe(
-      (speed) =&gt; {
-        console.log(&#39;Your speed is &#39; + speed);
-      }
-    );
-  }
-}</code></pre></div><h3>Check Internet Speed w/ Custom Settings</h3>
-<div><pre class="line-numbers"><code class="language-typescript">import {SpeedTestService} from &#39;ng-speed-test&#39;;
+&#64;Component({
+  selector: &#39;app-speed-test&#39;,
+  template: `
+    &lt;div&gt;
+      &lt;button (click)=&quot;runSpeedTest()&quot; [disabled]=&quot;isLoading&quot;&gt;
+        {{ isLoading ? &#39;Testing...&#39; : &#39;Test Speed&#39; }}
+      &lt;/button&gt;
+      &lt;div *ngIf=&quot;speedResult&quot;&gt;
+        Your speed: {{ speedResult.mbps | number:&#39;1.2-2&#39; }} Mbps
+      &lt;/div&gt;
+    &lt;/div&gt;
+  `
+})
+export class SpeedTestComponent {
+  isLoading = false;
+  speedResult: any;
 
-&#64;Injectable()
-export class TechCheckService {
-  constructor(
-    private speedTestService:SpeedTestService
-  ) {
-    this.speedTestService.getMbps(
-      {
-        iterations: 10,
-        file: {
-          path: &#39;my-custom-image.png&#39;,
-          size: 2048
-        },
-        retryDelay: 1500,
-      }
-    ).subscribe(
-      (speed) =&gt; {
-        console.log(&#39;Your speed is &#39; + speed);
-      }
-    );
-  }
-}</code></pre></div><h3>Check If Online</h3>
-<div><pre class="line-numbers"><code class="language-typescript">import {SpeedTestService} from &#39;ng-speed-test&#39;;
+  constructor(private speedTestService: SpeedTestService) {}
 
-&#64;Injectable()
-export class TechCheckService {
-  constructor(
-    private speedTestService:SpeedTestService
-  ) {
-    this.speedTestService.isOnline().subscribe(
-      (isOnline) =&gt; {
-        if (isOnline === false) {
-          console.log(&#39;Network unavailable.&#39;);
-        }
+  runSpeedTest() {
+    this.isLoading = true;
+    
+    this.speedTestService.getSpeedTestResult().subscribe({
+      next: (result) =&gt; {
+        this.speedResult = result;
+        this.isLoading = false;
+      },
+      error: (error) =&gt; {
+        console.error(&#39;Speed test failed:&#39;, error);
+        this.isLoading = false;
       }
-    );
+    });
   }
-}</code></pre></div><h3>Functions</h3>
+}</code></pre></div><h2>🛠️ Configuration</h2>
+<h3>Basic Configuration</h3>
+<b>Example :</b><div><pre class="line-numbers"><code class="language-typescript">const customSettings = {
+  iterations: 5,           // Run 5 tests for better accuracy
+  retryDelay: 1000,       // Wait 1 second between retries
+  file: {
+    path: &#39;https://example.com/test-file.jpg&#39;,
+    size: 1048576,        // 1MB in bytes
+    shouldBustCache: true // Prevent browser caching
+  }
+};
+
+this.speedTestService.getMbps(customSettings).subscribe(speed =&gt; {
+  console.log(`Speed: ${speed} Mbps`);
+});</code></pre></div><h3>Available Test Files</h3>
+<p>Pre-configured test files hosted on GitHub:</p>
+<table class="table table-bordered compodoc-table">
+<thead>
+<tr>
+<th>Size</th>
+<th>Actual Size (bytes)</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>500KB</td>
+<td>408,949</td>
+<td><code>https://raw.githubusercontent.com/jrquick17/ng-speed-test/.../500kb.jpg</code></td>
+</tr>
+<tr>
+<td>1MB</td>
+<td>1,197,292</td>
+<td><code>https://raw.githubusercontent.com/jrquick17/ng-speed-test/.../1mb.jpg</code></td>
+</tr>
+<tr>
+<td><strong>5MB</strong></td>
+<td>4,952,221</td>
+<td><code>https://raw.githubusercontent.com/jrquick17/ng-speed-test/.../5mb.jpg</code> <em>(default)</em></td>
+</tr>
+<tr>
+<td>13MB</td>
+<td>13,848,150</td>
+<td><code>https://raw.githubusercontent.com/jrquick17/ng-speed-test/.../13mb.jpg</code></td>
+</tr>
+</tbody>
+</table>
+<h2>📚 API Reference</h2>
+<h3>Core Methods</h3>
+<h4><code>getSpeedTestResult(settings?)</code></h4>
+<p>Returns comprehensive speed test results with duration info.</p>
+<b>Example :</b><div><pre class="line-numbers"><code class="language-typescript">this.speedTestService.getSpeedTestResult().subscribe(result =&gt; {
+  console.log(&#39;Speed:&#39;, result.mbps, &#39;Mbps&#39;);
+  console.log(&#39;Duration:&#39;, result.duration, &#39;seconds&#39;);
+  console.log(&#39;Bits per second:&#39;, result.bps);
+  console.log(&#39;Kilobits per second:&#39;, result.kbps);
+});</code></pre></div><h4><code>getMbps(settings?)</code></h4>
+<p>Get speed in megabits per second.</p>
+<b>Example :</b><div><pre class="line-numbers"><code class="language-typescript">this.speedTestService.getMbps().subscribe(speed =&gt; {
+  console.log(&#39;Speed:&#39;, speed, &#39;Mbps&#39;);
+});</code></pre></div><h4><code>getKbps(settings?)</code></h4>
+<p>Get speed in kilobits per second.</p>
+<b>Example :</b><div><pre class="line-numbers"><code class="language-typescript">this.speedTestService.getKbps().subscribe(speed =&gt; {
+  console.log(&#39;Speed:&#39;, speed, &#39;Kbps&#39;);
+});</code></pre></div><h4><code>getBps(settings?)</code></h4>
+<p>Get speed in bits per second.</p>
+<b>Example :</b><div><pre class="line-numbers"><code class="language-typescript">this.speedTestService.getBps().subscribe(speed =&gt; {
+  console.log(&#39;Speed:&#39;, speed, &#39;bps&#39;);
+});</code></pre></div><h3>Network Monitoring</h3>
+<h4><code>isOnline()</code></h4>
+<p>Check network connectivity.</p>
+<b>Example :</b><div><pre class="line-numbers"><code class="language-typescript">this.speedTestService.isOnline().subscribe(isOnline =&gt; {
+  if (!isOnline) {
+    console.log(&#39;No internet connection&#39;);
+  }
+});</code></pre></div><h4><code>getNetworkStatus()</code></h4>
+<p>Get detailed network information (when available).</p>
+<b>Example :</b><div><pre class="line-numbers"><code class="language-typescript">this.speedTestService.getNetworkStatus().subscribe(status =&gt; {
+  console.log(&#39;Online:&#39;, status.isOnline);
+  console.log(&#39;Connection type:&#39;, status.effectiveType); // &#39;4g&#39;, &#39;wifi&#39;, etc.
+  console.log(&#39;Downlink speed:&#39;, status.downlink); // Estimated speed
+});</code></pre></div><h3>Configuration Options</h3>
+<table class="table table-bordered compodoc-table">
+<thead>
+<tr>
+<th>Option</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>iterations</code></td>
+<td>number</td>
+<td>3</td>
+<td>Number of tests to run for averaging</td>
+</tr>
+<tr>
+<td><code>retryDelay</code></td>
+<td>number</td>
+<td>500</td>
+<td>Milliseconds to wait between retries</td>
+</tr>
+<tr>
+<td><code>file.path</code></td>
+<td>string</td>
+<td>GitHub 5MB image</td>
+<td>URL of test file</td>
+</tr>
+<tr>
+<td><code>file.size</code></td>
+<td>number</td>
+<td>4,952,221</td>
+<td>File size in bytes</td>
+</tr>
+<tr>
+<td><code>file.shouldBustCache</code></td>
+<td>boolean</td>
+<td>true</td>
+<td>Add cache-busting parameter</td>
+</tr>
+</tbody>
+</table>
+<h2>💡 Examples</h2>
+<h3>Advanced Speed Test with Progress</h3>
+<b>Example :</b><div><pre class="line-numbers"><code class="language-typescript">import { Component } from &#39;&#64;angular/core&#39;;
+import { SpeedTestService } from &#39;ng-speed-test&#39;;
+
+&#64;Component({
+  template: `
+    &lt;div class=&quot;speed-test&quot;&gt;
+      &lt;h2&gt;Internet Speed Test&lt;/h2&gt;
+      
+      &lt;!-- Network Status --&gt;
+      &lt;div class=&quot;status&quot; [class.online]=&quot;isOnline&quot;&gt;
+        Status: {{ isOnline ? &#39;Online&#39; : &#39;Offline&#39; }}
+      &lt;/div&gt;
+      
+      &lt;!-- Test Controls --&gt;
+      &lt;div class=&quot;controls&quot;&gt;
+        &lt;select [(ngModel)]=&quot;selectedSize&quot;&gt;
+          &lt;option value=&quot;500kb&quot;&gt;500 KB Test&lt;/option&gt;
+          &lt;option value=&quot;1mb&quot;&gt;1 MB Test&lt;/option&gt;
+          &lt;option value=&quot;5mb&quot; selected&gt;5 MB Test&lt;/option&gt;
+          &lt;option value=&quot;13mb&quot;&gt;13 MB Test&lt;/option&gt;
+        &lt;/select&gt;
+        
+        &lt;input type=&quot;number&quot; [(ngModel)]=&quot;iterations&quot; 
+               min=&quot;1&quot; max=&quot;10&quot; placeholder=&quot;Iterations&quot;&gt;
+        
+        &lt;button (click)=&quot;runTest()&quot; [disabled]=&quot;isRunning&quot;&gt;
+          {{ isRunning ? &#39;Testing...&#39; : &#39;Start Test&#39; }}
+        &lt;/button&gt;
+      &lt;/div&gt;
+      
+      &lt;!-- Progress --&gt;
+      &lt;div *ngIf=&quot;isRunning&quot; class=&quot;progress&quot;&gt;
+        &lt;div class=&quot;progress-bar&quot;&gt;
+          &lt;div class=&quot;fill&quot; [style.width.%]=&quot;progress&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;p&gt;{{ progressText }}&lt;/p&gt;
+      &lt;/div&gt;
+      
+      &lt;!-- Results --&gt;
+      &lt;div *ngIf=&quot;lastResult&quot; class=&quot;results&quot;&gt;
+        &lt;h3&gt;Results&lt;/h3&gt;
+        &lt;div class=&quot;result-grid&quot;&gt;
+          &lt;div class=&quot;result-item&quot;&gt;
+            &lt;strong&gt;{{ lastResult.mbps | number:&#39;1.2-2&#39; }}&lt;/strong&gt;
+            &lt;span&gt;Mbps&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;result-item&quot;&gt;
+            &lt;strong&gt;{{ lastResult.kbps | number:&#39;1.0-0&#39; }}&lt;/strong&gt;
+            &lt;span&gt;Kbps&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;result-item&quot;&gt;
+            &lt;strong&gt;{{ lastResult.duration | number:&#39;1.2-2&#39; }}&lt;/strong&gt;
+            &lt;span&gt;seconds&lt;/span&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  `,
+  styles: [`
+    .speed-test { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .status { padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+    .status.online { background: #d4edda; color: #155724; }
+    .controls { display: flex; gap: 10px; margin-bottom: 20px; }
+    .progress-bar { width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; }
+    .fill { height: 100%; background: #007bff; transition: width 0.3s; }
+    .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+    .result-item { text-align: center; padding: 15px; background: #f8f9fa; border-radius: 5px; }
+  `]
+})
+export class AdvancedSpeedTestComponent {
+  isOnline = true;
+  isRunning = false;
+  progress = 0;
+  progressText = &#39;&#39;;
+  lastResult: any = null;
+  selectedSize = &#39;5mb&#39;;
+  iterations = 3;
+
+  private fileSizes = {
+    &#39;500kb&#39;: { size: 408949, path: &#39;https://raw.githubusercontent.com/.../500kb.jpg&#39; },
+    &#39;1mb&#39;: { size: 1197292, path: &#39;https://raw.githubusercontent.com/.../1mb.jpg&#39; },
+    &#39;5mb&#39;: { size: 4952221, path: &#39;https://raw.githubusercontent.com/.../5mb.jpg&#39; },
+    &#39;13mb&#39;: { size: 13848150, path: &#39;https://raw.githubusercontent.com/.../13mb.jpg&#39; }
+  };
+
+  constructor(private speedTestService: SpeedTestService) {
+    // Monitor network status
+    this.speedTestService.isOnline().subscribe(status =&gt; {
+      this.isOnline = status;
+    });
+  }
+
+  runTest() {
+    if (!this.isOnline) return;
+
+    this.isRunning = true;
+    this.progress = 0;
+    this.progressText = &#39;Initializing...&#39;;
+
+    const fileConfig = this.fileSizes[this.selectedSize];
+    const settings = {
+      iterations: this.iterations,
+      file: {
+        path: fileConfig.path,
+        size: fileConfig.size,
+        shouldBustCache: true
+      }
+    };
+
+    // Simulate progress
+    const progressInterval = setInterval(() =&gt; {
+      if (this.progress &lt; 90) {
+        this.progress += Math.random() * 10;
+        this.progressText = `Testing... ${Math.floor(this.progress)}%`;
+      }
+    }, 200);
+
+    this.speedTestService.getSpeedTestResult(settings).subscribe({
+      next: (result) =&gt; {
+        clearInterval(progressInterval);
+        this.progress = 100;
+        this.progressText = &#39;Complete!&#39;;
+        this.lastResult = result;
+        this.isRunning = false;
+      },
+      error: (error) =&gt; {
+        clearInterval(progressInterval);
+        console.error(&#39;Test failed:&#39;, error);
+        this.isRunning = false;
+      }
+    });
+  }
+}</code></pre></div><h3>Simple Network Monitor</h3>
+<b>Example :</b><div><pre class="line-numbers"><code class="language-typescript">&#64;Component({
+  template: `
+    &lt;div [class]=&quot;networkStatus.isOnline ? &#39;online&#39; : &#39;offline&#39;&quot;&gt;
+      {{ networkStatus.isOnline ? &#39;Connected&#39; : &#39;Disconnected&#39; }}
+      &lt;span *ngIf=&quot;networkStatus.effectiveType&quot;&gt;
+        ({{ networkStatus.effectiveType }})
+      &lt;/span&gt;
+    &lt;/div&gt;
+  `
+})
+export class NetworkMonitorComponent {
+  networkStatus = { isOnline: true, effectiveType: null };
+
+  constructor(private speedTestService: SpeedTestService) {
+    this.speedTestService.getNetworkStatus().subscribe(status =&gt; {
+      this.networkStatus = status;
+    });
+  }
+}</code></pre></div><h2>🌐 Browser Support</h2>
 <ul>
-<li><code>getBps()</code> - Get the current internet speed in Bps (bits per second).</li>
-<li><code>getKbps()</code> - Get the current internet speed in Kbps (kilobits per second).</li>
-<li><code>getMbps()</code> - Get the current internet speed in Mbps (megabits per second).</li>
-<li><code>isOnline()</code> - Check if the network is available.</li>
+<li><strong>Chrome</strong> 60+</li>
+<li><strong>Firefox</strong> 55+</li>
+<li><strong>Safari</strong> 12+</li>
+<li><strong>Edge</strong> 79+</li>
+<li><strong>Mobile browsers</strong> with Fetch API support</li>
 </ul>
-<h3>Settings</h3>
+<h2>🔧 Angular Compatibility</h2>
+<table class="table table-bordered compodoc-table">
+<thead>
+<tr>
+<th>ng-speed-test</th>
+<th>Angular</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3.x</td>
+<td>16, 17, 18</td>
+</tr>
+<tr>
+<td>2.x</td>
+<td>12, 13, 14, 15</td>
+</tr>
+<tr>
+<td>1.x</td>
+<td>8, 9, 10, 11</td>
+</tr>
+</tbody>
+</table>
+<h2>🐛 Troubleshooting</h2>
+<h3>Common Issues</h3>
+<p><strong>CORS Errors</strong></p>
 <ul>
-<li><code>file</code> - see <a href="#file-settings">File Settings (below)</a></li>
-<li><code>iterations</code> - (default: 3) The number of speed readings to take for the average. 
-Increase iterations the more accurate results, decrease iterations for faster results.</li>
-<li><code>retryDelay</code> - (default: 500) The number of milliseconds to wait before the next iteration after a network error</li>
+<li>Use the provided test files or ensure your custom files have proper CORS headers</li>
+<li>GitHub-hosted test files are CORS-enabled</li>
 </ul>
-<h4>File Settings</h4>
+<p><strong>Inaccurate Results</strong></p>
 <ul>
-<li><code>[path]</code> - <em>(default: ~5Mb image stored on GitHub)</em> The URL where to download an image for determining internet speed. <ul>
-<li><em>Other Included Paths</em> <ul>
-<li>~500 KB (408949 kb) - <a href="https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/500kb.jpg">https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/500kb.jpg</a></li>
-<li>~1 MB (1197292 kb)- <a href="https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/1mb.jpg">https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/1mb.jpg</a></li>
-<li>~5 MB (4952221 kb) <em>(default)</em> - <a href="https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/5mb.jpg">https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/5mb.jpg</a></li>
-<li>~13 MB (13848150 kb) - <a href="https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/13mb.jpg">https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/13mb.jpg</a></li>
+<li>Increase <code>iterations</code> for better accuracy (recommended: 5-10)</li>
+<li>Use appropriate file sizes (1-5MB for most connections)</li>
+<li>Ensure stable network during testing</li>
 </ul>
-</li>
-</ul>
-</li>
-<li><code>[size]</code> - (default: ~5Mb) The size of the image at the path (in bits)</li>
-<li><code>[shouldBustCache]</code> <em>(default: true)</em> Append GET variable to bust browser cache</li>
-</ul>
-<h2>Contributing</h2>
-<h3>Thanks</h3>
+<p><strong>TypeScript Errors</strong></p>
 <ul>
-<li><a href="https://github.com/jrquick17">jrquick17</a></li>
+<li>Make sure you&#39;re importing from <code>&#39;ng-speed-test&#39;</code></li>
+<li>Check that your Angular version is compatible</li>
 </ul>
-<h2>Issues</h2>
-<p>If you find any issues feel free to open a request in <a href="https://github.com/jrquick17/ng-speed-test/issues">the Issues tab</a>. If I have the time I will try to solve any issues but cannot make any guarantees. Feel free to contribute yourself.</p>
-<h2>Release</h2>
-<h3>Demo</h3>
+<h2>🤝 Contributing</h2>
+<p>We welcome contributions! Please see our <a href="CONTRIBUTING.md">Contributing Guide</a> for details.</p>
+<h3>Development Setup</h3>
+<b>Example :</b><div><pre class="line-numbers"><code class="language-bash"># Clone the repository
+git clone https://github.com/jrquick17/ng-speed-test.git
+
+# Install dependencies
+npm install
+
+# Run the demo
+npm run demo
+
+# Build the library
+npm run build
+
+# Run tests
+npm run test</code></pre></div><h2>📄 License</h2>
+<p>This project is licensed under the MIT License - see the <a href="LICENSE">LICENSE</a> file for details.</p>
+<h2>🙏 Acknowledgments</h2>
 <ul>
-<li>Run <code>npm install</code> to get packages required for the demo and then run <code>npm run demo</code> to run locally.</li>
+<li>Created by <a href="https://jrquick.com">Jeremy Quick</a></li>
+<li>Inspired by the need for reliable network testing in Angular applications</li>
+<li>Thanks to all <a href="https://github.com/jrquick17/ng-speed-test/graphs/contributors">contributors</a></li>
 </ul>
-<h3>Generate Docs</h3>
+<h2>🔗 Links</h2>
 <ul>
-<li>Run <code>npm run docs:build</code></li>
+<li><a href="https://ng-speed-test.jrquick.com">Live Demo</a></li>
+<li><a href="https://github.com/jrquick17/ng-speed-test">GitHub Repository</a></li>
+<li><a href="https://www.npmjs.com/package/ng-speed-test">NPM Package</a></li>
+<li><a href="https://github.com/jrquick17/ng-speed-test/issues">Issues &amp; Support</a></li>
+<li><a href="https://jrquick.com">Jeremy&#39;s Website</a></li>
 </ul>
-<h4>Update Version</h4>
-<ul>
-<li>Update version <code>package.json</code> files in both the root and <code>dist/</code> directory following <a href="https://semver.org/">Semantic Versioning (2.0.0)</a>.</li>
-</ul>
-<h3>Build</h3>
-<ul>
-<li>Run <code>npm run build</code> from root.</li>
-</ul>
-<h4>Test</h4>
-<ul>
-<li>Run <code>npm run build:link</code> in root directory</li>
-<li>Run <code>npm link ng-speed-test</code> in <code>demo/</code> or any external project</li>
-<li>Run Demo <a href="#demo">See: Demo</a></li>
-<li>When done, run <code>npm unlink</code> in <code>demo/</code> or any external project</li>
-</ul>
-<h4>NPM Release</h4>
-<ul>
-<li>Run <code>npm run shipit</code></li>
-</ul>
-<h4>Update Changelog</h4>
-<ul>
-<li>Add updates to <code>CHANGELOG.md</code> in root.</li>
-</ul>
+<hr>
+<p><strong>Made with ❤️ for the Angular community</strong></p>
 
 
 
@@ -245,6 +570,19 @@ Increase iterations the more accurate results, decrease iterations for faster re
             var MAX_SEARCH_RESULTS = 15;
        </script>
 
+       <script>
+               $darkModeToggleSwitchers = document.querySelectorAll('.dark-mode-switch input');
+               checkToggle(darkModeState);
+               if ($darkModeToggleSwitchers.length > 0) {
+                    for (var i = 0; i < $darkModeToggleSwitchers.length; i++) {
+                         $darkModeToggleSwitchers[i].addEventListener('change', function (event) {
+                              darkModeState = !darkModeState;
+                              toggleDarkMode(darkModeState);
+                         });
+                    }
+               }
+          </script>
+
        <script src="./js/libs/custom-elements.min.js"></script>
        <script src="./js/libs/lit-html.js"></script>
 
@@ -256,7 +594,6 @@ Increase iterations the more accurate results, decrease iterations for faster re
        <script src="./js/libs/es6-shim.min.js"></script>
        <script src="./js/libs/EventDispatcher.js"></script>
        <script src="./js/libs/promise.min.js"></script>
-       <script src="./js/libs/zepto.min.js"></script>
 
        <script src="./js/compodoc.js"></script>
 

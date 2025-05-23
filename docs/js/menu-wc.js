@@ -44,6 +44,11 @@ customElements.define('compodoc-menu', class extends HTMLElement {
                             </a>
                         </li>
                                 <li class="link">
+                                    <a href="dependencies.html" data-type="chapter-link">
+                                        <span class="icon ion-ios-list"></span>Dependencies
+                                    </a>
+                                </li>
+                                <li class="link">
                                     <a href="properties.html" data-type="chapter-link">
                                         <span class="icon ion-ios-apps"></span>Properties
                                     </a>
@@ -64,13 +69,13 @@ customElements.define('compodoc-menu', class extends HTMLElement {
                                 <a href="modules/AppModule.html" data-type="entity-link" >AppModule</a>
                                     <li class="chapter inner">
                                         <div class="simple menu-toggler" data-bs-toggle="collapse" ${ isNormalMode ?
-                                            'data-bs-target="#components-links-module-AppModule-fb406477f93e22650ea1ca9a0ed81dd6b02bc16a3d3196d7f80cb1786ca4f3795cbfa094e572d9c5a3a40ee8cbcbb0406bd9a273383e782fc74e839a964aa99b"' : 'data-bs-target="#xs-components-links-module-AppModule-fb406477f93e22650ea1ca9a0ed81dd6b02bc16a3d3196d7f80cb1786ca4f3795cbfa094e572d9c5a3a40ee8cbcbb0406bd9a273383e782fc74e839a964aa99b"' }>
+                                            'data-bs-target="#components-links-module-AppModule-abfbfab096aa7d407b1556a61f1521a7f06aaccda6f713b4e13467ba5211e1b80ac0eddee6e5fe9f501aa0955d3e136f92f929303c88eb024af2ef9e7a3fa058"' : 'data-bs-target="#xs-components-links-module-AppModule-abfbfab096aa7d407b1556a61f1521a7f06aaccda6f713b4e13467ba5211e1b80ac0eddee6e5fe9f501aa0955d3e136f92f929303c88eb024af2ef9e7a3fa058"' }>
                                             <span class="icon ion-md-cog"></span>
                                             <span>Components</span>
                                             <span class="icon ion-ios-arrow-down"></span>
                                         </div>
-                                        <ul class="links collapse" ${ isNormalMode ? 'id="components-links-module-AppModule-fb406477f93e22650ea1ca9a0ed81dd6b02bc16a3d3196d7f80cb1786ca4f3795cbfa094e572d9c5a3a40ee8cbcbb0406bd9a273383e782fc74e839a964aa99b"' :
-                                            'id="xs-components-links-module-AppModule-fb406477f93e22650ea1ca9a0ed81dd6b02bc16a3d3196d7f80cb1786ca4f3795cbfa094e572d9c5a3a40ee8cbcbb0406bd9a273383e782fc74e839a964aa99b"' }>
+                                        <ul class="links collapse" ${ isNormalMode ? 'id="components-links-module-AppModule-abfbfab096aa7d407b1556a61f1521a7f06aaccda6f713b4e13467ba5211e1b80ac0eddee6e5fe9f501aa0955d3e136f92f929303c88eb024af2ef9e7a3fa058"' :
+                                            'id="xs-components-links-module-AppModule-abfbfab096aa7d407b1556a61f1521a7f06aaccda6f713b4e13467ba5211e1b80ac0eddee6e5fe9f501aa0955d3e136f92f929303c88eb024af2ef9e7a3fa058"' }>
                                             <li class="link">
                                                 <a href="components/AppComponent.html" data-type="entity-link" data-context="sub-entity" data-context-id="modules" >AppComponent</a>
                                             </li>
@@ -84,13 +89,13 @@ customElements.define('compodoc-menu', class extends HTMLElement {
                                 <a href="modules/SpeedTestModule.html" data-type="entity-link" >SpeedTestModule</a>
                                 <li class="chapter inner">
                                     <div class="simple menu-toggler" data-bs-toggle="collapse" ${ isNormalMode ?
-                                        'data-bs-target="#injectables-links-module-SpeedTestModule-202026ce8faeaff0125d86f874a7769c75679daae299559dbcb762f8928522ea8e048a5ba7e910e8d2b545a65b86ed394b4bf01c4563ec968097b74a202cf587"' : 'data-bs-target="#xs-injectables-links-module-SpeedTestModule-202026ce8faeaff0125d86f874a7769c75679daae299559dbcb762f8928522ea8e048a5ba7e910e8d2b545a65b86ed394b4bf01c4563ec968097b74a202cf587"' }>
+                                        'data-bs-target="#injectables-links-module-SpeedTestModule-e75db968e721bde070466807ffaf221826fe71fff7e7e640d480d6667b228a94e8a90dc46a42897e5fab6039956a7cd69389e680ce95d302cfe5b55ffb0fd7f1"' : 'data-bs-target="#xs-injectables-links-module-SpeedTestModule-e75db968e721bde070466807ffaf221826fe71fff7e7e640d480d6667b228a94e8a90dc46a42897e5fab6039956a7cd69389e680ce95d302cfe5b55ffb0fd7f1"' }>
                                         <span class="icon ion-md-arrow-round-down"></span>
                                         <span>Injectables</span>
                                         <span class="icon ion-ios-arrow-down"></span>
                                     </div>
-                                    <ul class="links collapse" ${ isNormalMode ? 'id="injectables-links-module-SpeedTestModule-202026ce8faeaff0125d86f874a7769c75679daae299559dbcb762f8928522ea8e048a5ba7e910e8d2b545a65b86ed394b4bf01c4563ec968097b74a202cf587"' :
-                                        'id="xs-injectables-links-module-SpeedTestModule-202026ce8faeaff0125d86f874a7769c75679daae299559dbcb762f8928522ea8e048a5ba7e910e8d2b545a65b86ed394b4bf01c4563ec968097b74a202cf587"' }>
+                                    <ul class="links collapse" ${ isNormalMode ? 'id="injectables-links-module-SpeedTestModule-e75db968e721bde070466807ffaf221826fe71fff7e7e640d480d6667b228a94e8a90dc46a42897e5fab6039956a7cd69389e680ce95d302cfe5b55ffb0fd7f1"' :
+                                        'id="xs-injectables-links-module-SpeedTestModule-e75db968e721bde070466807ffaf221826fe71fff7e7e640d480d6667b228a94e8a90dc46a42897e5fab6039956a7cd69389e680ce95d302cfe5b55ffb0fd7f1"' }>
                                         <li class="link">
                                             <a href="injectables/SpeedTestService.html" data-type="entity-link" data-context="sub-entity" data-context-id="modules" >SpeedTestService</a>
                                         </li>
@@ -100,6 +105,19 @@ customElements.define('compodoc-menu', class extends HTMLElement {
                 </ul>
                 </li>
                     <li class="chapter">
+                        <div class="simple menu-toggler" data-bs-toggle="collapse" ${ isNormalMode ? 'data-bs-target="#components-links"' :
+                            'data-bs-target="#xs-components-links"' }>
+                            <span class="icon ion-md-cog"></span>
+                            <span>Components</span>
+                            <span class="icon ion-ios-arrow-down"></span>
+                        </div>
+                        <ul class="links collapse " ${ isNormalMode ? 'id="components-links"' : 'id="xs-components-links"' }>
+                            <li class="link">
+                                <a href="components/SpeedTestComponent.html" data-type="entity-link" >SpeedTestComponent</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="chapter">
                         <div class="simple menu-toggler" data-bs-toggle="collapse" ${ isNormalMode ? 'data-bs-target="#classes-links"' :
                             'data-bs-target="#xs-classes-links"' }>
                             <span class="icon ion-ios-paper"></span>
@@ -107,9 +125,6 @@ customElements.define('compodoc-menu', class extends HTMLElement {
                             <span class="icon ion-ios-arrow-down"></span>
                         </div>
                         <ul class="links collapse " ${ isNormalMode ? 'id="classes-links"' : 'id="xs-classes-links"' }>
-                            <li class="link">
-                                <a href="classes/AppPage.html" data-type="entity-link" >AppPage</a>
-                            </li>
                             <li class="link">
                                 <a href="classes/SpeedTestFileModel.html" data-type="entity-link" >SpeedTestFileModel</a>
                             </li>
@@ -134,6 +149,28 @@ customElements.define('compodoc-menu', class extends HTMLElement {
                                 </li>
                             </ul>
                         </li>
+                    <li class="chapter">
+                        <div class="simple menu-toggler" data-bs-toggle="collapse" ${ isNormalMode ? 'data-bs-target="#interfaces-links"' :
+                            'data-bs-target="#xs-interfaces-links"' }>
+                            <span class="icon ion-md-information-circle-outline"></span>
+                            <span>Interfaces</span>
+                            <span class="icon ion-ios-arrow-down"></span>
+                        </div>
+                        <ul class="links collapse " ${ isNormalMode ? ' id="interfaces-links"' : 'id="xs-interfaces-links"' }>
+                            <li class="link">
+                                <a href="interfaces/SpeedTestFile.html" data-type="entity-link" >SpeedTestFile</a>
+                            </li>
+                            <li class="link">
+                                <a href="interfaces/SpeedTestResult.html" data-type="entity-link" >SpeedTestResult</a>
+                            </li>
+                            <li class="link">
+                                <a href="interfaces/SpeedTestResults.html" data-type="entity-link" >SpeedTestResults</a>
+                            </li>
+                            <li class="link">
+                                <a href="interfaces/SpeedTestSettings.html" data-type="entity-link" >SpeedTestSettings</a>
+                            </li>
+                        </ul>
+                    </li>
                     <li class="chapter">
                         <div class="simple menu-toggler" data-bs-toggle="collapse" ${ isNormalMode ? 'data-bs-target="#miscellaneous-links"'
                             : 'data-bs-target="#xs-miscellaneous-links"' }>

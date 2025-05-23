@@ -12,10 +12,61 @@
         <link rel="stylesheet" href="../styles/dark.css">
     </head>
     <body>
+          <script>
+               // Blocking script to avoid flickering dark mode
+               // Dark mode toggle button
+               var useDark = window.matchMedia('(prefers-color-scheme: dark)');
+               var darkModeState = useDark.matches;
+               var $darkModeToggleSwitchers = document.querySelectorAll('.dark-mode-switch input');
+               var $darkModeToggles = document.querySelectorAll('.dark-mode-switch');
+               var darkModeStateLocal = localStorage.getItem('compodoc_darkmode-state');
 
-        <div class="navbar navbar-default navbar-fixed-top d-block d-sm-none">
-            <a href="../" class="navbar-brand">ng-speed-test</a>
-            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+               function checkToggle(check) {
+                    for (var i = 0; i < $darkModeToggleSwitchers.length; i++) {
+                         $darkModeToggleSwitchers[i].checked = check;
+                    }
+               }
+
+               function toggleDarkMode(state) {
+                    if (window.localStorage) {
+                         localStorage.setItem('compodoc_darkmode-state', state);
+                    }
+
+                    checkToggle(state);
+
+                    const hasClass = document.body.classList.contains('dark');
+
+                    if (state) {
+                         for (var i = 0; i < $darkModeToggles.length; i++) {
+                              $darkModeToggles[i].classList.add('dark');
+                         }
+                         if (!hasClass) {
+                              document.body.classList.add('dark');
+                         }
+                    } else {
+                         for (var i = 0; i < $darkModeToggles.length; i++) {
+                              $darkModeToggles[i].classList.remove('dark');
+                         }
+                         if (hasClass) {
+                              document.body.classList.remove('dark');
+                         }
+                    }
+               }
+
+               useDark.addEventListener('change', function (evt) {
+                    toggleDarkMode(evt.matches);
+               });
+               if (darkModeStateLocal) {
+                    darkModeState = darkModeStateLocal === 'true';
+               }
+               toggleDarkMode(darkModeState);
+          </script>
+
+        <div class="navbar navbar-default navbar-fixed-top d-md-none p-0">
+               <div class="d-flex">
+                    <a href="../" class="navbar-brand">ng-speed-test</a>
+                    <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+               </div>
         </div>
 
         <div class="xs-menu menu" id="mobile-menu">
@@ -24,7 +75,7 @@
 
         <div class="container-fluid main">
            <div class="row main">
-               <div class="hidden-xs menu">
+               <div class="d-none d-md-block menu">
                    <compodoc-menu mode="normal"></compodoc-menu>
                </div>
                <!-- START CONTENT -->
@@ -64,7 +115,7 @@
             <h3>File</h3>
         </p>
         <p class="comment">
-            <code>src/app/services/speed-test.service.ts</code>
+            <code>src/services/speed-test.service.ts</code>
         </p>
 
 
@@ -85,7 +136,8 @@
                         <ul class="index-list">
                             <li>
                                     <span class="modifier">Private</span>
-                                <a href="#_applyCacheBuster" >_applyCacheBuster</a>
+                                    <span class="modifier">Readonly</span>
+                                <a href="#DEFAULT_TIMEOUT" >DEFAULT_TIMEOUT</a>
                             </li>
                         </ul>
                     </td>
@@ -101,7 +153,11 @@
                         <ul class="index-list">
                             <li>
                                     <span class="modifier">Private</span>
-                                <a href="#_download" >_download</a>
+                                <a href="#applyCacheBuster" >applyCacheBuster</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#downloadTest" >downloadTest</a>
                             </li>
                             <li>
                                 <a href="#getBps" >getBps</a>
@@ -113,7 +169,17 @@
                                 <a href="#getMbps" >getMbps</a>
                             </li>
                             <li>
+                                <a href="#getNetworkStatus" >getNetworkStatus</a>
+                            </li>
+                            <li>
+                                <a href="#getSpeedTestResult" >getSpeedTestResult</a>
+                            </li>
+                            <li>
                                 <a href="#isOnline" >isOnline</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#validateSettings" >validateSettings</a>
                             </li>
                         </ul>
                     </td>
@@ -138,7 +204,7 @@
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="11" class="link-to-prism">src/app/services/speed-test.service.ts:11</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="13" class="link-to-prism">src/services/speed-test.service.ts:13</a></div>
                             </td>
                         </tr>
 
@@ -155,81 +221,154 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="_download"></a>
+                    <a name="applyCacheBuster"></a>
                     <span class="name">
-                        <span class="modifier">Private</span>
-                        <span ><b>_download</b></span>
-                        <a href="#_download"><span class="icon ion-ios-link"></span></a>
+                            <span class="modifier">Private</span>
+                        <span ><b>applyCacheBuster</b></span>
+                        <a href="#applyCacheBuster"><span class="icon ion-ios-link"></span></a>
                     </span>
                 </td>
             </tr>
             <tr>
                 <td class="col-md-4">
-                    <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>_download(settings: <a href="../classes/SpeedTestSettingsModel.html" target="_self">SpeedTestSettingsModel</a>, allDetails?: <a href="../classes/SpeedTestResultsModel.html" target="_self">SpeedTestResultsModel[]</a>)</code>
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>applyCacheBuster(path: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
                 </td>
             </tr>
 
 
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="17"
+                                    class="link-to-prism">src/services/speed-test.service.ts:17</a></div>
+                        </td>
+                    </tr>
+
+
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="18"
-                            class="link-to-prism">src/app/services/speed-test.service.ts:18</a></div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>path</td>
+                                            <td>
+                                                            <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="downloadTest"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>downloadTest</b></span>
+                        <a href="#downloadTest"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>downloadTest(settings: <a href="../classes/SpeedTestSettingsModel.html" target="_self">SpeedTestSettingsModel</a>, allResults: <a href="../classes/SpeedTestResultsModel.html" target="_self">SpeedTestResultsModel[]</a>)</code>
                 </td>
             </tr>
 
 
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="22"
+                                    class="link-to-prism">src/services/speed-test.service.ts:22</a></div>
+                        </td>
+                    </tr>
+
+
             <tr>
                 <td class="col-md-4">
 
-                    <div class="io-description">
-                        <b>Parameters :</b>
-                        
-                        <table class="params">
-                            <thead>
-                                <tr>
-                                    <td>Name</td>
-                                    <td>Type</td>
-                                    <td>Optional</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>settings</td>
-                                    <td>
-                                                <code><a href="../classes/SpeedTestSettingsModel.html" target="_self" >SpeedTestSettingsModel</a></code>
-                                    </td>
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                                <td>Default value</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>settings</td>
+                                            <td>
+                                                            <code><a href="../classes/SpeedTestSettingsModel.html" target="_self" >SpeedTestSettingsModel</a></code>
+                                            </td>
 
-                                    <td>
-                                        No
-                                    </td>
+                                            <td>
+                                                    No
+                                            </td>
 
+                                            <td>
+                                            </td>
 
-                                </tr>
-                                <tr>
-                                    <td>allDetails</td>
-                                    <td>
-                                                <code><a href="../classes/SpeedTestResultsModel.html" target="_self" >SpeedTestResultsModel[]</a></code>
-                                    </td>
+                                        </tr>
+                                        <tr>
+                                                <td>allResults</td>
+                                            <td>
+                                                            <code><a href="../classes/SpeedTestResultsModel.html" target="_self" >SpeedTestResultsModel[]</a></code>
+                                            </td>
 
-                                    <td>
-                                        Yes
-                                    </td>
+                                            <td>
+                                                    No
+                                            </td>
 
+                                            <td>
+                                                    <code>[]</code>
+                                            </td>
 
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div>
-                    </div>
-                    <div class="io-description">
-                        <b>Returns : </b>    <code>Observable&lt;number&gt;</code>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>    <code>Observable&lt;number&gt;</code>
 
-                    </div>
-                    <div class="io-description">
-                        
-                    </div>
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
                 </td>
             </tr>
         </tbody>
@@ -247,58 +386,58 @@
             </tr>
             <tr>
                 <td class="col-md-4">
-<code>getBps(settings?: <a href="../classes/SpeedTestSettingsModel.html" target="_self">SpeedTestSettingsModel</a>)</code>
+<code>getBps(customSettings?: <a href="../interfaces/SpeedTestSettings.html" target="_self">Partial&lt;SpeedTestSettingsModel&gt;</a>)</code>
                 </td>
             </tr>
 
 
-            <tr>
-                <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="93"
-                            class="link-to-prism">src/app/services/speed-test.service.ts:93</a></div>
-                </td>
-            </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="116"
+                                    class="link-to-prism">src/services/speed-test.service.ts:116</a></div>
+                        </td>
+                    </tr>
 
 
             <tr>
                 <td class="col-md-4">
+                        <div class="io-description"><p>Get internet speed in bits per second (bps)</p>
+</div>
 
-                    <div class="io-description">
-                        <b>Parameters :</b>
-                        
-                        <table class="params">
-                            <thead>
-                                <tr>
-                                    <td>Name</td>
-                                    <td>Type</td>
-                                    <td>Optional</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>settings</td>
-                                    <td>
-                                                <code><a href="../classes/SpeedTestSettingsModel.html" target="_self" >SpeedTestSettingsModel</a></code>
-                                    </td>
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>customSettings</td>
+                                            <td>
+                                                            <code><a href="../interfaces/SpeedTestSettings.html" target="_self" >Partial&lt;SpeedTestSettingsModel&gt;</a></code>
+                                            </td>
 
-                                    <td>
-                                        Yes
-                                    </td>
+                                            <td>
+                                                    Yes
+                                            </td>
 
 
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div>
-                    </div>
-                    <div class="io-description">
-                        <b>Returns : </b>    <code>Observable&lt;number | null&gt;</code>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>    <code>Observable&lt;number&gt;</code>
 
-                    </div>
-                    <div class="io-description">
-                        
-                    </div>
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
                 </td>
             </tr>
         </tbody>
@@ -316,58 +455,58 @@
             </tr>
             <tr>
                 <td class="col-md-4">
-<code>getKbps(settings?: <a href="../classes/SpeedTestSettingsModel.html" target="_self">SpeedTestSettingsModel</a>)</code>
+<code>getKbps(settings?: <a href="../interfaces/SpeedTestSettings.html" target="_self">Partial&lt;SpeedTestSettingsModel&gt;</a>)</code>
                 </td>
             </tr>
 
 
-            <tr>
-                <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="146"
-                            class="link-to-prism">src/app/services/speed-test.service.ts:146</a></div>
-                </td>
-            </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="144"
+                                    class="link-to-prism">src/services/speed-test.service.ts:144</a></div>
+                        </td>
+                    </tr>
 
 
             <tr>
                 <td class="col-md-4">
+                        <div class="io-description"><p>Get internet speed in kilobits per second (Kbps)</p>
+</div>
 
-                    <div class="io-description">
-                        <b>Parameters :</b>
-                        
-                        <table class="params">
-                            <thead>
-                                <tr>
-                                    <td>Name</td>
-                                    <td>Type</td>
-                                    <td>Optional</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>settings</td>
-                                    <td>
-                                                <code><a href="../classes/SpeedTestSettingsModel.html" target="_self" >SpeedTestSettingsModel</a></code>
-                                    </td>
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>settings</td>
+                                            <td>
+                                                            <code><a href="../interfaces/SpeedTestSettings.html" target="_self" >Partial&lt;SpeedTestSettingsModel&gt;</a></code>
+                                            </td>
 
-                                    <td>
-                                        Yes
-                                    </td>
+                                            <td>
+                                                    Yes
+                                            </td>
 
 
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div>
-                    </div>
-                    <div class="io-description">
-                        <b>Returns : </b>    <code>Observable&lt;number&gt;</code>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>    <code>Observable&lt;number&gt;</code>
 
-                    </div>
-                    <div class="io-description">
-                        
-                    </div>
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
                 </td>
             </tr>
         </tbody>
@@ -385,58 +524,166 @@
             </tr>
             <tr>
                 <td class="col-md-4">
-<code>getMbps(settings?: <a href="../classes/SpeedTestSettingsModel.html" target="_self">SpeedTestSettingsModel</a>)</code>
+<code>getMbps(settings?: <a href="../interfaces/SpeedTestSettings.html" target="_self">Partial&lt;SpeedTestSettingsModel&gt;</a>)</code>
                 </td>
             </tr>
 
 
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="153"
+                                    class="link-to-prism">src/services/speed-test.service.ts:153</a></div>
+                        </td>
+                    </tr>
+
+
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="156"
-                            class="link-to-prism">src/app/services/speed-test.service.ts:156</a></div>
+                        <div class="io-description"><p>Get internet speed in megabits per second (Mbps)</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>settings</td>
+                                            <td>
+                                                            <code><a href="../interfaces/SpeedTestSettings.html" target="_self" >Partial&lt;SpeedTestSettingsModel&gt;</a></code>
+                                            </td>
+
+                                            <td>
+                                                    Yes
+                                            </td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>    <code>Observable&lt;number&gt;</code>
+
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getNetworkStatus"></a>
+                    <span class="name">
+                        <span ><b>getNetworkStatus</b></span>
+                        <a href="#getNetworkStatus"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>getNetworkStatus()</code>
                 </td>
             </tr>
 
 
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="189"
+                                    class="link-to-prism">src/services/speed-test.service.ts:189</a></div>
+                        </td>
+                    </tr>
+
+
             <tr>
                 <td class="col-md-4">
+                        <div class="io-description"><p>Monitor network connection status</p>
+</div>
 
-                    <div class="io-description">
-                        <b>Parameters :</b>
-                        
-                        <table class="params">
-                            <thead>
-                                <tr>
-                                    <td>Name</td>
-                                    <td>Type</td>
-                                    <td>Optional</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>settings</td>
-                                    <td>
-                                                <code><a href="../classes/SpeedTestSettingsModel.html" target="_self" >SpeedTestSettingsModel</a></code>
-                                    </td>
+                        <div class="io-description">
+                            <b>Returns : </b>    <code>Observable&lt;literal type&gt;</code>
 
-                                    <td>
-                                        Yes
-                                    </td>
+                        </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getSpeedTestResult"></a>
+                    <span class="name">
+                        <span ><b>getSpeedTestResult</b></span>
+                        <a href="#getSpeedTestResult"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>getSpeedTestResult(settings?: <a href="../interfaces/SpeedTestSettings.html" target="_self">Partial&lt;SpeedTestSettingsModel&gt;</a>)</code>
+                </td>
+            </tr>
 
 
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div>
-                    </div>
-                    <div class="io-description">
-                        <b>Returns : </b>    <code>Observable&lt;number&gt;</code>
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="162"
+                                    class="link-to-prism">src/services/speed-test.service.ts:162</a></div>
+                        </td>
+                    </tr>
 
-                    </div>
-                    <div class="io-description">
-                        
-                    </div>
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>Get comprehensive speed test results</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>settings</td>
+                                            <td>
+                                                            <code><a href="../interfaces/SpeedTestSettings.html" target="_self" >Partial&lt;SpeedTestSettingsModel&gt;</a></code>
+                                            </td>
+
+                                            <td>
+                                                    Yes
+                                            </td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="../interfaces/SpeedTestResult.html" target="_self" >Observable&lt;SpeedTestResult&gt;</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
                 </td>
             </tr>
         </tbody>
@@ -459,21 +706,92 @@
             </tr>
 
 
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="178"
+                                    class="link-to-prism">src/services/speed-test.service.ts:178</a></div>
+                        </td>
+                    </tr>
+
+
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="166"
-                            class="link-to-prism">src/app/services/speed-test.service.ts:166</a></div>
+                        <div class="io-description"><p>Check if the browser is online</p>
+</div>
+
+                        <div class="io-description">
+                            <b>Returns : </b>    <code>Observable&lt;boolean&gt;</code>
+
+                        </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="validateSettings"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>validateSettings</b></span>
+                        <a href="#validateSettings"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>validateSettings(settings: <a href="../classes/SpeedTestSettingsModel.html" target="_self">SpeedTestSettingsModel</a>)</code>
                 </td>
             </tr>
 
 
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="99"
+                                    class="link-to-prism">src/services/speed-test.service.ts:99</a></div>
+                        </td>
+                    </tr>
+
+
             <tr>
                 <td class="col-md-4">
 
-                    <div class="io-description">
-                        <b>Returns : </b>    <code>Observable&lt;boolean&gt;</code>
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>settings</td>
+                                            <td>
+                                                            <code><a href="../classes/SpeedTestSettingsModel.html" target="_self" >SpeedTestSettingsModel</a></code>
+                                            </td>
 
-                    </div>
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
                 </td>
             </tr>
         </tbody>
@@ -488,22 +806,29 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="_applyCacheBuster"></a>
+                    <a name="DEFAULT_TIMEOUT"></a>
                     <span class="name">
                             <span class="modifier">Private</span>
-                        <span ><b>_applyCacheBuster</b></span>
-                        <a href="#_applyCacheBuster"><span class="icon ion-ios-link"></span></a>
+                            <span class="modifier">Readonly</span>
+                        <span ><b>DEFAULT_TIMEOUT</b></span>
+                        <a href="#DEFAULT_TIMEOUT"><span class="icon ion-ios-link"></span></a>
                     </span>
                 </td>
             </tr>
                 <tr>
                     <td class="col-md-4">
-                        <i>Default value : </i><code>() &#x3D;&gt; {...}</code>
+                        <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>30000</code>
                     </td>
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="16" class="link-to-prism">src/app/services/speed-test.service.ts:16</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="13" class="link-to-prism">src/services/speed-test.service.ts:13</a></div>
                         </td>
                     </tr>
 
@@ -516,191 +841,213 @@
 
 
     <div class="tab-pane fade  tab-source-code" id="source">
-        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import {Injectable} from &#x27;@angular/core&#x27;;
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable } from &#x27;@angular/core&#x27;;
+import { fromEvent, merge, Observable, of, throwError } from &#x27;rxjs&#x27;;
+import { map, mergeMap, catchError, timeout } from &#x27;rxjs/operators&#x27;;
 
-import {fromEvent, merge, Observable, Observer, of} from &#x27;rxjs&#x27;;
-import {map, mergeMap} from &#x27;rxjs/operators&#x27;;
+import { SpeedTestResultsModel } from &#x27;../models/speed-test-results.model&#x27;;
+import { SpeedTestSettingsModel } from &#x27;../models/speed-test-settings.model&#x27;;
+import {SpeedTestResult} from &#x27;../models/speed-test-result.model&#x27;;
 
-import {SpeedTestFileModel} from &#x27;../models/speed-test-file.model&#x27;;
-import {SpeedTestResultsModel} from &#x27;../models/speed-test-results.model&#x27;;
-import {SpeedTestSettingsModel} from &#x27;../models/speed-test-settings.model&#x27;;
-
-@Injectable()
+@Injectable({
+    providedIn: &#x27;root&#x27;
+})
 export class SpeedTestService {
-  constructor() {
+    private readonly DEFAULT_TIMEOUT &#x3D; 30000; // 30 seconds
 
-  }
+    constructor() {}
 
-  private _applyCacheBuster &#x3D; (path:string): string &#x3D;&gt; path + &#x27;?nnn&#x3D;&#x27; + Math.random();
+    private applyCacheBuster(path: string): string {
+        const separator &#x3D; path.includes(&#x27;?&#x27;) ? &#x27;&amp;&#x27; : &#x27;?&#x27;;
+        return &#x60;${path}${separator}cache_bust&#x3D;${Date.now()}_${Math.random()}&#x60;;
+    }
 
-  private _download(settings:SpeedTestSettingsModel, allDetails?:SpeedTestResultsModel[]):Observable&lt;number&gt; {
-    return new Observable&lt;SpeedTestResultsModel&gt;(
-      (observer) &#x3D;&gt; {
-        const newSpeedDetails &#x3D; new SpeedTestResultsModel(settings.file.size);
+    private downloadTest(settings: SpeedTestSettingsModel, allResults: SpeedTestResultsModel[] &#x3D; []): Observable&lt;number&gt; {
+        return new Observable&lt;SpeedTestResultsModel&gt;(observer &#x3D;&gt; {
+            const testResult &#x3D; new SpeedTestResultsModel(settings.file!.size);
 
-        const download &#x3D; new Image();
+            // Use fetch API for better error handling and modern approach
+            const abortController &#x3D; new AbortController();
 
-        download.onload &#x3D; () &#x3D;&gt; {
-          newSpeedDetails.end();
-
-          observer.next(newSpeedDetails);
-          observer.complete();
-        };
-
-        download.onerror &#x3D; () &#x3D;&gt; {
-          newSpeedDetails.error();
-
-          let delay &#x3D; 0;
-          if (settings.iterations !&#x3D;&#x3D; 1) {
-            delay &#x3D; settings.retryDelay;
-          }
-
-          if (typeof window &#x3D;&#x3D;&#x3D; &#x27;undefined&#x27;) {
-            console.error(&quot;ng-speed-test: window is not defined.&quot;);
-            return;
-          }
-
-          window.setTimeout(
-            () &#x3D;&gt; {
-              observer.next(newSpeedDetails);
-              observer.complete();
-            },
-            delay
-          );
-        };
-
-        let filePath &#x3D; settings.file.path;
-        if (settings.file.shouldBustCache) {
-          filePath &#x3D; this._applyCacheBuster(filePath);
-        }
-
-        newSpeedDetails.start();
-
-        download.src &#x3D; filePath;
-      }
-    ).pipe(
-      mergeMap(
-        (newSpeedDetails:SpeedTestResultsModel|null) &#x3D;&gt; {
-          if (typeof allDetails &#x3D;&#x3D;&#x3D; &#x27;undefined&#x27;) {
-            allDetails &#x3D; [];
-          }
-
-          allDetails.push(newSpeedDetails);
-
-          if (settings.iterations &#x3D;&#x3D;&#x3D; 1) {
-            const count &#x3D; allDetails.length;
-            let total &#x3D; 0;
-
-            for (let i &#x3D; 0; i &lt; count; i++) {
-              total +&#x3D; allDetails[i].speedBps;
+            let filePath &#x3D; settings.file!.path;
+            if (settings.file!.shouldBustCache) {
+                filePath &#x3D; this.applyCacheBuster(filePath);
             }
 
-            const speedBps &#x3D; total / count;
+            testResult.start();
 
-            return of(speedBps);
-          } else {
-            settings.iterations--;
+            fetch(filePath, {
+                method: &#x27;GET&#x27;,
+                signal: abortController.signal,
+                cache: &#x27;no-cache&#x27;
+            })
+                .then(response &#x3D;&gt; {
+                    if (!response.ok) {
+                        throw new Error(&#x60;HTTP ${response.status}: ${response.statusText}&#x60;);
+                    }
+                    return response.blob();
+                })
+                .then(() &#x3D;&gt; {
+                    testResult.end();
+                    observer.next(testResult);
+                    observer.complete();
+                })
+                .catch(error &#x3D;&gt; {
+                    console.warn(&#x27;Speed test download failed:&#x27;, error);
+                    testResult.error();
 
-            return this._download(settings, allDetails);
-          }
-        }
-      )
-    );
-  }
+                    const delay &#x3D; settings.iterations !&#x3D;&#x3D; 1 ? settings.retryDelay! : 0;
 
-  getBps(settings?:SpeedTestSettingsModel):Observable&lt;number|null&gt; {
-    return new Observable(
-      (observer) &#x3D;&gt; {
-        window.setTimeout(
-          () &#x3D;&gt; {
-            const defaultSettings &#x3D; new SpeedTestSettingsModel();
-            if (typeof settings &#x3D;&#x3D;&#x3D; &#x27;undefined&#x27;) {
-              settings &#x3D; { ...defaultSettings };
-            } else {
-              if (typeof settings.iterations &#x3D;&#x3D;&#x3D; &#x27;undefined&#x27;) {
-                settings.iterations &#x3D; defaultSettings.iterations;
-              }
+                    setTimeout(() &#x3D;&gt; {
+                        observer.next(testResult);
+                        observer.complete();
+                    }, delay);
+                });
 
-              if (typeof settings.file &#x3D;&#x3D;&#x3D; &#x27;undefined&#x27;) {
-                settings.file &#x3D; defaultSettings.file;
-              } else {
-                const defaultFileSettings &#x3D; new SpeedTestFileModel();
+            // Cleanup function
+            return () &#x3D;&gt; {
+                abortController.abort();
+            };
+        }).pipe(
+            timeout(this.DEFAULT_TIMEOUT),
+            catchError(error &#x3D;&gt; {
+                console.error(&#x27;Speed test timeout or error:&#x27;, error);
+                const failedResult &#x3D; new SpeedTestResultsModel(settings.file!.size);
+                failedResult.error();
+                return of(failedResult);
+            }),
+            mergeMap((testResult: SpeedTestResultsModel) &#x3D;&gt; {
+                allResults.push(testResult);
 
-                if (typeof settings.file.path &#x3D;&#x3D;&#x3D; &#x27;undefined&#x27;) {
-                  console.error(&#x27;ng-speed-test: File path is missing.&#x27;);
+                if (settings.iterations &#x3D;&#x3D;&#x3D; 1) {
+                    // Calculate average speed from all valid results
+                    const validResults &#x3D; allResults.filter(result &#x3D;&gt; result.speedBps &gt; 0);
 
-                  return null;
+                    if (validResults.length &#x3D;&#x3D;&#x3D; 0) {
+                        return throwError(() &#x3D;&gt; new Error(&#x27;All speed test iterations failed&#x27;));
+                    }
+
+                    const totalSpeed &#x3D; validResults.reduce((sum, result) &#x3D;&gt; sum + result.speedBps, 0);
+                    const averageSpeed &#x3D; totalSpeed / validResults.length;
+
+                    return of(averageSpeed);
+                } else {
+                    settings.iterations!--;
+                    return this.downloadTest(settings, allResults);
                 }
-
-                if (typeof settings.file.size &#x3D;&#x3D;&#x3D; &#x27;undefined&#x27;) {
-                  console.error(&#x27;ng-speed-test: File size is missing.&#x27;);
-
-                  return null;
-                }
-
-                if (typeof settings.file.shouldBustCache &#x3D;&#x3D;&#x3D; &#x27;undefined&#x27;) {
-                  settings.file.shouldBustCache &#x3D; defaultFileSettings.shouldBustCache;
-                }
-
-                if (typeof settings.retryDelay &#x3D;&#x3D;&#x3D; &#x27;undefined&#x27;) {
-                  settings.retryDelay &#x3D; defaultSettings.retryDelay;
-                }
-              }
-            }
-
-            this._download({ ...settings }).subscribe(
-              (speedBps) &#x3D;&gt; {
-                observer.next(speedBps);
-                observer.complete();
-              }
-            );
-          },
-          1
+            })
         );
-      }
-    );
-  }
+    }
 
-  getKbps(settings?:SpeedTestSettingsModel):Observable&lt;number&gt; {
-    return this.getBps(settings).pipe(
-      map(
-        (bps) &#x3D;&gt; {
-          return bps / 1024;
+    private validateSettings(settings: SpeedTestSettingsModel): void {
+        if (!settings.file?.path) {
+            throw new Error(&#x27;ng-speed-test: File path is required&#x27;);
         }
-      )
-    );
-  }
 
-  getMbps(settings?:SpeedTestSettingsModel):Observable&lt;number&gt; {
-    return this.getKbps(settings).pipe(
-      map(
-        (kpbs) &#x3D;&gt; {
-          return kpbs / 1024;
+        if (!settings.file?.size || settings.file.size &lt;&#x3D; 0) {
+            throw new Error(&#x27;ng-speed-test: Valid file size is required&#x27;);
         }
-      )
-    );
-  }
 
-  isOnline():Observable&lt;boolean&gt; {
-    return merge&lt;boolean&gt;(
-      fromEvent(window, &#x27;offline&#x27;).pipe(
-        map(
-          () &#x3D;&gt; false
-        )
-      ),
-      fromEvent(window, &#x27;online&#x27;).pipe(
-        map(
-          () &#x3D;&gt; true
-        )
-      ),
-      new Observable(
-        (sub:Observer&lt;boolean&gt;) &#x3D;&gt; {
-          sub.next(navigator.onLine);
-          sub.complete();
+        if (settings.iterations &amp;&amp; settings.iterations &lt; 1) {
+            throw new Error(&#x27;ng-speed-test: Iterations must be at least 1&#x27;);
         }
-      )
-    );
-  }
+    }
+
+    /**
+     * Get internet speed in bits per second (bps)
+     */
+    getBps(customSettings?: Partial&lt;SpeedTestSettingsModel&gt;): Observable&lt;number&gt; {
+        return new Observable(observer &#x3D;&gt; {
+            // Small delay to ensure proper initialization
+            setTimeout(() &#x3D;&gt; {
+                const settings &#x3D; new SpeedTestSettingsModel(customSettings);
+
+                try {
+                    this.validateSettings(settings);
+
+                    this.downloadTest(settings).subscribe({
+                        next: (speedBps) &#x3D;&gt; {
+                            observer.next(speedBps);
+                            observer.complete();
+                        },
+                        error: (error) &#x3D;&gt; {
+                            observer.error(error);
+                        }
+                    });
+                } catch (error) {
+                    observer.error(error);
+                }
+            }, 1);
+        });
+    }
+
+    /**
+     * Get internet speed in kilobits per second (Kbps)
+     */
+    getKbps(settings?: Partial&lt;SpeedTestSettingsModel&gt;): Observable&lt;number&gt; {
+        return this.getBps(settings).pipe(
+            map(bps &#x3D;&gt; bps / 1024)
+        );
+    }
+
+    /**
+     * Get internet speed in megabits per second (Mbps)
+     */
+    getMbps(settings?: Partial&lt;SpeedTestSettingsModel&gt;): Observable&lt;number&gt; {
+        return this.getKbps(settings).pipe(
+            map(kbps &#x3D;&gt; kbps / 1024)
+        );
+    }
+
+    /**
+     * Get comprehensive speed test results
+     */
+    getSpeedTestResult(settings?: Partial&lt;SpeedTestSettingsModel&gt;): Observable&lt;SpeedTestResult&gt; {
+        const startTime &#x3D; Date.now();
+
+        return this.getBps(settings).pipe(
+            map(bps &#x3D;&gt; ({
+                bps,
+                kbps: bps / 1024,
+                mbps: bps / (1024 * 1024),
+                duration: (Date.now() - startTime) / 1000
+            }))
+        );
+    }
+
+    /**
+     * Check if the browser is online
+     */
+    isOnline(): Observable&lt;boolean&gt; {
+        return merge(
+            fromEvent(window, &#x27;offline&#x27;).pipe(map(() &#x3D;&gt; false)),
+            fromEvent(window, &#x27;online&#x27;).pipe(map(() &#x3D;&gt; true)),
+            of(navigator.onLine)
+        );
+    }
+
+    /**
+     * Monitor network connection status
+     */
+    getNetworkStatus(): Observable&lt;{ isOnline: boolean; effectiveType?: string; downlink?: number }&gt; {
+        const getConnectionInfo &#x3D; () &#x3D;&gt; {
+            const connection &#x3D; (navigator as any).connection ||
+                (navigator as any).mozConnection ||
+                (navigator as any).webkitConnection;
+
+            return {
+                isOnline: navigator.onLine,
+                effectiveType: connection?.effectiveType,
+                downlink: connection?.downlink
+            };
+        };
+
+        return merge(
+            fromEvent(window, &#x27;offline&#x27;).pipe(map(() &#x3D;&gt; ({ ...getConnectionInfo(), isOnline: false }))),
+            fromEvent(window, &#x27;online&#x27;).pipe(map(() &#x3D;&gt; ({ ...getConnectionInfo(), isOnline: true }))),
+            of(getConnectionInfo())
+        );
+    }
 }
 </code></pre>
     </div>
@@ -749,6 +1096,19 @@ export class SpeedTestService {
             var MAX_SEARCH_RESULTS = 15;
        </script>
 
+       <script>
+               $darkModeToggleSwitchers = document.querySelectorAll('.dark-mode-switch input');
+               checkToggle(darkModeState);
+               if ($darkModeToggleSwitchers.length > 0) {
+                    for (var i = 0; i < $darkModeToggleSwitchers.length; i++) {
+                         $darkModeToggleSwitchers[i].addEventListener('change', function (event) {
+                              darkModeState = !darkModeState;
+                              toggleDarkMode(darkModeState);
+                         });
+                    }
+               }
+          </script>
+
        <script src="../js/libs/custom-elements.min.js"></script>
        <script src="../js/libs/lit-html.js"></script>
 
@@ -760,7 +1120,6 @@ export class SpeedTestService {
        <script src="../js/libs/es6-shim.min.js"></script>
        <script src="../js/libs/EventDispatcher.js"></script>
        <script src="../js/libs/promise.min.js"></script>
-       <script src="../js/libs/zepto.min.js"></script>
 
        <script src="../js/compodoc.js"></script>
 
