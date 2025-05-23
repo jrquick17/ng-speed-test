@@ -1,18 +1,62 @@
 {
   "name": "ng-speed-test",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Angular library for testing internet connection speed",
+  "readme": "README.md",
+  "homepage": "https://ng-speed-test.jrquick.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jrquick17/ng-speed-test"
+  },
+  "bugs": {
+    "url": "https://github.com/jrquick17/ng-speed-test/issues"
+  },
   "main": "bundles/ng-speed-test.umd.js",
-  "module": "fesm2015/ng-speed-test.js",
-  "es2020": "fesm2020/ng-speed-test.js",
-  "esm2020": "esm2020/ng-speed-test.js",
-  "fesm2020": "fesm2020/ng-speed-test.js",
-  "fesm2015": "fesm2015/ng-speed-test.js",
+  "module": "fesm2022/ng-speed-test.mjs",
+  "es2020": "fesm2020/ng-speed-test.mjs",
+  "esm2020": "esm2020/ng-speed-test.mjs",
+  "fesm2020": "fesm2020/ng-speed-test.mjs",
+  "fesm2022": "fesm2022/ng-speed-test.mjs",
   "typings": "index.d.ts",
+  "exports": {
+    "./package.json": {
+      "default": "./package.json"
+    },
+    ".": {
+      "types": "./index.d.ts",
+      "esm2022": "./esm2022/ng-speed-test.mjs",
+      "esm2020": "./esm2020/ng-speed-test.mjs",
+      "es2020": "./fesm2020/ng-speed-test.mjs",
+      "es2015": "./fesm2015/ng-speed-test.mjs",
+      "node": "./fesm2022/ng-speed-test.mjs",
+      "default": "./fesm2022/ng-speed-test.mjs"
+    }
+  },
+  "sideEffects": false,
   "scripts": {
-    "build": "ng build",
-    "test": "ng test",
-    "lint": "ng lint"
+    "build": "ng build ng-speed-test",
+    "build:watch": "ng build ng-speed-test --watch",
+    "build:link": "npm run build && cd dist/ng-speed-test && npm link",
+    "demo": "ng serve demo",
+    "demo:build": "ng build demo --configuration production",
+    "demo:test": "npm run build && cd dist/ng-speed-test && npm link && cd ../.. && cd projects/demo && npm link ng-speed-test && cd ../.. && npm run demo",
+    "docs": "npm run docs:build",
+    "docs:build": "compodoc -p tsconfig.json -n ng-speed-test -d docs --hideGenerator",
+    "docs:serve": "npm run docs:build -- -s",
+    "docs:watch": "npm run docs:build -- -s -w",
+    "lint": "ng lint",
+    "test": "ng test ng-speed-test --watch=false --browsers=ChromeHeadless",
+    "test:watch": "ng test ng-speed-test",
+    "pack": "npm run build && cd dist/ng-speed-test && npm pack",
+    "publish": "npm run build && cd dist/ng-speed-test && npm publish",
+    "publish:dry": "npm run build && cd dist/ng-speed-test && npm publish --dry-run",
+    "version:patch": "npm version patch",
+    "version:minor": "npm version minor",
+    "version:major": "npm version major",
+    "shipit": "npm run lint && npm run test && npm run build && npm run demo:build && npm run docs:build && npm run publish",
+    "shipit:dry": "npm run lint && npm run test && npm run build && npm run demo:build && npm run docs:build && npm run publish:dry",
+    "clean": "rimraf dist",
+    "clean:all": "rimraf dist node_modules package-lock.json && npm install"
   },
   "keywords": [
     "angular",
@@ -20,15 +64,23 @@
     "internet-speed",
     "network-test",
     "bandwidth",
-    "connection-speed"
+    "connection-speed",
+    "typescript",
+    "rxjs",
+    "angular18"
   ],
   "author": "Jeremy Quick",
   "license": "MIT",
   "peerDependencies": {
+    "@angular/common": "^16.0.0 || ^17.0.0 || ^18.0.0",
+    "@angular/core": "^16.0.0 || ^17.0.0 || ^18.0.0",
     "rxjs": "^7.5.0",
     "tslib": "^2.3.0"
   },
   "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
     "@angular/animations": "^18.2.13",
     "@angular/cdk": "~18.2.14",
     "@angular/common": "^18.2.13",
@@ -39,17 +91,22 @@
     "@angular/platform-browser": "^18.2.13",
     "@angular/platform-browser-dynamic": "^18.2.13",
     "@angular/router": "^18.2.13",
-    "ng-speed-test": "^2.6.1",
-    "rxjs": "^7.5.0",
-    "tslib": "^2.3.0",
-    "zone.js": "~0.14.10"
-  },
-  "devDependencies": {
     "@angular-devkit/build-angular": "^18.2.19",
     "@angular/cli": "^18.2.19",
     "@angular/compiler-cli": "^18.2.13",
-    "@types/node": "^18.19.0",
+    "@compodoc/compodoc": "^1.1.25",
+    "@types/jasmine": "~5.1.0",
+    "@types/node": "^20.0.0",
+    "jasmine-core": "~5.1.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
     "ng-packagr": "^18.2.1",
-    "typescript": "~5.5.4"
+    "rimraf": "^6.0.0",
+    "typescript": "~5.5.4",
+    "rxjs": "^7.8.0",
+    "zone.js": "~0.14.10"
   }
 }

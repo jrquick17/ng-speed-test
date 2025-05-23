@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { SpeedTestService } from 'ng-speed-test';
+import { SpeedTestService } from '../../../../src/services/speed-test.service';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +12,7 @@ export class AppComponent {
   public hasTracked: boolean = false;
   public isTracking: boolean = false;
   public iterations: number = 1;
-  public speeds: number[] = []; // Changed from string[] to number[]
+  public speeds: number[] = [];
 
   constructor(private speedTestService: SpeedTestService) {}
 
@@ -34,7 +34,6 @@ export class AppComponent {
 
     this.speedTestService.getMbps({ iterations: 1, retryDelay: 1500 }).subscribe(
         (speed) => {
-          // Store as number for progress bar, but display formatted
           this.speeds.unshift(speed);
 
           if (this.speeds.length < this.iterations) {
