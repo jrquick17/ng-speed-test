@@ -1,0 +1,52 @@
+{
+  "name": "ng-speed-test",
+  "version": "2.0.0",
+  "description": "Angular library for testing internet connection speed",
+  "main": "bundles/ng-speed-test.umd.js",
+  "module": "fesm2022/ng-speed-test.mjs",
+  "es2020": "fesm2020/ng-speed-test.js",
+  "esm2020": "esm2020/ng-speed-test.js",
+  "fesm2020": "fesm2020/ng-speed-test.js",
+  "fesm2015": "fesm2015/ng-speed-test.js",
+  "typings": "index.d.ts",
+  "keywords": [
+    "angular",
+    "speed-test",
+    "internet-speed",
+    "network-test",
+    "bandwidth",
+    "connection-speed"
+  ],
+  "author": "Jeremy Quick",
+  "license": "MIT",
+  "peerDependencies": {
+    "@angular/common": "^17.0.0",
+    "@angular/core": "^17.0.0",
+    "rxjs": "^7.5.0"
+  },
+  "dependencies": {
+    "@angular/animations": "^17.3.12",
+    "@angular/common": "^17.3.12",
+    "@angular/compiler": "^17.3.12",
+    "@angular/core": "^17.3.12",
+    "@angular/forms": "^17.3.12",
+    "@angular/platform-browser": "^17.3.12",
+    "@angular/platform-browser-dynamic": "^17.3.12",
+    "@angular/router": "^17.3.12",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.14.10"
+  },
+  "exports": {
+    "./package.json": {
+      "default": "./package.json"
+    },
+    ".": {
+      "types": "./index.d.ts",
+      "esm2022": "./esm2022/ng-speed-test.mjs",
+      "esm": "./esm2022/ng-speed-test.mjs",
+      "default": "./fesm2022/ng-speed-test.mjs"
+    }
+  },
+  "sideEffects": false
+}
