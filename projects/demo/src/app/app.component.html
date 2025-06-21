@@ -1,57 +1,218 @@
+<!-- projects/demo/src/app/app.component.html -->
 <p>
-  <mat-toolbar color="primary">
-    <mat-toolbar-row>
-      <button mat-icon-button
-              style="margin-left: 10px;"
-              aria-label="Go to GitHub"
-              (click)="goToGitHub()">
-        <mat-icon>home</mat-icon>
-      </button>
+    <mat-toolbar color="primary">
+        <mat-toolbar-row>
+            <button mat-icon-button
+                    style="margin-left: 10px;"
+                    aria-label="Go to GitHub"
+                    (click)="goToGitHub()"
+                    [disabled]="!isOnline">
+                <mat-icon>home</mat-icon>
+            </button>
 
-      <span (click)="goToGitHub()" style="cursor: pointer;">ng-speed-test</span>
-    </mat-toolbar-row>
-  </mat-toolbar>
+            <span (click)="goToGitHub()"
+                  [style.cursor]="isOnline ? 'pointer' : 'default'"
+                  [style.opacity]="isOnline ? '1' : '0.6'">
+        ng-speed-test
+      </span>
+
+            <!-- Network Status in Toolbar -->
+            <span class="spacer"></span>
+            <div class="network-status-toolbar"
+                 [class.online]="isOnline"
+                 [class.offline]="!isOnline">
+                <mat-icon>{{ isOnline ? 'wifi' : 'wifi_off' }}</mat-icon>
+                <span>{{ getConnectionStatusText() }}</span>
+                <button mat-icon-button
+                        (click)="recheckConnectivity()"
+                        matTooltip="Refresh connection status"
+                        class="refresh-btn">
+                    <mat-icon>refresh</mat-icon>
+                </button>
+            </div>
+        </mat-toolbar-row>
+    </mat-toolbar>
 </p>
 
 <mat-card style="margin: 20px; padding: 20px;">
-  <mat-card-subtitle style="text-align: center; margin-top: 30px; margin-bottom: 30px;">
-    Test Your Internet Speed
-  </mat-card-subtitle>
+    <!-- Enhanced Network Status Card -->
+    <mat-card-subtitle style="text-align: center; margin-bottom: 20px;">
+        <div class="connection-status-card"
+             [class.online]="isOnline"
+             [class.offline]="!isOnline">
+            <div class="status-icon">{{ connectionIcon }}</div>
+            <div class="status-text">
+                <strong>{{ getConnectionStatusText() }}</strong>
+                <div class="status-details" *ngIf="networkStatus">
+                    <small *ngIf="networkStatus.effectiveType">
+                        Connection: {{ networkStatus.effectiveType?.toUpperCase() }}
+                    </small>
+                    <small *ngIf="networkStatus.downlink">
+                        Estimated: {{ networkStatus.downlink }} Mbps
+                    </small>
+                    <small>
+                        Last checked: {{ lastConnectivityCheck | date:'HH:mm:ss' }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </mat-card-subtitle>
 
-  <mat-card-content>
-    <div style="
-            margin-left: auto;
-            margin-right: auto;
-            min-width: 1px;
-            max-width: 280px;
-         ">
-      <mat-form-field>
-        <mat-label>Iterations</mat-label>
-
-        <input matInput
-               type="number"
-               [min]="1"
-               [max]="100"
-               [(ngModel)]="iterations"
-               [disabled]="isTracking"/>
-      </mat-form-field>
-
-      <button mat-raised-button
-              style="margin-left: 10px;"
-              (click)="trackSpeed()"
-              [disabled]="isTracking">
-        {{ isTracking ? 'Tracking' : 'Track' }}
-      </button>
+    <!-- Connection Warning -->
+    <div *ngIf="!isOnline" class="offline-warning">
+        <mat-card class="warning-card">
+            <mat-card-content>
+                <div class="warning-content">
+                    <mat-icon color="warn">warning</mat-icon>
+                    <div>
+                        <strong>No Internet Connection</strong>
+                        <p>Please check your connection before running a speed test.</p>
+                        <button mat-raised-button color="primary" (click)="recheckConnectivity()">
+                            <mat-icon>refresh</mat-icon>
+                            Check Again
+                        </button>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
     </div>
 
-      <div *ngIf="hasTracked || isTracking" style="margin: 10px 10px 10px 20px;">
-          <p style="float: right; margin-bottom: 3px;">{{ getFormattedSpeed(speeds[0]) }} MBPS</p>
+    <!-- Main Content -->
+    <mat-card-content>
+        <div class="test-header">
+            <h2 style="text-align: center; margin-bottom: 30px;">
+                Test Your Internet Speed
+            </h2>
+        </div>
 
-          <span *ngFor="let speedInstance of speeds">
-    <mat-progress-bar style="height: 10px;"
-                      mode="determinate"
-                      [value]="speedInstance"></mat-progress-bar>
+        <!-- Error Messages -->
+        <div *ngIf="errorMessage" class="error-message">
+            <mat-card class="error-card">
+                <mat-card-content>
+                    <div class="error-content">
+                        <mat-icon color="warn">error</mat-icon>
+                        <span>{{ errorMessage }}</span>
+                        <button mat-icon-button (click)="clearError()" aria-label="Clear error">
+                            <mat-icon>close</mat-icon>
+                        </button>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+        </div>
+
+        <!-- Test Controls -->
+        <div class="test-controls">
+            <mat-form-field appearance="outline">
+                <mat-label>Iterations</mat-label>
+                <input matInput
+                       type="number"
+                       [min]="1"
+                       [max]="100"
+                       [(ngModel)]="iterations"
+                       [disabled]="isTracking || !isOnline"/>
+                <mat-hint>Number of tests to run (1-100)</mat-hint>
+            </mat-form-field>
+
+            <button mat-raised-button
+                    color="primary"
+                    class="test-button"
+                    (click)="trackSpeed()"
+                    [disabled]="isTracking || !isOnline">
+                <mat-icon>{{ isTracking ? 'hourglass_empty' : (isOnline ? 'speed' : 'wifi_off') }}</mat-icon>
+                {{ isTracking ? 'Testing...' : (isOnline ? 'Start Speed Test' : 'Offline') }}
+            </button>
+        </div>
+
+        <!-- Progress Section -->
+        <div *ngIf="isTracking" class="progress-section">
+            <div class="progress-info">
+                <h3>{{ getProgressText() }}</h3>
+                <div class="progress-stats">
+                    <span>Progress: {{ progressPercentage | number:'1.0-0' }}%</span>
+                    <span *ngIf="estimatedTimeRemaining > 0">
+            Est. remaining: {{ estimatedTimeRemaining | number:'1.0-0' }}s
           </span>
-      </div>
-  </mat-card-content>
+                </div>
+            </div>
+
+            <mat-progress-bar
+                    mode="determinate"
+                    [value]="progressPercentage"
+                    class="main-progress-bar">
+            </mat-progress-bar>
+
+            <!-- Individual test progress -->
+            <div class="test-progress">
+                <span>Current test: {{ currentIteration }}/{{ iterations }}</span>
+                <span *ngIf="lastTestDuration > 0">
+          Last test: {{ lastTestDuration | number:'1.1-1' }}s
+        </span>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div *ngIf="hasTracked || isTracking" class="results-section">
+            <div class="results-header">
+                <h3>Speed Test Results</h3>
+                <div *ngIf="averageSpeed > 0" class="average-speed">
+                    Average: {{ getFormattedSpeed(averageSpeed) }} Mbps
+                </div>
+            </div>
+
+            <!-- Speed visualization -->
+            <div class="speed-visualization">
+                <div *ngFor="let speedInstance of speeds; let i = index"
+                     class="speed-bar-container">
+                    <div class="speed-label">
+                        Test {{ speeds.length - i }}: {{ getFormattedSpeed(speedInstance) }} Mbps
+                    </div>
+                    <mat-progress-bar
+                            mode="determinate"
+                            [value]="speedInstance * 10"
+                            class="speed-bar">
+                    </mat-progress-bar>
+                </div>
+            </div>
+
+            <!-- Speed Statistics -->
+            <div *ngIf="speeds.length > 1" class="speed-stats">
+                <div class="stat-item">
+                    <strong>Best:</strong> {{ getFormattedSpeed(getMaxSpeed()) }} Mbps
+                </div>
+                <div class="stat-item">
+                    <strong>Worst:</strong> {{ getFormattedSpeed(getMinSpeed()) }} Mbps
+                </div>
+                <div class="stat-item">
+                    <strong>Range:</strong> {{ getFormattedSpeed(getSpeedRange()) }} Mbps
+                </div>
+            </div>
+        </div>
+
+        <!-- Connection Quality Indicator -->
+        <div *ngIf="hasTracked && isOnline" class="connection-quality">
+            <div class="quality-indicator" [attr.data-quality]="connectionQuality">
+                <div class="quality-icon">{{ connectionIcon }}</div>
+                <div class="quality-text">
+                    <strong>Connection Quality: {{ connectionQuality | titlecase }}</strong>
+                    <small *ngIf="averageSpeed > 0">
+                        Based on {{ averageSpeed | number:'1.1-1' }} Mbps average speed
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tips Section -->
+        <div class="tips-section" *ngIf="!isTracking">
+            <h3>💡 Speed Test Tips</h3>
+            <div class="tips-content">
+                <ul>
+                    <li><strong>Stable Connection:</strong> Ensure you have a stable internet connection</li>
+                    <li><strong>Close Apps:</strong> Close other apps using internet for accurate results</li>
+                    <li><strong>Multiple Tests:</strong> Run 3-5 iterations for more reliable averages</li>
+                    <li><strong>Wi-Fi vs Mobile:</strong> Results may vary between Wi-Fi and mobile data</li>
+                    <li><strong>Time of Day:</strong> Network speeds can vary based on usage patterns</li>
+                </ul>
+            </div>
+        </div>
+    </mat-card-content>
 </mat-card>

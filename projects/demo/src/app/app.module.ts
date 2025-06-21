@@ -1,3 +1,4 @@
+// projects/demo/src/app/app.module.ts
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
@@ -11,9 +12,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatExpansionModule } from '@angular/material/expansion';
 
-// Import from source instead of package
-import { SpeedTestModule } from '../../../../src/speed-test.module';
+// Import service directly
+import { SpeedTestService } from '../../../../src/services/speed-test.service';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -26,7 +29,6 @@ import { AppComponent } from './app.component';
     AppRoutingModule,
     BrowserModule,
     FormsModule,
-    SpeedTestModule,  // This will now work
     BrowserAnimationsModule,
     MatCardModule,
     MatIconModule,
@@ -34,9 +36,13 @@ import { AppComponent } from './app.component';
     MatFormFieldModule,
     MatProgressBarModule,
     MatToolbarModule,
-    MatButtonModule
+    MatButtonModule,
+    MatTooltipModule,
+    MatExpansionModule
   ],
-  providers: [],
+  providers: [
+    SpeedTestService
+  ],
   bootstrap: [
     AppComponent
   ]

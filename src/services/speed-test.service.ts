@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { fromEvent, merge, Observable, of, throwError } from 'rxjs';
 import { map, mergeMap, catchError, timeout, switchMap, startWith } from 'rxjs/operators';
 
-import { SpeedTestResultsModel } from '../models/speed-test-results.model';
+import { SpeedTestFileModel } from '../models/speed-test-file.model';
 import { SpeedTestSettingsModel } from '../models/speed-test-settings.model';
+import { SpeedTestResultsModel } from '../models/speed-test-results.model';
 
 export interface SpeedTestResult {
     bps: number;
@@ -184,7 +185,9 @@ export class SpeedTestService {
 
             // Small delay to ensure proper initialization
             setTimeout(() => {
-                const settings = new SpeedTestSettingsModel(customSettings);
+                // Create settings with proper merging
+                const defaultSettings = new SpeedTestSettingsModel();
+                const settings = this.mergeSettings(defaultSettings, customSettings);
 
                 try {
                     this.validateSettings(settings);
@@ -203,6 +206,51 @@ export class SpeedTestService {
                 }
             }, 1);
         });
+    }
+
+    /**
+     * Properly merge custom settings with defaults
+     */
+    private mergeSettings(defaultSettings: SpeedTestSettingsModel, customSettings?: Partial<SpeedTestSettingsModel>): SpeedTestSettingsModel {
+        if (!customSettings) {
+            return defaultSettings;
+        }
+
+        const mergedSettings = new SpeedTestSettingsModel();
+
+        // Merge iterations
+        mergedSettings.iterations = customSettings.iterations !== undefined
+            ? customSettings.iterations
+            : defaultSettings.iterations;
+
+        // Merge retryDelay
+        mergedSettings.retryDelay = customSettings.retryDelay !== undefined
+            ? customSettings.retryDelay
+            : defaultSettings.retryDelay;
+
+        // Merge file settings
+        if (customSettings.file) {
+            mergedSettings.file = new SpeedTestFileModel();
+
+            // Merge file path
+            mergedSettings.file.path = customSettings.file.path !== undefined
+                ? customSettings.file.path
+                : defaultSettings.file!.path;
+
+            // Merge file size
+            mergedSettings.file.size = customSettings.file.size !== undefined
+                ? customSettings.file.size
+                : defaultSettings.file!.size;
+
+            // Merge shouldBustCache
+            mergedSettings.file.shouldBustCache = customSettings.file.shouldBustCache !== undefined
+                ? customSettings.file.shouldBustCache
+                : defaultSettings.file!.shouldBustCache;
+        } else {
+            mergedSettings.file = defaultSettings.file;
+        }
+
+        return mergedSettings;
     }
 
     /**

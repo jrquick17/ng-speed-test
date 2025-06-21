@@ -24,6 +24,10 @@ export declare class SpeedTestService {
      */
     getBps(customSettings?: Partial<SpeedTestSettingsModel>): Observable<number>;
     /**
+     * Properly merge custom settings with defaults
+     */
+    private mergeSettings;
+    /**
      * Get internet speed in kilobits per second (Kbps)
      */
     getKbps(settings?: Partial<SpeedTestSettingsModel>): Observable<number>;

@@ -6,21 +6,20 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 class SpeedTestFileModel {
-    // Available test files:
-    // https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/500kb.jpg
-    // 500kb - 408949 bytes
-    // https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/1mb.jpg
-    // 1mb - 1197292 bytes
-    // https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/5mb.jpg
-    // 5mb - 4952221 bytes
-    // https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/13mb.jpg
-    // 13mb - 13848150 bytes
     constructor(file) {
         this.path = 'https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/5mb.jpg';
         this.shouldBustCache = true;
         this.size = 4952221;
         if (file) {
-            Object.assign(this, file);
+            if (file.path !== undefined) {
+                this.path = file.path;
+            }
+            if (file.size !== undefined) {
+                this.size = file.size;
+            }
+            if (file.shouldBustCache !== undefined) {
+                this.shouldBustCache = file.shouldBustCache;
+            }
         }
     }
 }
@@ -75,9 +74,23 @@ class SpeedTestSettingsModel {
         this.file = new SpeedTestFileModel();
         this.retryDelay = 500;
         if (settings) {
-            Object.assign(this, settings);
+            if (settings.iterations !== undefined) {
+                this.iterations = settings.iterations;
+            }
+            if (settings.retryDelay !== undefined) {
+                this.retryDelay = settings.retryDelay;
+            }
             if (settings.file) {
-                this.file = new SpeedTestFileModel(settings.file);
+                this.file = new SpeedTestFileModel();
+                if (settings.file.path !== undefined) {
+                    this.file.path = settings.file.path;
+                }
+                if (settings.file.size !== undefined) {
+                    this.file.size = settings.file.size;
+                }
+                if (settings.file.shouldBustCache !== undefined) {
+                    this.file.shouldBustCache = settings.file.shouldBustCache;
+                }
             }
         }
     }
@@ -227,7 +240,9 @@ class SpeedTestService {
             }
             // Small delay to ensure proper initialization
             setTimeout(() => {
-                const settings = new SpeedTestSettingsModel(customSettings);
+                // Create settings with proper merging
+                const defaultSettings = new SpeedTestSettingsModel();
+                const settings = this.mergeSettings(defaultSettings, customSettings);
                 try {
                     this.validateSettings(settings);
                     this.downloadTest(settings).subscribe({
@@ -245,6 +260,43 @@ class SpeedTestService {
                 }
             }, 1);
         });
+    }
+    /**
+     * Properly merge custom settings with defaults
+     */
+    mergeSettings(defaultSettings, customSettings) {
+        if (!customSettings) {
+            return defaultSettings;
+        }
+        const mergedSettings = new SpeedTestSettingsModel();
+        // Merge iterations
+        mergedSettings.iterations = customSettings.iterations !== undefined
+            ? customSettings.iterations
+            : defaultSettings.iterations;
+        // Merge retryDelay
+        mergedSettings.retryDelay = customSettings.retryDelay !== undefined
+            ? customSettings.retryDelay
+            : defaultSettings.retryDelay;
+        // Merge file settings
+        if (customSettings.file) {
+            mergedSettings.file = new SpeedTestFileModel();
+            // Merge file path
+            mergedSettings.file.path = customSettings.file.path !== undefined
+                ? customSettings.file.path
+                : defaultSettings.file.path;
+            // Merge file size
+            mergedSettings.file.size = customSettings.file.size !== undefined
+                ? customSettings.file.size
+                : defaultSettings.file.size;
+            // Merge shouldBustCache
+            mergedSettings.file.shouldBustCache = customSettings.file.shouldBustCache !== undefined
+                ? customSettings.file.shouldBustCache
+                : defaultSettings.file.shouldBustCache;
+        }
+        else {
+            mergedSettings.file = defaultSettings.file;
+        }
+        return mergedSettings;
     }
     /**
      * Get internet speed in kilobits per second (Kbps)

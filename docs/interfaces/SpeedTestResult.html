@@ -122,7 +122,7 @@
             <h3>File</h3>
         </p>
         <p class="comment">
-            <code>src/models/speed-test-result.model.ts</code>
+            <code>src/services/speed-test.service.ts</code>
         </p>
 
 
@@ -312,11 +312,363 @@
 
 
     <div class="tab-pane fade  tab-source-code" id="source">
-        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">export interface SpeedTestResult {
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable } from &#x27;@angular/core&#x27;;
+import { fromEvent, merge, Observable, of, throwError } from &#x27;rxjs&#x27;;
+import { map, mergeMap, catchError, timeout, switchMap, startWith } from &#x27;rxjs/operators&#x27;;
+
+import { SpeedTestFileModel } from &#x27;../models/speed-test-file.model&#x27;;
+import { SpeedTestSettingsModel } from &#x27;../models/speed-test-settings.model&#x27;;
+import { SpeedTestResultsModel } from &#x27;../models/speed-test-results.model&#x27;;
+
+export interface SpeedTestResult {
     bps: number;
     kbps: number;
     mbps: number;
     duration: number;
+}
+
+@Injectable({
+    providedIn: &#x27;root&#x27;
+})
+export class SpeedTestService {
+    private readonly DEFAULT_TIMEOUT &#x3D; 15000; // Reduced from 30s to 15s
+    private readonly OFFLINE_CHECK_TIMEOUT &#x3D; 3000; // Quick offline check
+
+    constructor() {}
+
+    private applyCacheBuster(path: string): string {
+        const separator &#x3D; path.includes(&#x27;?&#x27;) ? &#x27;&amp;&#x27; : &#x27;?&#x27;;
+        return &#x60;${path}${separator}cache_bust&#x3D;${Date.now()}_${Math.random()}&#x60;;
+    }
+
+    /**
+     * Quick connectivity check before running speed test
+     */
+    private checkConnectivity(): Observable&lt;boolean&gt; {
+        // First check navigator.onLine
+        if (!navigator.onLine) {
+            return of(false);
+        }
+
+        // Then do a quick network request to verify actual connectivity
+        return new Observable&lt;boolean&gt;(observer &#x3D;&gt; {
+            const controller &#x3D; new AbortController();
+            const timeoutId &#x3D; setTimeout(() &#x3D;&gt; {
+                controller.abort();
+                observer.next(false);
+                observer.complete();
+            }, this.OFFLINE_CHECK_TIMEOUT);
+
+            // Use a small, fast endpoint for connectivity check
+            fetch(&#x27;https://httpbin.org/get?minimal&#x3D;true&#x27;, {
+                method: &#x27;HEAD&#x27;,
+                mode: &#x27;no-cors&#x27;,
+                signal: controller.signal,
+                cache: &#x27;no-cache&#x27;
+            })
+                .then(() &#x3D;&gt; {
+                    clearTimeout(timeoutId);
+                    observer.next(true);
+                    observer.complete();
+                })
+                .catch(() &#x3D;&gt; {
+                    clearTimeout(timeoutId);
+                    observer.next(false);
+                    observer.complete();
+                });
+
+            return () &#x3D;&gt; {
+                clearTimeout(timeoutId);
+                controller.abort();
+            };
+        });
+    }
+
+    private downloadTest(settings: SpeedTestSettingsModel, allResults: SpeedTestResultsModel[] &#x3D; []): Observable&lt;number&gt; {
+        // Quick connectivity check first
+        return this.checkConnectivity().pipe(
+            switchMap(isConnected &#x3D;&gt; {
+                if (!isConnected) {
+                    return throwError(() &#x3D;&gt; new Error(&#x27;No internet connection available&#x27;));
+                }
+
+                return new Observable&lt;SpeedTestResultsModel&gt;(observer &#x3D;&gt; {
+                    const testResult &#x3D; new SpeedTestResultsModel(settings.file!.size);
+                    const abortController &#x3D; new AbortController();
+
+                    let filePath &#x3D; settings.file!.path;
+                    if (settings.file!.shouldBustCache) {
+                        filePath &#x3D; this.applyCacheBuster(filePath);
+                    }
+
+                    testResult.start();
+
+                    // Set a more aggressive timeout for the fetch request
+                    const fetchTimeout &#x3D; setTimeout(() &#x3D;&gt; {
+                        abortController.abort();
+                        testResult.error();
+                        observer.next(testResult);
+                        observer.complete();
+                    }, this.DEFAULT_TIMEOUT);
+
+                    fetch(filePath, {
+                        method: &#x27;GET&#x27;,
+                        signal: abortController.signal,
+                        cache: &#x27;no-cache&#x27;
+                    })
+                        .then(response &#x3D;&gt; {
+                            clearTimeout(fetchTimeout);
+                            if (!response.ok) {
+                                throw new Error(&#x60;HTTP ${response.status}: ${response.statusText}&#x60;);
+                            }
+                            return response.blob();
+                        })
+                        .then(() &#x3D;&gt; {
+                            testResult.end();
+                            observer.next(testResult);
+                            observer.complete();
+                        })
+                        .catch(error &#x3D;&gt; {
+                            clearTimeout(fetchTimeout);
+                            console.warn(&#x27;Speed test download failed:&#x27;, error);
+                            testResult.error();
+
+                            const delay &#x3D; settings.iterations !&#x3D;&#x3D; 1 ? settings.retryDelay! : 0;
+
+                            setTimeout(() &#x3D;&gt; {
+                                observer.next(testResult);
+                                observer.complete();
+                            }, delay);
+                        });
+
+                    // Cleanup function
+                    return () &#x3D;&gt; {
+                        clearTimeout(fetchTimeout);
+                        abortController.abort();
+                    };
+                });
+            }),
+            mergeMap((testResult: SpeedTestResultsModel) &#x3D;&gt; {
+                allResults.push(testResult);
+
+                if (settings.iterations &#x3D;&#x3D;&#x3D; 1) {
+                    // Calculate average speed from all valid results
+                    const validResults &#x3D; allResults.filter(result &#x3D;&gt; result.speedBps &gt; 0);
+
+                    if (validResults.length &#x3D;&#x3D;&#x3D; 0) {
+                        return throwError(() &#x3D;&gt; new Error(&#x27;All speed test iterations failed - no internet connection or server unreachable&#x27;));
+                    }
+
+                    const totalSpeed &#x3D; validResults.reduce((sum, result) &#x3D;&gt; sum + result.speedBps, 0);
+                    const averageSpeed &#x3D; totalSpeed / validResults.length;
+
+                    return of(averageSpeed);
+                } else {
+                    settings.iterations!--;
+                    return this.downloadTest(settings, allResults);
+                }
+            })
+        );
+    }
+
+    private validateSettings(settings: SpeedTestSettingsModel): void {
+        if (!settings.file?.path) {
+            throw new Error(&#x27;ng-speed-test: File path is required&#x27;);
+        }
+
+        if (!settings.file?.size || settings.file.size &lt;&#x3D; 0) {
+            throw new Error(&#x27;ng-speed-test: Valid file size is required&#x27;);
+        }
+
+        if (settings.iterations &amp;&amp; settings.iterations &lt; 1) {
+            throw new Error(&#x27;ng-speed-test: Iterations must be at least 1&#x27;);
+        }
+    }
+
+    /**
+     * Get internet speed in bits per second (bps)
+     * Fails fast if no internet connection is available
+     */
+    getBps(customSettings?: Partial&lt;SpeedTestSettingsModel&gt;): Observable&lt;number&gt; {
+        return new Observable(observer &#x3D;&gt; {
+            // Check connectivity immediately
+            if (!navigator.onLine) {
+                observer.error(new Error(&#x27;No internet connection - browser reports offline&#x27;));
+                return;
+            }
+
+            // Small delay to ensure proper initialization
+            setTimeout(() &#x3D;&gt; {
+                // Create settings with proper merging
+                const defaultSettings &#x3D; new SpeedTestSettingsModel();
+                const settings &#x3D; this.mergeSettings(defaultSettings, customSettings);
+
+                try {
+                    this.validateSettings(settings);
+
+                    this.downloadTest(settings).subscribe({
+                        next: (speedBps) &#x3D;&gt; {
+                            observer.next(speedBps);
+                            observer.complete();
+                        },
+                        error: (error) &#x3D;&gt; {
+                            observer.error(error);
+                        }
+                    });
+                } catch (error) {
+                    observer.error(error);
+                }
+            }, 1);
+        });
+    }
+
+    /**
+     * Properly merge custom settings with defaults
+     */
+    private mergeSettings(defaultSettings: SpeedTestSettingsModel, customSettings?: Partial&lt;SpeedTestSettingsModel&gt;): SpeedTestSettingsModel {
+        if (!customSettings) {
+            return defaultSettings;
+        }
+
+        const mergedSettings &#x3D; new SpeedTestSettingsModel();
+
+        // Merge iterations
+        mergedSettings.iterations &#x3D; customSettings.iterations !&#x3D;&#x3D; undefined
+            ? customSettings.iterations
+            : defaultSettings.iterations;
+
+        // Merge retryDelay
+        mergedSettings.retryDelay &#x3D; customSettings.retryDelay !&#x3D;&#x3D; undefined
+            ? customSettings.retryDelay
+            : defaultSettings.retryDelay;
+
+        // Merge file settings
+        if (customSettings.file) {
+            mergedSettings.file &#x3D; new SpeedTestFileModel();
+
+            // Merge file path
+            mergedSettings.file.path &#x3D; customSettings.file.path !&#x3D;&#x3D; undefined
+                ? customSettings.file.path
+                : defaultSettings.file!.path;
+
+            // Merge file size
+            mergedSettings.file.size &#x3D; customSettings.file.size !&#x3D;&#x3D; undefined
+                ? customSettings.file.size
+                : defaultSettings.file!.size;
+
+            // Merge shouldBustCache
+            mergedSettings.file.shouldBustCache &#x3D; customSettings.file.shouldBustCache !&#x3D;&#x3D; undefined
+                ? customSettings.file.shouldBustCache
+                : defaultSettings.file!.shouldBustCache;
+        } else {
+            mergedSettings.file &#x3D; defaultSettings.file;
+        }
+
+        return mergedSettings;
+    }
+
+    /**
+     * Get internet speed in kilobits per second (Kbps)
+     */
+    getKbps(settings?: Partial&lt;SpeedTestSettingsModel&gt;): Observable&lt;number&gt; {
+        return this.getBps(settings).pipe(
+            map(bps &#x3D;&gt; bps / 1024)
+        );
+    }
+
+    /**
+     * Get internet speed in megabits per second (Mbps)
+     */
+    getMbps(settings?: Partial&lt;SpeedTestSettingsModel&gt;): Observable&lt;number&gt; {
+        return this.getKbps(settings).pipe(
+            map(kbps &#x3D;&gt; kbps / 1024)
+        );
+    }
+
+    /**
+     * Get comprehensive speed test results with fast failure for offline scenarios
+     */
+    getSpeedTestResult(settings?: Partial&lt;SpeedTestSettingsModel&gt;): Observable&lt;SpeedTestResult&gt; {
+        const startTime &#x3D; Date.now();
+
+        return this.getBps(settings).pipe(
+            map(bps &#x3D;&gt; ({
+                bps,
+                kbps: bps / 1024,
+                mbps: bps / (1024 * 1024),
+                duration: (Date.now() - startTime) / 1000
+            })),
+            timeout(this.DEFAULT_TIMEOUT + 5000), // Overall timeout slightly longer than individual request timeout
+            catchError(error &#x3D;&gt; {
+                if (error.name &#x3D;&#x3D;&#x3D; &#x27;TimeoutError&#x27;) {
+                    return throwError(() &#x3D;&gt; new Error(&#x27;Speed test timed out - please check your internet connection&#x27;));
+                }
+                return throwError(() &#x3D;&gt; error);
+            })
+        );
+    }
+
+    /**
+     * Check if the browser is online with enhanced detection
+     */
+    isOnline(): Observable&lt;boolean&gt; {
+        return merge(
+            fromEvent(window, &#x27;offline&#x27;).pipe(map(() &#x3D;&gt; false)),
+            fromEvent(window, &#x27;online&#x27;).pipe(map(() &#x3D;&gt; true)),
+            of(navigator.onLine)
+        ).pipe(
+            startWith(navigator.onLine),
+            // Verify actual connectivity for online state
+            switchMap(browserOnline &#x3D;&gt; {
+                if (!browserOnline) {
+                    return of(false);
+                }
+                // Quick connectivity verification
+                return this.checkConnectivity();
+            })
+        );
+    }
+
+    /**
+     * Monitor network connection status with enhanced detection
+     */
+    getNetworkStatus(): Observable&lt;{ isOnline: boolean; effectiveType?: string; downlink?: number }&gt; {
+        const getConnectionInfo &#x3D; () &#x3D;&gt; {
+            const connection &#x3D; (navigator as any).connection ||
+                (navigator as any).mozConnection ||
+                (navigator as any).webkitConnection;
+
+            return {
+                isOnline: navigator.onLine,
+                effectiveType: connection?.effectiveType,
+                downlink: connection?.downlink
+            };
+        };
+
+        return merge(
+            fromEvent(window, &#x27;offline&#x27;).pipe(
+                map(() &#x3D;&gt; ({ ...getConnectionInfo(), isOnline: false }))
+            ),
+            fromEvent(window, &#x27;online&#x27;).pipe(
+                map(() &#x3D;&gt; getConnectionInfo()),
+                // Verify actual connectivity when browser reports online
+                switchMap(info &#x3D;&gt;
+                    this.checkConnectivity().pipe(
+                        map(actuallyOnline &#x3D;&gt; ({ ...info, isOnline: actuallyOnline }))
+                    )
+                )
+            ),
+            of(getConnectionInfo()).pipe(
+                switchMap(info &#x3D;&gt;
+                    info.isOnline
+                        ? this.checkConnectivity().pipe(
+                            map(actuallyOnline &#x3D;&gt; ({ ...info, isOnline: actuallyOnline }))
+                        )
+                        : of(info)
+                )
+            )
+        );
+    }
 }
 </code></pre>
     </div>

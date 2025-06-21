@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { SpeedTestService } from './services/speed-test.service';
 import { SpeedTestSettingsModel } from './models/speed-test-settings.model';
-import {SpeedTestResult} from './models/speed-test-result.model';
+import {SpeedTestResult} from './models/speed-test-results.model';
 
 @Component({
     selector: 'app-speed-test',

@@ -499,8 +499,8 @@
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="40"
-                                    class="link-to-prism">src/models/speed-test-results.model.ts:40</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="39"
+                                    class="link-to-prism">src/models/speed-test-results.model.ts:39</a></div>
                         </td>
                     </tr>
 
@@ -536,8 +536,8 @@
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="48"
-                                    class="link-to-prism">src/models/speed-test-results.model.ts:48</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="47"
+                                    class="link-to-prism">src/models/speed-test-results.model.ts:47</a></div>
                         </td>
                     </tr>
 
@@ -573,8 +573,8 @@
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="56"
-                                    class="link-to-prism">src/models/speed-test-results.model.ts:56</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="55"
+                                    class="link-to-prism">src/models/speed-test-results.model.ts:55</a></div>
                         </td>
                     </tr>
 
@@ -650,63 +650,62 @@
 
     <div class="tab-pane fade  tab-source-code" id="source">
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">export interface SpeedTestResults {
-  duration: number;
-  hasEnded: boolean;
-  startTime: number | null;
-  endTime: number | null;
-  speedBps: number;
-  speedKbps: number;
-  speedMbps: number;
+    duration: number;
+    hasEnded: boolean;
+    startTime: number | null;
+    endTime: number | null;
+    speedBps: number;
+    speedKbps: number;
+    speedMbps: number;
 }
 
 export class SpeedTestResultsModel implements SpeedTestResults {
-  public duration: number &#x3D; 0;
-  public hasEnded: boolean &#x3D; false;
-  public startTime: number | null &#x3D; null;
-  public endTime: number | null &#x3D; null;
-  public speedBps: number &#x3D; 0;
+    public duration: number &#x3D; 0;
+    public hasEnded: boolean &#x3D; false;
+    public startTime: number | null &#x3D; null;
+    public endTime: number | null &#x3D; null;
+    public speedBps: number &#x3D; 0;
 
-  constructor(private fileSize: number) {}
+    constructor(private fileSize: number) {}
 
-  get speedKbps(): number {
-    return this.speedBps / 1024;
-  }
-
-  get speedMbps(): number {
-    return this.speedKbps / 1024;
-  }
-
-  private _update(): void {
-    if (this.endTime !&#x3D;&#x3D; null &amp;&amp; this.startTime !&#x3D;&#x3D; null) {
-      const milliseconds &#x3D; this.endTime - this.startTime;
-      if (milliseconds !&#x3D;&#x3D; 0) {
-        this.duration &#x3D; milliseconds / 1000;
-      }
-
-      const bitsLoaded &#x3D; this.fileSize * 8;
-      this.speedBps &#x3D; bitsLoaded / this.duration;
+    get speedKbps(): number {
+        return this.speedBps / 1024;
     }
-  }
 
-  end(): void {
-    if (!this.hasEnded) {
-      this.hasEnded &#x3D; true;
-      this.endTime &#x3D; Date.now();
-      this._update();
+    get speedMbps(): number {
+        return this.speedKbps / 1024;
     }
-  }
 
-  error(): void {
-    if (!this.hasEnded) {
-      this.hasEnded &#x3D; true;
-      this.endTime &#x3D; null;
-      this._update();
+    private _update(): void {
+        if (this.endTime !&#x3D;&#x3D; null &amp;&amp; this.startTime !&#x3D;&#x3D; null) {
+            const milliseconds &#x3D; this.endTime - this.startTime;
+            if (milliseconds !&#x3D;&#x3D; 0) {
+                this.duration &#x3D; milliseconds / 1000;
+            }
+            const bitsLoaded &#x3D; this.fileSize * 8;
+            this.speedBps &#x3D; bitsLoaded / this.duration;
+        }
     }
-  }
 
-  start(): void {
-    this.startTime &#x3D; Date.now();
-  }
+    end(): void {
+        if (!this.hasEnded) {
+            this.hasEnded &#x3D; true;
+            this.endTime &#x3D; Date.now();
+            this._update();
+        }
+    }
+
+    error(): void {
+        if (!this.hasEnded) {
+            this.hasEnded &#x3D; true;
+            this.endTime &#x3D; null;
+            this._update();
+        }
+    }
+
+    start(): void {
+        this.startTime &#x3D; Date.now();
+    }
 }
 </code></pre>
     </div>

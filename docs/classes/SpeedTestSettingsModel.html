@@ -353,9 +353,23 @@ export class SpeedTestSettingsModel implements SpeedTestSettings {
 
   constructor(settings?: Partial&lt;SpeedTestSettings&gt;) {
     if (settings) {
-      Object.assign(this, settings);
+      if (settings.iterations !&#x3D;&#x3D; undefined) {
+        this.iterations &#x3D; settings.iterations;
+      }
+      if (settings.retryDelay !&#x3D;&#x3D; undefined) {
+        this.retryDelay &#x3D; settings.retryDelay;
+      }
       if (settings.file) {
-        this.file &#x3D; new SpeedTestFileModel(settings.file);
+        this.file &#x3D; new SpeedTestFileModel();
+        if (settings.file.path !&#x3D;&#x3D; undefined) {
+          this.file.path &#x3D; settings.file.path;
+        }
+        if (settings.file.size !&#x3D;&#x3D; undefined) {
+          this.file.size &#x3D; settings.file.size;
+        }
+        if (settings.file.shouldBustCache !&#x3D;&#x3D; undefined) {
+          this.file.shouldBustCache &#x3D; settings.file.shouldBustCache;
+        }
       }
     }
   }
