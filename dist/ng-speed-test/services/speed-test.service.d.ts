@@ -1,15 +1,26 @@
 import { Observable } from 'rxjs';
 import { SpeedTestSettingsModel } from '../models/speed-test-settings.model';
-import { SpeedTestResult } from '../models/speed-test-result.model';
 import * as i0 from "@angular/core";
+export interface SpeedTestResult {
+    bps: number;
+    kbps: number;
+    mbps: number;
+    duration: number;
+}
 export declare class SpeedTestService {
     private readonly DEFAULT_TIMEOUT;
+    private readonly OFFLINE_CHECK_TIMEOUT;
     constructor();
     private applyCacheBuster;
+    /**
+     * Quick connectivity check before running speed test
+     */
+    private checkConnectivity;
     private downloadTest;
     private validateSettings;
     /**
      * Get internet speed in bits per second (bps)
+     * Fails fast if no internet connection is available
      */
     getBps(customSettings?: Partial<SpeedTestSettingsModel>): Observable<number>;
     /**
@@ -21,15 +32,15 @@ export declare class SpeedTestService {
      */
     getMbps(settings?: Partial<SpeedTestSettingsModel>): Observable<number>;
     /**
-     * Get comprehensive speed test results
+     * Get comprehensive speed test results with fast failure for offline scenarios
      */
     getSpeedTestResult(settings?: Partial<SpeedTestSettingsModel>): Observable<SpeedTestResult>;
     /**
-     * Check if the browser is online
+     * Check if the browser is online with enhanced detection
      */
     isOnline(): Observable<boolean>;
     /**
-     * Monitor network connection status
+     * Monitor network connection status with enhanced detection
      */
     getNetworkStatus(): Observable<{
         isOnline: boolean;

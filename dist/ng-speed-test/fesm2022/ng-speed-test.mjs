@@ -1,7 +1,7 @@
 import * as i0 from '@angular/core';
 import { Injectable, NgModule } from '@angular/core';
-import { Observable, of, throwError, merge, fromEvent } from 'rxjs';
-import { timeout, catchError, mergeMap, map } from 'rxjs/operators';
+import { of, Observable, throwError, merge, fromEvent } from 'rxjs';
+import { switchMap, mergeMap, map, timeout, catchError, startWith } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -85,63 +85,113 @@ class SpeedTestSettingsModel {
 
 class SpeedTestService {
     constructor() {
-        this.DEFAULT_TIMEOUT = 30000; // 30 seconds
+        this.DEFAULT_TIMEOUT = 15000; // Reduced from 30s to 15s
+        this.OFFLINE_CHECK_TIMEOUT = 3000; // Quick offline check
     }
     applyCacheBuster(path) {
         const separator = path.includes('?') ? '&' : '?';
         return `${path}${separator}cache_bust=${Date.now()}_${Math.random()}`;
     }
-    downloadTest(settings, allResults = []) {
+    /**
+     * Quick connectivity check before running speed test
+     */
+    checkConnectivity() {
+        // First check navigator.onLine
+        if (!navigator.onLine) {
+            return of(false);
+        }
+        // Then do a quick network request to verify actual connectivity
         return new Observable(observer => {
-            const testResult = new SpeedTestResultsModel(settings.file.size);
-            // Use fetch API for better error handling and modern approach
-            const abortController = new AbortController();
-            let filePath = settings.file.path;
-            if (settings.file.shouldBustCache) {
-                filePath = this.applyCacheBuster(filePath);
-            }
-            testResult.start();
-            fetch(filePath, {
-                method: 'GET',
-                signal: abortController.signal,
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => {
+                controller.abort();
+                observer.next(false);
+                observer.complete();
+            }, this.OFFLINE_CHECK_TIMEOUT);
+            // Use a small, fast endpoint for connectivity check
+            fetch('https://httpbin.org/get?minimal=true', {
+                method: 'HEAD',
+                mode: 'no-cors',
+                signal: controller.signal,
                 cache: 'no-cache'
             })
-                .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                return response.blob();
-            })
                 .then(() => {
-                testResult.end();
-                observer.next(testResult);
+                clearTimeout(timeoutId);
+                observer.next(true);
                 observer.complete();
             })
-                .catch(error => {
-                console.warn('Speed test download failed:', error);
-                testResult.error();
-                const delay = settings.iterations !== 1 ? settings.retryDelay : 0;
-                setTimeout(() => {
+                .catch(() => {
+                clearTimeout(timeoutId);
+                observer.next(false);
+                observer.complete();
+            });
+            return () => {
+                clearTimeout(timeoutId);
+                controller.abort();
+            };
+        });
+    }
+    downloadTest(settings, allResults = []) {
+        // Quick connectivity check first
+        return this.checkConnectivity().pipe(switchMap(isConnected => {
+            if (!isConnected) {
+                return throwError(() => new Error('No internet connection available'));
+            }
+            return new Observable(observer => {
+                const testResult = new SpeedTestResultsModel(settings.file.size);
+                const abortController = new AbortController();
+                let filePath = settings.file.path;
+                if (settings.file.shouldBustCache) {
+                    filePath = this.applyCacheBuster(filePath);
+                }
+                testResult.start();
+                // Set a more aggressive timeout for the fetch request
+                const fetchTimeout = setTimeout(() => {
+                    abortController.abort();
+                    testResult.error();
                     observer.next(testResult);
                     observer.complete();
-                }, delay);
+                }, this.DEFAULT_TIMEOUT);
+                fetch(filePath, {
+                    method: 'GET',
+                    signal: abortController.signal,
+                    cache: 'no-cache'
+                })
+                    .then(response => {
+                    clearTimeout(fetchTimeout);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.blob();
+                })
+                    .then(() => {
+                    testResult.end();
+                    observer.next(testResult);
+                    observer.complete();
+                })
+                    .catch(error => {
+                    clearTimeout(fetchTimeout);
+                    console.warn('Speed test download failed:', error);
+                    testResult.error();
+                    const delay = settings.iterations !== 1 ? settings.retryDelay : 0;
+                    setTimeout(() => {
+                        observer.next(testResult);
+                        observer.complete();
+                    }, delay);
+                });
+                // Cleanup function
+                return () => {
+                    clearTimeout(fetchTimeout);
+                    abortController.abort();
+                };
             });
-            // Cleanup function
-            return () => {
-                abortController.abort();
-            };
-        }).pipe(timeout(this.DEFAULT_TIMEOUT), catchError(error => {
-            console.error('Speed test timeout or error:', error);
-            const failedResult = new SpeedTestResultsModel(settings.file.size);
-            failedResult.error();
-            return of(failedResult);
         }), mergeMap((testResult) => {
             allResults.push(testResult);
             if (settings.iterations === 1) {
                 // Calculate average speed from all valid results
                 const validResults = allResults.filter(result => result.speedBps > 0);
                 if (validResults.length === 0) {
-                    return throwError(() => new Error('All speed test iterations failed'));
+                    return throwError(() => new Error('All speed test iterations failed - no internet connection or server unreachable'));
                 }
                 const totalSpeed = validResults.reduce((sum, result) => sum + result.speedBps, 0);
                 const averageSpeed = totalSpeed / validResults.length;
@@ -166,9 +216,15 @@ class SpeedTestService {
     }
     /**
      * Get internet speed in bits per second (bps)
+     * Fails fast if no internet connection is available
      */
     getBps(customSettings) {
         return new Observable(observer => {
+            // Check connectivity immediately
+            if (!navigator.onLine) {
+                observer.error(new Error('No internet connection - browser reports offline'));
+                return;
+            }
             // Small delay to ensure proper initialization
             setTimeout(() => {
                 const settings = new SpeedTestSettingsModel(customSettings);
@@ -203,7 +259,7 @@ class SpeedTestService {
         return this.getKbps(settings).pipe(map(kbps => kbps / 1024));
     }
     /**
-     * Get comprehensive speed test results
+     * Get comprehensive speed test results with fast failure for offline scenarios
      */
     getSpeedTestResult(settings) {
         const startTime = Date.now();
@@ -212,16 +268,30 @@ class SpeedTestService {
             kbps: bps / 1024,
             mbps: bps / (1024 * 1024),
             duration: (Date.now() - startTime) / 1000
-        })));
+        })), timeout(this.DEFAULT_TIMEOUT + 5000), // Overall timeout slightly longer than individual request timeout
+        catchError(error => {
+            if (error.name === 'TimeoutError') {
+                return throwError(() => new Error('Speed test timed out - please check your internet connection'));
+            }
+            return throwError(() => error);
+        }));
     }
     /**
-     * Check if the browser is online
+     * Check if the browser is online with enhanced detection
      */
     isOnline() {
-        return merge(fromEvent(window, 'offline').pipe(map(() => false)), fromEvent(window, 'online').pipe(map(() => true)), of(navigator.onLine));
+        return merge(fromEvent(window, 'offline').pipe(map(() => false)), fromEvent(window, 'online').pipe(map(() => true)), of(navigator.onLine)).pipe(startWith(navigator.onLine), 
+        // Verify actual connectivity for online state
+        switchMap(browserOnline => {
+            if (!browserOnline) {
+                return of(false);
+            }
+            // Quick connectivity verification
+            return this.checkConnectivity();
+        }));
     }
     /**
-     * Monitor network connection status
+     * Monitor network connection status with enhanced detection
      */
     getNetworkStatus() {
         const getConnectionInfo = () => {
@@ -234,7 +304,11 @@ class SpeedTestService {
                 downlink: connection?.downlink
             };
         };
-        return merge(fromEvent(window, 'offline').pipe(map(() => ({ ...getConnectionInfo(), isOnline: false }))), fromEvent(window, 'online').pipe(map(() => ({ ...getConnectionInfo(), isOnline: true }))), of(getConnectionInfo()));
+        return merge(fromEvent(window, 'offline').pipe(map(() => ({ ...getConnectionInfo(), isOnline: false }))), fromEvent(window, 'online').pipe(map(() => getConnectionInfo()), 
+        // Verify actual connectivity when browser reports online
+        switchMap(info => this.checkConnectivity().pipe(map(actuallyOnline => ({ ...info, isOnline: actuallyOnline }))))), of(getConnectionInfo()).pipe(switchMap(info => info.isOnline
+            ? this.checkConnectivity().pipe(map(actuallyOnline => ({ ...info, isOnline: actuallyOnline })))
+            : of(info))));
     }
     static { this.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "18.2.13", ngImport: i0, type: SpeedTestService, deps: [], target: i0.ɵɵFactoryTarget.Injectable }); }
     static { this.ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "18.2.13", ngImport: i0, type: SpeedTestService, providedIn: 'root' }); }
