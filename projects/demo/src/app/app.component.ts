@@ -196,7 +196,13 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     this.initializeSpeedTest();
+    this.runSingleSpeedTest();
+  }
 
+  /**
+   * Run a single speed test iteration
+   */
+  private runSingleSpeedTest(): void {
     const testStartTime = Date.now();
 
     this.speedTestService.getMbps({
@@ -255,19 +261,14 @@ export class AppComponent implements OnInit, OnDestroy {
    * Initialize speed test state
    */
   private initializeSpeedTest(): void {
-    // Only reset if we're starting fresh (not continuing iterations)
-    if (this.currentIteration === 0) {
-      if (this.hasTracked) {
-        this.speeds = [];
-        this.hasTracked = false;
-      }
-
-      this.isTracking = true;
-      this.currentIteration = 0;
-      this.progressPercentage = 0;
-      this.estimatedTimeRemaining = this.iterations * 3; // Rough estimate
-      this.errorMessage = '';
-    }
+    // Reset state for new test
+    this.speeds = [];
+    this.hasTracked = false;
+    this.isTracking = true;
+    this.currentIteration = 0;
+    this.progressPercentage = 0;
+    this.estimatedTimeRemaining = this.iterations * 3; // Rough estimate
+    this.errorMessage = '';
   }
 
   /**
@@ -285,11 +286,11 @@ export class AppComponent implements OnInit, OnDestroy {
     const remainingTests = this.iterations - this.currentIteration;
     this.estimatedTimeRemaining = remainingTests * testDuration;
 
-    if (this.speeds.length < this.iterations) {
+    if (this.currentIteration < this.iterations) {
       // Continue testing
       setTimeout(() => {
         if (this.isOnline) {
-          this.trackSpeed();
+          this.runSingleSpeedTest();
         } else {
           this.handleSpeedTestError(new Error('Connection lost during test'));
         }
