@@ -1,6 +1,6 @@
 {
   "name": "ng-speed-test",
-  "version": "3.0.2",
+  "version": "3.1.0",
   "description": "Angular library for testing internet connection speed",
   "readme": "README.md",
   "homepage": "https://ng-speed-test.jrquick.com",
@@ -29,8 +29,7 @@
       "es2020": "./fesm2020/ng-speed-test.mjs",
       "es2015": "./fesm2015/ng-speed-test.mjs",
       "node": "./fesm2022/ng-speed-test.mjs",
-      "default": "./fesm2022/ng-speed-test.mjs",
-      "esm": "./esm2022/ng-speed-test.mjs"
+      "default": "./fesm2022/ng-speed-test.mjs"
     }
   },
   "sideEffects": false,
@@ -43,13 +42,13 @@
     "connection-speed",
     "typescript",
     "rxjs",
-    "angular18"
+    "angular19"
   ],
   "author": "Jeremy Quick",
   "license": "MIT",
   "peerDependencies": {
-    "@angular/common": "^16.0.0 || ^17.0.0 || ^18.0.0",
-    "@angular/core": "^16.0.0 || ^17.0.0 || ^18.0.0",
+    "@angular/common": "^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
+    "@angular/core": "^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
     "rxjs": "^7.5.0"
   },
   "dependencies": {

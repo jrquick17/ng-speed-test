@@ -8,7 +8,7 @@ module.exports = function (config) {
     plugins: [
       require('@angular-devkit/build-angular/plugins/karma'),
       require('karma-chrome-launcher'),
-      require('karma-coverage-istanbul-reporter'),
+      require('karma-coverage'),
       require('karma-jasmine'),
       require('karma-jasmine-html-reporter'),
       require('karma-phantomjs-launcher'),
@@ -16,7 +16,7 @@ module.exports = function (config) {
     client: {
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
-    coverageIstanbulReporter: {
+    coverageReporter: {
       dir: require('path').join(__dirname, './coverage/new-test'),
       reports: ['html', 'lcovonly', 'text-summary'],
       fixWebpackSourcePaths: true

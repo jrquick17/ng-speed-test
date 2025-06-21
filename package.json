@@ -1,6 +1,6 @@
 {
   "name": "ng-speed-test",
-  "version": "3.0.2",
+  "version": "3.1.0",
   "description": "Angular library for testing internet connection speed",
   "readme": "README.md",
   "homepage": "https://ng-speed-test.jrquick.com",
@@ -45,7 +45,7 @@
     "docs:serve": "npm run docs:build -- -s",
     "docs:watch": "npm run docs:build -- -s -w",
     "lint": "ng lint",
-    "test": "ng test ng-speed-test --watch=false --browsers=ChromeHeadless",
+    "test": "ng test ng-speed-test",
     "test:watch": "ng test ng-speed-test",
     "pack": "npm run build && cd dist/ng-speed-test && npm pack",
     "publish": "npm run build && cd dist/ng-speed-test && npm publish",
@@ -67,13 +67,13 @@
     "connection-speed",
     "typescript",
     "rxjs",
-    "angular18"
+    "angular19"
   ],
   "author": "Jeremy Quick",
   "license": "MIT",
   "peerDependencies": {
-    "@angular/common": "^16.0.0 || ^17.0.0 || ^18.0.0",
-    "@angular/core": "^16.0.0 || ^17.0.0 || ^18.0.0",
+    "@angular/common": "^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
+    "@angular/core": "^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
     "rxjs": "^7.5.0",
     "tslib": "^2.3.0"
   },
@@ -81,19 +81,19 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^18.2.20",
-    "@angular/animations": "^18.2.13",
-    "@angular/cdk": "~18.2.14",
-    "@angular/cli": "^18.2.20",
-    "@angular/common": "^18.2.13",
-    "@angular/compiler": "^18.2.13",
-    "@angular/compiler-cli": "^18.2.13",
-    "@angular/core": "^18.2.13",
-    "@angular/forms": "^18.2.13",
-    "@angular/material": "~18.2.14",
-    "@angular/platform-browser": "^18.2.13",
-    "@angular/platform-browser-dynamic": "^18.2.13",
-    "@angular/router": "^18.2.13",
+    "@angular-devkit/build-angular": "^19.2.15",
+    "@angular/animations": "^19.2.14",
+    "@angular/cdk": "~19.2.18",
+    "@angular/cli": "^19.2.15",
+    "@angular/common": "^19.2.14",
+    "@angular/compiler": "^19.2.14",
+    "@angular/compiler-cli": "^19.2.14",
+    "@angular/core": "^19.2.14",
+    "@angular/forms": "^19.2.14",
+    "@angular/material": "~19.2.18",
+    "@angular/platform-browser": "^19.2.14",
+    "@angular/platform-browser-dynamic": "^19.2.14",
+    "@angular/router": "^19.2.14",
     "@compodoc/compodoc": "^1.1.25",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^20.0.0",
@@ -105,11 +105,11 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "ng-packagr": "^18.2.1",
+    "ng-packagr": "^19.2.2",
     "rimraf": "^6.0.0",
     "rxjs": "^7.8.0",
     "typescript": "~5.5.4",
     "typescript-eslint": "8.33.1",
-    "zone.js": "~0.14.10"
+    "zone.js": "~0.15.1"
   }
 }

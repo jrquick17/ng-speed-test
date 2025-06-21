@@ -8,7 +8,6 @@ import {SpeedTestResult} from './models/speed-test-results.model';
 
 @Component({
     selector: 'app-speed-test',
-    standalone: true,
     imports: [CommonModule, FormsModule],
     template: `
     <div class="speed-test-container">
