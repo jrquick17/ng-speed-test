@@ -11,11 +11,8 @@
   "bugs": {
     "url": "https://github.com/jrquick17/ng-speed-test/issues"
   },
-  "main": "bundles/ng-speed-test.umd.js",
+  "main": "fesm2022/ng-speed-test.mjs",
   "module": "fesm2022/ng-speed-test.mjs",
-  "es2020": "fesm2020/ng-speed-test.mjs",
-  "esm2020": "esm2020/ng-speed-test.mjs",
-  "fesm2020": "fesm2020/ng-speed-test.mjs",
   "fesm2022": "fesm2022/ng-speed-test.mjs",
   "typings": "index.d.ts",
   "exports": {
@@ -24,10 +21,6 @@
     },
     ".": {
       "types": "./index.d.ts",
-      "esm2022": "./esm2022/ng-speed-test.mjs",
-      "esm2020": "./esm2020/ng-speed-test.mjs",
-      "es2020": "./fesm2020/ng-speed-test.mjs",
-      "es2015": "./fesm2015/ng-speed-test.mjs",
       "node": "./fesm2022/ng-speed-test.mjs",
       "default": "./fesm2022/ng-speed-test.mjs"
     }
