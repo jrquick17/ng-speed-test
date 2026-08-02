@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {interval, Subject, takeUntil} from 'rxjs';
-import {SpeedTestService} from '../../../../src/services/speed-test.service';
+import {SpeedTestService} from 'ng-speed-test';
 
 @Component({
     selector: 'app-root',

@@ -15,8 +15,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatExpansionModule } from '@angular/material/expansion';
 
-// Import service directly
-import { SpeedTestService } from '../../../../src/services/speed-test.service';
+// Import service from the built package
+import { SpeedTestService } from 'ng-speed-test';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
