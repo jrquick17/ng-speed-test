@@ -21,6 +21,7 @@ export class SpeedTestService {
     private readonly config = inject(SPEED_TEST_CONFIG, { optional: true }) ?? {};
     private readonly DEFAULT_TIMEOUT = this.config.timeout ?? 15000; // Reduced from 30s to 15s
     private readonly OFFLINE_CHECK_TIMEOUT = this.config.connectivityCheckTimeout ?? 3000; // Quick offline check
+    private readonly WARM_UP_TIMEOUT = 3000; // Fixed, short budget - independent of the configurable download timeout
 
     constructor() {}
 
@@ -79,7 +80,54 @@ export class SpeedTestService {
         });
     }
 
-    private downloadTest(settings: SpeedTestSettingsModel, allResults: SpeedTestResultsModel[] = []): Observable<number> {
+    /**
+     * Runs one untimed GET against the configured file before the first timed iteration, so
+     * DNS lookup / TLS handshake / TCP slow-start aren't counted as transfer time on that first
+     * measurement (D6). The response is discarded and any failure here is swallowed - a real
+     * connectivity problem still surfaces from the timed fetch that follows.
+     */
+    private warmUp(settings: SpeedTestSettingsModel): Observable<void> {
+        return new Observable<void>(observer => {
+            const abortController = new AbortController();
+
+            let filePath = settings.file!.path;
+            if (settings.file!.shouldBustCache) {
+                filePath = this.applyCacheBuster(filePath);
+            }
+
+            // Mirrors the real download's fetchTimeout below: complete directly from the timeout
+            // rather than waiting on the fetch promise to settle after abort() - a fetch that
+            // never reacts to its AbortSignal (e.g. one that hangs indefinitely) would otherwise
+            // never let this warm-up finish.
+            const warmUpTimeout = setTimeout(() => {
+                abortController.abort();
+                observer.next();
+                observer.complete();
+            }, this.WARM_UP_TIMEOUT);
+
+            fetch(filePath, {
+                method: 'GET',
+                signal: abortController.signal,
+                cache: 'no-cache'
+            })
+                .then(response => response.blob())
+                .catch(() => {
+                    // Ignored - a real problem still surfaces from the timed fetch that follows.
+                })
+                .finally(() => {
+                    clearTimeout(warmUpTimeout);
+                    observer.next();
+                    observer.complete();
+                });
+
+            return () => {
+                clearTimeout(warmUpTimeout);
+                abortController.abort();
+            };
+        });
+    }
+
+    private downloadTest(settings: SpeedTestSettingsModel, allResults: SpeedTestResultsModel[] = [], warmedUp = false): Observable<number> {
         // Quick connectivity check first
         return this.checkConnectivity().pipe(
             switchMap(isConnected => {
@@ -87,65 +135,71 @@ export class SpeedTestService {
                     return throwError(() => new Error('No internet connection available'));
                 }
 
-                return new Observable<SpeedTestResultsModel>(observer => {
-                    const testResult = new SpeedTestResultsModel();
-                    const abortController = new AbortController();
+                // Warm up once, before the first timed iteration - skipped on the recursive
+                // calls for iterations 2+ within the same getBps() call (warmedUp === true).
+                const warmUp$ = warmedUp ? of(undefined) : this.warmUp(settings);
 
-                    let filePath = settings.file!.path;
-                    if (settings.file!.shouldBustCache) {
-                        filePath = this.applyCacheBuster(filePath);
-                    }
+                return warmUp$.pipe(
+                    switchMap(() => new Observable<SpeedTestResultsModel>(observer => {
+                        const testResult = new SpeedTestResultsModel();
+                        const abortController = new AbortController();
 
-                    testResult.start();
+                        let filePath = settings.file!.path;
+                        if (settings.file!.shouldBustCache) {
+                            filePath = this.applyCacheBuster(filePath);
+                        }
 
-                    // Set a more aggressive timeout for the fetch request
-                    const fetchTimeout = setTimeout(() => {
-                        abortController.abort();
-                        testResult.error();
-                        observer.next(testResult);
-                        observer.complete();
-                    }, this.DEFAULT_TIMEOUT);
+                        testResult.start();
 
-                    fetch(filePath, {
-                        method: 'GET',
-                        signal: abortController.signal,
-                        cache: 'no-cache'
-                    })
-                        .then(response => {
-                            clearTimeout(fetchTimeout);
-                            if (!response.ok) {
-                                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                            }
-                            return response.blob();
-                        })
-                        .then(blob => {
-                            testResult.end(blob.size);
+                        // Set a more aggressive timeout for the fetch request
+                        const fetchTimeout = setTimeout(() => {
+                            abortController.abort();
+                            testResult.error();
                             observer.next(testResult);
                             observer.complete();
+                        }, this.DEFAULT_TIMEOUT);
+
+                        fetch(filePath, {
+                            method: 'GET',
+                            signal: abortController.signal,
+                            cache: 'no-cache'
                         })
-                        .catch(() => {
-                            clearTimeout(fetchTimeout);
-                            // Surfaced via the existing error channel: testResult.error() marks
-                            // this iteration as failed (speedBps stays 0), so it is discarded by
-                            // the `speedBps > 0` filter below rather than logged to the console.
-                            // If every iteration fails, the mergeMap below throws a descriptive
-                            // error that propagates out through the returned Observable.
-                            testResult.error();
-
-                            const delay = settings.iterations !== 1 ? settings.retryDelay! : 0;
-
-                            setTimeout(() => {
+                            .then(response => {
+                                clearTimeout(fetchTimeout);
+                                if (!response.ok) {
+                                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                                }
+                                return response.blob();
+                            })
+                            .then(blob => {
+                                testResult.end(blob.size);
                                 observer.next(testResult);
                                 observer.complete();
-                            }, delay);
-                        });
+                            })
+                            .catch(() => {
+                                clearTimeout(fetchTimeout);
+                                // Surfaced via the existing error channel: testResult.error() marks
+                                // this iteration as failed (speedBps stays 0), so it is discarded by
+                                // the `speedBps > 0` filter below rather than logged to the console.
+                                // If every iteration fails, the mergeMap below throws a descriptive
+                                // error that propagates out through the returned Observable.
+                                testResult.error();
 
-                    // Cleanup function
-                    return () => {
-                        clearTimeout(fetchTimeout);
-                        abortController.abort();
-                    };
-                });
+                                const delay = settings.iterations !== 1 ? settings.retryDelay! : 0;
+
+                                setTimeout(() => {
+                                    observer.next(testResult);
+                                    observer.complete();
+                                }, delay);
+                            });
+
+                        // Cleanup function
+                        return () => {
+                            clearTimeout(fetchTimeout);
+                            abortController.abort();
+                        };
+                    }))
+                );
             }),
             mergeMap((testResult: SpeedTestResultsModel) => {
                 allResults.push(testResult);
@@ -164,7 +218,7 @@ export class SpeedTestService {
                     return of(averageSpeed);
                 } else {
                     settings.iterations!--;
-                    return this.downloadTest(settings, allResults);
+                    return this.downloadTest(settings, allResults, true);
                 }
             })
         );

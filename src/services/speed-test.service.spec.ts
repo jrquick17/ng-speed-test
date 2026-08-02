@@ -23,15 +23,22 @@ function okResponse(bodySize = testFile.size): Response {
 }
 
 /**
- * Installs a global fetch mock that resolves a call to CONNECTIVITY_URL immediately and serves
- * `fileOutcomes` in order for every other call (the actual file fetch). Only relevant when a test
- * has opted into connectivityCheckUrl - by default the service never calls fetch for connectivity.
+ * Installs a global fetch mock that resolves a call to CONNECTIVITY_URL immediately, always
+ * resolves the one-time D6 warm-up fetch (the first non-connectivity call) with 'ok' regardless
+ * of `fileOutcomes`, then serves `fileOutcomes` in order for every subsequent call (the timed
+ * per-iteration file fetch).
  */
 function stubFetch(fileOutcomes: FetchOutcome[] = []): ReturnType<typeof vi.fn> {
     let fileCallIndex = 0;
+    let warmedUp = false;
     const fetchMock = vi.fn((input: RequestInfo | URL) => {
         if (requestUrl(input) === CONNECTIVITY_URL) {
             return Promise.resolve(okResponse());
+        }
+
+        if (!warmedUp) {
+            warmedUp = true;
+            return Promise.resolve(okResponse()); // D6 warm-up fetch - always succeeds, discarded
         }
 
         const outcome = fileOutcomes[fileCallIndex++];
@@ -128,15 +135,15 @@ describe('SpeedTestService', () => {
 
             await firstValueFrom(service.getBps({ iterations: 1, retryDelay: 0, file: testFile }));
 
-            expect(fetchMock).toHaveBeenCalledTimes(1); // only the file fetch, no connectivity probe
+            expect(fetchMock).toHaveBeenCalledTimes(2); // D6 warm-up + the file fetch, no connectivity probe
         });
 
-        it('runs exactly one file fetch per iteration when no connectivityCheckUrl is configured', async () => {
+        it('runs one file fetch per iteration, plus a single one-time D6 warm-up fetch, when no connectivityCheckUrl is configured', async () => {
             const fetchMock = stubFetch(['ok', 'ok']);
 
             await firstValueFrom(service.getBps({ iterations: 2, retryDelay: 0, file: testFile }));
 
-            expect(fetchMock).toHaveBeenCalledTimes(2);
+            expect(fetchMock).toHaveBeenCalledTimes(3); // 1 warm-up + 2 iterations
         });
 
         describe('with connectivityCheckUrl configured (opt-in)', () => {
@@ -159,12 +166,13 @@ describe('SpeedTestService', () => {
                 expect(fetchMock).toHaveBeenCalledTimes(1);
             });
 
-            it('runs a connectivity check and a file fetch for every iteration', async () => {
+            it('runs a connectivity check and a file fetch for every iteration, plus a single one-time D6 warm-up fetch', async () => {
                 const fetchMock = stubFetch(['ok', 'ok']);
 
                 await firstValueFrom(service.getBps({ iterations: 2, retryDelay: 0, file: testFile }));
 
-                expect(fetchMock).toHaveBeenCalledTimes(4); // 2 iterations x (connectivity + file)
+                // 2 iterations x (connectivity + file), plus 1 warm-up fetch after the first connectivity check
+                expect(fetchMock).toHaveBeenCalledTimes(5);
             });
         });
     });
@@ -207,13 +215,69 @@ describe('SpeedTestService', () => {
         });
     });
 
+    describe('warm-up iteration (D6)', () => {
+        beforeEach(() => {
+            let elapsed = 0;
+            vi.spyOn(performance, 'now').mockImplementation(() => (elapsed += 1000));
+        });
+
+        it('runs one untimed warm-up fetch before the timed iteration and excludes it from the reported speed', async () => {
+            let callIndex = 0;
+            const fetchMock = vi.fn(() => {
+                // The warm-up's body is wildly different from the timed fetch's - if it leaked
+                // into the measurement, the assertion below would catch it.
+                const bodySize = callIndex++ === 0 ? 999_999_999 : 500;
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    statusText: 'OK',
+                    blob: () => Promise.resolve({ size: bodySize } as Blob)
+                } as unknown as Response);
+            });
+            vi.stubGlobal('fetch', fetchMock);
+
+            const bps = await firstValueFrom(
+                service.getBps({ iterations: 1, retryDelay: 0, file: testFile })
+            );
+
+            expect(fetchMock).toHaveBeenCalledTimes(2);
+            expect(bps).toBe(4_000); // 500 bytes * 8 bits / 1s - the timed fetch's body, not the warm-up's
+        });
+
+        it('warms up only once across multiple iterations in the same getBps() call', async () => {
+            const fetchMock = stubFetch(['ok', 'ok', 'ok']);
+
+            await firstValueFrom(service.getBps({ iterations: 3, retryDelay: 0, file: testFile }));
+
+            expect(fetchMock).toHaveBeenCalledTimes(4); // 1 warm-up + 3 timed iterations
+        });
+
+        it('a failed warm-up does not block or fail the timed iteration that follows', async () => {
+            let callIndex = 0;
+            const fetchMock = vi.fn(() => {
+                if (callIndex++ === 0) {
+                    return Promise.reject(new Error('simulated warm-up failure'));
+                }
+                return Promise.resolve(okResponse());
+            });
+            vi.stubGlobal('fetch', fetchMock);
+
+            const bps = await firstValueFrom(
+                service.getBps({ iterations: 1, retryDelay: 0, file: testFile })
+            );
+
+            expect(bps).toBe(8_000_000); // the timed fetch succeeded despite the warm-up failing
+        });
+    });
+
     describe('mergeSettings() (via getBps())', () => {
         it('uses the default file, including the cache-buster, when no custom settings are given', async () => {
             const fetchMock = stubFetch(['ok']);
 
             await firstValueFrom(service.getBps({ iterations: 1, retryDelay: 0 }));
 
-            expect(fetchMock).toHaveBeenCalledTimes(1);
+            expect(fetchMock).toHaveBeenCalledTimes(2); // D6 warm-up + the file fetch
+            // The warm-up (call 0) applies the same default-file/cache-bust logic as the timed fetch.
             const url = requestUrl(fetchMock.mock.calls[0][0]);
             expect(url.startsWith(new SpeedTestFileModel().path)).toBe(true);
             expect(url).toContain('cache_bust=');
@@ -274,7 +338,9 @@ describe('SpeedTestService', () => {
                 'All speed test iterations failed - no internet connection or server unreachable'
             );
 
-            await vi.advanceTimersByTimeAsync(6_000); // past the configured 5s timeout, well under the 15s default
+            // The D6 warm-up runs first with its own fixed 3s budget, then the timed fetch gets
+            // the configured 5s - so failure lands at ~8s, well before the 15s default's ~18s.
+            await vi.advanceTimersByTimeAsync(9_000);
             await rejection;
         });
     });
