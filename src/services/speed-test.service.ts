@@ -88,7 +88,7 @@ export class SpeedTestService {
                 }
 
                 return new Observable<SpeedTestResultsModel>(observer => {
-                    const testResult = new SpeedTestResultsModel(settings.file!.size);
+                    const testResult = new SpeedTestResultsModel();
                     const abortController = new AbortController();
 
                     let filePath = settings.file!.path;
@@ -118,8 +118,8 @@ export class SpeedTestService {
                             }
                             return response.blob();
                         })
-                        .then(() => {
-                            testResult.end();
+                        .then(blob => {
+                            testResult.end(blob.size);
                             observer.next(testResult);
                             observer.complete();
                         })
@@ -173,10 +173,6 @@ export class SpeedTestService {
     private validateSettings(settings: SpeedTestSettingsModel): void {
         if (!settings.file?.path) {
             throw new Error('ng-speed-test: File path is required');
-        }
-
-        if (!settings.file?.size || settings.file.size <= 0) {
-            throw new Error('ng-speed-test: Valid file size is required');
         }
 
         if (settings.iterations !== undefined && settings.iterations < 1) {

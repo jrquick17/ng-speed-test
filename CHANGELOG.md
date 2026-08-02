@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   fast.com. Reported Kbps values increase by a factor of 1024/1000 (2.4% higher than before); reported Mbps
   values increase by a factor of 1024²/1,000,000 = 1.048576 (4.8576% higher than before). `getBps()`/`bps` are
   unaffected — bits per second was never unit-ambiguous by [jrquick17](https://github.com/jrquick17)
+* **Breaking:** Speed is now computed from the actual number of bytes received (`Blob.size` of the fetched
+  response), not the configured `file.size`. A redirected, re-encoded, truncated, or otherwise changed file now
+  reports its real speed instead of a confidently wrong number. `SpeedTestFile.size` is now optional and is no
+  longer validated or used in the speed calculation — it's an unused hint kept for backward compatibility.
+  `SpeedTestResultsModel`'s constructor no longer takes a `fileSize` argument, and `end()` now takes the actual
+  `bytesReceived` by [jrquick17](https://github.com/jrquick17)
 
 ### Removed
 * Broken README link to a nonexistent `CONTRIBUTING.md` by [jrquick17](https://github.com/jrquick17)

@@ -17,8 +17,9 @@ function requestUrl(input: RequestInfo | URL): string {
     return typeof input === 'string' ? input : input.toString();
 }
 
-function okResponse(): Response {
-    return { ok: true, status: 200, statusText: 'OK', blob: () => Promise.resolve({} as Blob) } as unknown as Response;
+/** bodySize defaults to testFile.size so existing bps assertions (8,000,000) stay deterministic. */
+function okResponse(bodySize = testFile.size): Response {
+    return { ok: true, status: 200, statusText: 'OK', blob: () => Promise.resolve({ size: bodySize } as Blob) } as unknown as Response;
 }
 
 /**
@@ -90,10 +91,12 @@ describe('SpeedTestService', () => {
             ).rejects.toThrow('ng-speed-test: File path is required');
         });
 
-        it('rejects a zero or negative file size', async () => {
+        it('does not reject a zero, negative, or missing file size - size is only an optional hint (C3)', async () => {
+            stubFetch(['ok']);
+
             await expect(
-                firstValueFrom(service.getBps({ file: { ...testFile, size: 0 } }))
-            ).rejects.toThrow('ng-speed-test: Valid file size is required');
+                firstValueFrom(service.getBps({ iterations: 1, retryDelay: 0, file: { ...testFile, size: 0 } }))
+            ).resolves.not.toThrow();
         });
 
         it('rejects an iteration count of 0 instead of hanging (regression)', async () => {
@@ -367,16 +370,16 @@ describe('SpeedTestService', () => {
         });
     });
 
-    describe('known limitations (tracked for milestone C)', () => {
+    describe('computes speed from bytes actually received (C3)', () => {
         beforeEach(() => {
             let elapsed = 0;
             vi.spyOn(performance, 'now').mockImplementation(() => (elapsed += 1000));
         });
 
-        it('C3 - computes speed from the configured file.size, ignoring the bytes actually received', async () => {
+        it('uses the actual response body size, not the configured file.size hint', async () => {
             const fetchMock = vi.fn(() =>
-                // The response body is far smaller than the configured size - a redirected,
-                // truncated, or re-encoded file. downloadTest() still trusts settings.file.size.
+                // The response body is far smaller than the configured size hint - a redirected,
+                // truncated, or re-encoded file. downloadTest() now trusts the real bytes received.
                 Promise.resolve({
                     ok: true,
                     status: 200,
@@ -387,22 +390,58 @@ describe('SpeedTestService', () => {
             vi.stubGlobal('fetch', fetchMock);
 
             const bps = await firstValueFrom(
-                service.getBps({ iterations: 1, retryDelay: 0, file: testFile }) // testFile.size = 1,000,000
+                service.getBps({ iterations: 1, retryDelay: 0, file: testFile }) // testFile.size = 1,000,000 (unused hint)
             );
 
-            expect(bps).toBe(8_000_000); // matches the configured 1,000,000-byte size, not the 500-byte body
+            expect(bps).toBe(4_000); // 500 bytes * 8 bits / 1s - matches the real body, not the size hint
         });
 
-        it('C4 - a caller supplying only a custom path silently keeps the default file size', async () => {
-            stubFetch(['ok']);
+        it('does not require file.size at all - an omitted hint still reports correctly', async () => {
+            const fetchMock = vi.fn(() =>
+                Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    statusText: 'OK',
+                    blob: () => Promise.resolve({ size: 250_000 } as Blob)
+                } as unknown as Response)
+            );
+            vi.stubGlobal('fetch', fetchMock);
+
+            const noSizeFile = { path: testFile.path, shouldBustCache: false };
+            const bps = await firstValueFrom(
+                service.getBps({ iterations: 1, retryDelay: 0, file: noSizeFile })
+            );
+
+            expect(bps).toBe(2_000_000); // 250,000 bytes * 8 bits / 1s
+        });
+    });
+
+    describe('known limitations (tracked for milestone C)', () => {
+        beforeEach(() => {
+            let elapsed = 0;
+            vi.spyOn(performance, 'now').mockImplementation(() => (elapsed += 1000));
+        });
+
+        it('C4 - a caller supplying only a custom path silently keeps the default file.size hint (cosmetic only, post-C3)', async () => {
+            const fetchMock = vi.fn(() =>
+                Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    statusText: 'OK',
+                    blob: () => Promise.resolve({ size: 42 } as Blob)
+                } as unknown as Response)
+            );
+            vi.stubGlobal('fetch', fetchMock);
 
             // SpeedTestSettings.file requires the full SpeedTestFile shape, so this is only
             // reachable from a loosely-typed (e.g. plain JS) caller - the cast simulates that.
             const pathOnly = { path: 'https://example.com/my-custom-file.bin' } as unknown as SpeedTestFile;
             const bps = await firstValueFrom(service.getBps({ iterations: 1, retryDelay: 0, file: pathOnly }));
 
-            const defaultSize = new SpeedTestFileModel().size;
-            expect(bps).toBe(defaultSize * 8); // reports a speed for a file that was never actually requested at that size
+            // Since C3, the reported speed is unaffected by the stale size hint - it comes from the
+            // real 42-byte body. C4's remaining footgun is now purely cosmetic (a caller reading
+            // settings.file.size back would see the wrong number), not a wrong reported speed.
+            expect(bps).toBe(42 * 8);
         });
     });
 

@@ -244,7 +244,7 @@ this.speedTestService.getNetworkStatus().subscribe(status => {
 | `iterations` | number | 3 | Number of tests to run for averaging |
 | `retryDelay` | number | 500 | Milliseconds to wait between retries |
 | `file.path` | string | GitHub 5MB image | URL of test file |
-| `file.size` | number | 4,952,221 | File size in bytes |
+| `file.size` | number \| undefined | 4,952,221 | Optional hint only - speed is computed from the actual response size, not this value |
 | `file.shouldBustCache` | boolean | true | Add cache-busting parameter |
 
 ## 💡 Examples
