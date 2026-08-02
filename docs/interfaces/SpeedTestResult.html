@@ -313,7 +313,7 @@
 
     <div class="tab-pane fade  tab-source-code" id="source">
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable } from &#x27;@angular/core&#x27;;
-import { fromEvent, merge, Observable, of, throwError } from &#x27;rxjs&#x27;;
+import { fromEvent, merge, Observable, of, Subscription, throwError } from &#x27;rxjs&#x27;;
 import { map, mergeMap, catchError, timeout, switchMap, startWith } from &#x27;rxjs/operators&#x27;;
 
 import { SpeedTestFileModel } from &#x27;../models/speed-test-file.model&#x27;;
@@ -428,9 +428,13 @@ export class SpeedTestService {
                             observer.next(testResult);
                             observer.complete();
                         })
-                        .catch(error &#x3D;&gt; {
+                        .catch(() &#x3D;&gt; {
                             clearTimeout(fetchTimeout);
-                            console.warn(&#x27;Speed test download failed:&#x27;, error);
+                            // Surfaced via the existing error channel: testResult.error() marks
+                            // this iteration as failed (speedBps stays 0), so it is discarded by
+                            // the &#x60;speedBps &gt; 0&#x60; filter below rather than logged to the console.
+                            // If every iteration fails, the mergeMap below throws a descriptive
+                            // error that propagates out through the returned Observable.
                             testResult.error();
 
                             const delay &#x3D; settings.iterations !&#x3D;&#x3D; 1 ? settings.retryDelay! : 0;
@@ -497,8 +501,10 @@ export class SpeedTestService {
                 return;
             }
 
+            let downloadSubscription: Subscription | undefined;
+
             // Small delay to ensure proper initialization
-            setTimeout(() &#x3D;&gt; {
+            const initTimeoutId &#x3D; setTimeout(() &#x3D;&gt; {
                 // Create settings with proper merging
                 const defaultSettings &#x3D; new SpeedTestSettingsModel();
                 const settings &#x3D; this.mergeSettings(defaultSettings, customSettings);
@@ -506,7 +512,7 @@ export class SpeedTestService {
                 try {
                     this.validateSettings(settings);
 
-                    this.downloadTest(settings).subscribe({
+                    downloadSubscription &#x3D; this.downloadTest(settings).subscribe({
                         next: (speedBps) &#x3D;&gt; {
                             observer.next(speedBps);
                             observer.complete();
@@ -519,6 +525,17 @@ export class SpeedTestService {
                     observer.error(error);
                 }
             }, 1);
+
+            // Teardown: runs on unsubscribe (including via takeUntil/timeout upstream, or normal
+            // completion/error). Clears the pending init setTimeout so it can&#x27;t fire after
+            // teardown, and unsubscribes the inner downloadTest() subscription, which propagates
+            // down through its switchMap/mergeMap chain to the per-iteration fetch Observable and
+            // triggers its own teardown (clearTimeout(fetchTimeout) + abortController.abort()),
+            // actually cancelling the in-flight fetch instead of letting it run to completion.
+            return () &#x3D;&gt; {
+                clearTimeout(initTimeoutId);
+                downloadSubscription?.unsubscribe();
+            };
         });
     }
 

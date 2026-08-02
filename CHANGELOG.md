@@ -6,6 +6,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.2]
+### Fixed
+* `ERESOLVE` install failure caused by a two-major toolchain version mismatch; `@angular-devkit/build-angular`/
+  `@angular/cli` and the whole `@angular/*` framework family are now pinned to matching versions by
+  [jrquick17](https://github.com/jrquick17)
+* `Infinity` speed result on a zero-duration test iteration by [jrquick17](https://github.com/jrquick17)
+* Unsubscribing from (or timing out) a speed test no longer leaves the download running in the background by
+  [jrquick17](https://github.com/jrquick17)
+* `shipit`/`shipit:dry` no longer chain the non-existent `lint`/`test` targets by
+  [jrquick17](https://github.com/jrquick17)
+
+### Added
+* CI workflow building the library and demo on every push/PR by [jrquick17](https://github.com/jrquick17)
+* `engines` field and `.nvmrc` documenting the minimum supported Node.js version by
+  [jrquick17](https://github.com/jrquick17)
+
+### Removed
+* Dead `speed-test.component.ts` (unreachable from the public API, did not compile) and unused `tslint.json` by
+  [jrquick17](https://github.com/jrquick17)
+* `console.warn` call from library code by [jrquick17](https://github.com/jrquick17)
+* Unused `karma-phantomjs-launcher` require from `karma.conf.js` by [jrquick17](https://github.com/jrquick17)
+
 ## [2.3.2]
 ### Update
 * Dependencies by [jrquick17](https://github.com/jrquick17)

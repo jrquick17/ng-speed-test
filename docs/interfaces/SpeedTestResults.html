@@ -459,18 +459,20 @@ export class SpeedTestResultsModel implements SpeedTestResults {
     private _update(): void {
         if (this.endTime !&#x3D;&#x3D; null &amp;&amp; this.startTime !&#x3D;&#x3D; null) {
             const milliseconds &#x3D; this.endTime - this.startTime;
-            if (milliseconds !&#x3D;&#x3D; 0) {
-                this.duration &#x3D; milliseconds / 1000;
-            }
+            this.duration &#x3D; milliseconds / 1000;
             const bitsLoaded &#x3D; this.fileSize * 8;
-            this.speedBps &#x3D; bitsLoaded / this.duration;
+            // Guard against a zero (or negative, e.g. clock anomalies) duration: dividing by it
+            // would otherwise produce Infinity/NaN, which would incorrectly pass the
+            // &#x60;speedBps &gt; 0&#x60; validity filter in SpeedTestService.downloadTest(). Falling back to
+            // 0 here keeps the result finite so it is correctly discarded like any other failure.
+            this.speedBps &#x3D; this.duration &gt; 0 ? bitsLoaded / this.duration : 0;
         }
     }
 
     end(): void {
         if (!this.hasEnded) {
             this.hasEnded &#x3D; true;
-            this.endTime &#x3D; Date.now();
+            this.endTime &#x3D; performance.now();
             this._update();
         }
     }
@@ -484,7 +486,7 @@ export class SpeedTestResultsModel implements SpeedTestResults {
     }
 
     start(): void {
-        this.startTime &#x3D; Date.now();
+        this.startTime &#x3D; performance.now();
     }
 }
 </code></pre>

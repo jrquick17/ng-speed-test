@@ -87,6 +87,31 @@
 <p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <h2>[Unreleased]</h2>
+<h2>[3.2.2]</h2>
+<h3>Fixed</h3>
+<ul>
+<li><code>ERESOLVE</code> install failure caused by a two-major toolchain version mismatch; <code>@angular-devkit/build-angular</code>/
+<code>@angular/cli</code> and the whole <code>@angular/*</code> framework family are now pinned to matching versions by
+<a href="https://github.com/jrquick17">jrquick17</a></li>
+<li><code>Infinity</code> speed result on a zero-duration test iteration by <a href="https://github.com/jrquick17">jrquick17</a></li>
+<li>Unsubscribing from (or timing out) a speed test no longer leaves the download running in the background by
+<a href="https://github.com/jrquick17">jrquick17</a></li>
+<li><code>shipit</code>/<code>shipit:dry</code> no longer chain the non-existent <code>lint</code>/<code>test</code> targets by
+<a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h3>Added</h3>
+<ul>
+<li>CI workflow building the library and demo on every push/PR by <a href="https://github.com/jrquick17">jrquick17</a></li>
+<li><code>engines</code> field and <code>.nvmrc</code> documenting the minimum supported Node.js version by
+<a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h3>Removed</h3>
+<ul>
+<li>Dead <code>speed-test.component.ts</code> (unreachable from the public API, did not compile) and unused <code>tslint.json</code> by
+<a href="https://github.com/jrquick17">jrquick17</a></li>
+<li><code>console.warn</code> call from library code by <a href="https://github.com/jrquick17">jrquick17</a></li>
+<li>Unused <code>karma-phantomjs-launcher</code> require from <code>karma.conf.js</code> by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
 <h2>[2.3.2]</h2>
 <h3>Update</h3>
 <ul>

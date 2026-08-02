@@ -34,6 +34,11 @@ A modern, lightweight Angular library for testing internet connection speed with
 
 ## 🚀 Installation
 
+Requires Node.js `^20.19.0 || ^22.12.0 || >=24.0.0` (the Angular CLI toolchain used to build this package enforces
+this range). An older Node, such as `20.5.x`, will pass `npm install` but fail on `ng build`/`ng serve`/etc. with
+the CLI's own version-check error — this project's `engines` field and `.nvmrc` will additionally surface an
+`EBADENGINE` warning during install so the mismatch isn't a surprise.
+
 ```bash
 npm install ng-speed-test --save
 ```
@@ -411,6 +416,9 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ```bash
 # Clone the repository
 git clone https://github.com/jrquick17/ng-speed-test.git
+
+# Use the supported Node version (see .nvmrc)
+nvm use
 
 # Install dependencies
 npm install

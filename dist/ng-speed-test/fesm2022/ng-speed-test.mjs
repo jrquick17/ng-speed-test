@@ -42,17 +42,19 @@ class SpeedTestResultsModel {
     _update() {
         if (this.endTime !== null && this.startTime !== null) {
             const milliseconds = this.endTime - this.startTime;
-            if (milliseconds !== 0) {
-                this.duration = milliseconds / 1000;
-            }
+            this.duration = milliseconds / 1000;
             const bitsLoaded = this.fileSize * 8;
-            this.speedBps = bitsLoaded / this.duration;
+            // Guard against a zero (or negative, e.g. clock anomalies) duration: dividing by it
+            // would otherwise produce Infinity/NaN, which would incorrectly pass the
+            // `speedBps > 0` validity filter in SpeedTestService.downloadTest(). Falling back to
+            // 0 here keeps the result finite so it is correctly discarded like any other failure.
+            this.speedBps = this.duration > 0 ? bitsLoaded / this.duration : 0;
         }
     }
     end() {
         if (!this.hasEnded) {
             this.hasEnded = true;
-            this.endTime = Date.now();
+            this.endTime = performance.now();
             this._update();
         }
     }
@@ -64,7 +66,7 @@ class SpeedTestResultsModel {
         }
     }
     start() {
-        this.startTime = Date.now();
+        this.startTime = performance.now();
     }
 }
 
@@ -182,9 +184,13 @@ class SpeedTestService {
                     observer.next(testResult);
                     observer.complete();
                 })
-                    .catch(error => {
+                    .catch(() => {
                     clearTimeout(fetchTimeout);
-                    console.warn('Speed test download failed:', error);
+                    // Surfaced via the existing error channel: testResult.error() marks
+                    // this iteration as failed (speedBps stays 0), so it is discarded by
+                    // the `speedBps > 0` filter below rather than logged to the console.
+                    // If every iteration fails, the mergeMap below throws a descriptive
+                    // error that propagates out through the returned Observable.
                     testResult.error();
                     const delay = settings.iterations !== 1 ? settings.retryDelay : 0;
                     setTimeout(() => {
@@ -238,14 +244,15 @@ class SpeedTestService {
                 observer.error(new Error('No internet connection - browser reports offline'));
                 return;
             }
+            let downloadSubscription;
             // Small delay to ensure proper initialization
-            setTimeout(() => {
+            const initTimeoutId = setTimeout(() => {
                 // Create settings with proper merging
                 const defaultSettings = new SpeedTestSettingsModel();
                 const settings = this.mergeSettings(defaultSettings, customSettings);
                 try {
                     this.validateSettings(settings);
-                    this.downloadTest(settings).subscribe({
+                    downloadSubscription = this.downloadTest(settings).subscribe({
                         next: (speedBps) => {
                             observer.next(speedBps);
                             observer.complete();
@@ -259,6 +266,16 @@ class SpeedTestService {
                     observer.error(error);
                 }
             }, 1);
+            // Teardown: runs on unsubscribe (including via takeUntil/timeout upstream, or normal
+            // completion/error). Clears the pending init setTimeout so it can't fire after
+            // teardown, and unsubscribes the inner downloadTest() subscription, which propagates
+            // down through its switchMap/mergeMap chain to the per-iteration fetch Observable and
+            // triggers its own teardown (clearTimeout(fetchTimeout) + abortController.abort()),
+            // actually cancelling the in-flight fetch instead of letting it run to completion.
+            return () => {
+                clearTimeout(initTimeoutId);
+                downloadSubscription?.unsubscribe();
+            };
         });
     }
     /**
@@ -362,10 +379,10 @@ class SpeedTestService {
             ? this.checkConnectivity().pipe(map(actuallyOnline => ({ ...info, isOnline: actuallyOnline })))
             : of(info))));
     }
-    static { this.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "20.1.3", ngImport: i0, type: SpeedTestService, deps: [], target: i0.ɵɵFactoryTarget.Injectable }); }
-    static { this.ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "20.1.3", ngImport: i0, type: SpeedTestService, providedIn: 'root' }); }
+    static { this.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "20.3.27", ngImport: i0, type: SpeedTestService, deps: [], target: i0.ɵɵFactoryTarget.Injectable }); }
+    static { this.ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "20.3.27", ngImport: i0, type: SpeedTestService, providedIn: 'root' }); }
 }
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "20.1.3", ngImport: i0, type: SpeedTestService, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "20.3.27", ngImport: i0, type: SpeedTestService, decorators: [{
             type: Injectable,
             args: [{
                     providedIn: 'root'
@@ -373,11 +390,11 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "20.1.3", ngImpor
         }], ctorParameters: () => [] });
 
 class SpeedTestModule {
-    static { this.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "20.1.3", ngImport: i0, type: SpeedTestModule, deps: [], target: i0.ɵɵFactoryTarget.NgModule }); }
-    static { this.ɵmod = i0.ɵɵngDeclareNgModule({ minVersion: "14.0.0", version: "20.1.3", ngImport: i0, type: SpeedTestModule, imports: [CommonModule, FormsModule] }); }
-    static { this.ɵinj = i0.ɵɵngDeclareInjector({ minVersion: "12.0.0", version: "20.1.3", ngImport: i0, type: SpeedTestModule, providers: [SpeedTestService], imports: [CommonModule, FormsModule] }); }
+    static { this.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "20.3.27", ngImport: i0, type: SpeedTestModule, deps: [], target: i0.ɵɵFactoryTarget.NgModule }); }
+    static { this.ɵmod = i0.ɵɵngDeclareNgModule({ minVersion: "14.0.0", version: "20.3.27", ngImport: i0, type: SpeedTestModule, imports: [CommonModule, FormsModule] }); }
+    static { this.ɵinj = i0.ɵɵngDeclareInjector({ minVersion: "12.0.0", version: "20.3.27", ngImport: i0, type: SpeedTestModule, providers: [SpeedTestService], imports: [CommonModule, FormsModule] }); }
 }
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "20.1.3", ngImport: i0, type: SpeedTestModule, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "20.3.27", ngImport: i0, type: SpeedTestModule, decorators: [{
             type: NgModule,
             args: [{
                     imports: [CommonModule, FormsModule],
