@@ -1,5 +1,5 @@
 import * as i0 from '@angular/core';
-import { Injectable, NgModule } from '@angular/core';
+import { InjectionToken, makeEnvironmentProviders, inject, Injectable, NgModule } from '@angular/core';
 import { of, Observable, throwError, merge, fromEvent } from 'rxjs';
 import { switchMap, mergeMap, map, timeout, catchError, startWith } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
@@ -98,22 +98,43 @@ class SpeedTestSettingsModel {
     }
 }
 
+const SPEED_TEST_CONFIG = new InjectionToken('SPEED_TEST_CONFIG');
+/**
+ * Configures SpeedTestService. Optional - every field has a working default and this call is
+ * not required to use the library. Pass connectivityCheckUrl only if you want an extra,
+ * network-verified connectivity check in addition to navigator.onLine; ng-speed-test does not
+ * contact any third-party host on its own unless you configure one here.
+ */
+function provideSpeedTest(config = {}) {
+    return makeEnvironmentProviders([
+        { provide: SPEED_TEST_CONFIG, useValue: config }
+    ]);
+}
+
 class SpeedTestService {
     constructor() {
-        this.DEFAULT_TIMEOUT = 15000; // Reduced from 30s to 15s
-        this.OFFLINE_CHECK_TIMEOUT = 3000; // Quick offline check
+        this.config = inject(SPEED_TEST_CONFIG, { optional: true }) ?? {};
+        this.DEFAULT_TIMEOUT = this.config.timeout ?? 15000; // Reduced from 30s to 15s
+        this.OFFLINE_CHECK_TIMEOUT = this.config.connectivityCheckTimeout ?? 3000; // Quick offline check
     }
     applyCacheBuster(path) {
         const separator = path.includes('?') ? '&' : '?';
         return `${path}${separator}cache_bust=${Date.now()}_${Math.random()}`;
     }
     /**
-     * Quick connectivity check before running speed test
+     * Quick connectivity check before running speed test.
+     *
+     * Only contacts a third-party host if the consumer opted in via
+     * provideSpeedTest({ connectivityCheckUrl }) - otherwise this trusts navigator.onLine, and an
+     * unreachable network still surfaces as a real, attributable error from the file fetch itself.
      */
     checkConnectivity() {
         // First check navigator.onLine
         if (!navigator.onLine) {
             return of(false);
+        }
+        if (!this.config.connectivityCheckUrl) {
+            return of(true);
         }
         // Then do a quick network request to verify actual connectivity
         return new Observable(observer => {
@@ -123,8 +144,7 @@ class SpeedTestService {
                 observer.next(false);
                 observer.complete();
             }, this.OFFLINE_CHECK_TIMEOUT);
-            // Use a small, fast endpoint for connectivity check
-            fetch('https://httpbin.org/get?minimal=true', {
+            fetch(this.config.connectivityCheckUrl, {
                 method: 'HEAD',
                 mode: 'no-cors',
                 signal: controller.signal,
@@ -206,7 +226,7 @@ class SpeedTestService {
             });
         }), mergeMap((testResult) => {
             allResults.push(testResult);
-            if (settings.iterations === 1) {
+            if (settings.iterations <= 1) {
                 // Calculate average speed from all valid results
                 const validResults = allResults.filter(result => result.speedBps > 0);
                 if (validResults.length === 0) {
@@ -229,7 +249,7 @@ class SpeedTestService {
         if (!settings.file?.size || settings.file.size <= 0) {
             throw new Error('ng-speed-test: Valid file size is required');
         }
-        if (settings.iterations && settings.iterations < 1) {
+        if (settings.iterations !== undefined && settings.iterations < 1) {
             throw new Error('ng-speed-test: Iterations must be at least 1');
         }
     }
@@ -249,6 +269,9 @@ class SpeedTestService {
             const initTimeoutId = setTimeout(() => {
                 // Create settings with proper merging
                 const defaultSettings = new SpeedTestSettingsModel();
+                if (this.config.file) {
+                    defaultSettings.file = new SpeedTestFileModel(this.config.file);
+                }
                 const settings = this.mergeSettings(defaultSettings, customSettings);
                 try {
                     this.validateSettings(settings);
@@ -406,5 +429,5 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "20.3.27", ngImpo
  * Generated bundle index. Do not edit.
  */
 
-export { SpeedTestFileModel, SpeedTestModule, SpeedTestResultsModel, SpeedTestService, SpeedTestSettingsModel };
+export { SPEED_TEST_CONFIG, SpeedTestFileModel, SpeedTestModule, SpeedTestResultsModel, SpeedTestService, SpeedTestSettingsModel, provideSpeedTest };
 //# sourceMappingURL=ng-speed-test.mjs.map

@@ -61,6 +61,20 @@
                }
                toggleDarkMode(darkModeState);
           </script>
+          <script>
+              // --- Iframe navigation tracking for Template Playground ---
+              function sendCurrentUrlToParent() {
+                  if (window.parent && window.parent !== window) {
+                      window.parent.postMessage({
+                          type: 'compodoc-iframe-navigate',
+                          url: window.location.pathname + window.location.hash
+                      }, '*');
+                  }
+              }
+              window.addEventListener('hashchange', sendCurrentUrlToParent, false);
+              window.addEventListener('popstate', sendCurrentUrlToParent, false);
+              window.addEventListener('DOMContentLoaded', sendCurrentUrlToParent, false);
+          </script>
 
         <div class="navbar navbar-default navbar-fixed-top d-md-none p-0">
                <div class="d-flex">
@@ -81,6 +95,10 @@
                <!-- START CONTENT -->
                <div class="content coverage">
                    <div class="content-data">
+
+
+
+
 
 
 
@@ -121,7 +139,7 @@
         <tr class="good">
             <td>
                 <!-- miscellaneous -->
-                <a href="./components/AppComponent.html">projects/demo/src/app/app.component.ts</a>
+                        <a href="./components/AppComponent.html">projects/demo/src/app/app.component.ts</a>
             </td>
             <td>component</td>
             <td>AppComponent</td>
@@ -137,6 +155,18 @@
             </td>
             <td>variable</td>
             <td>appConfig</td>
+            <td align="right" data-sort="0">
+                <span class="coverage-percent">0 %</span>
+                <span class="coverage-count">(0/1)</span>
+            </td>
+        </tr>
+        <tr class="low">
+            <td>
+                <!-- miscellaneous -->
+                        <a href="./miscellaneous/variables.html#routes">projects/demo/src/app/app.routes.ts</a>
+            </td>
+            <td>variable</td>
+            <td>routes</td>
             <td align="right" data-sort="0">
                 <span class="coverage-percent">0 %</span>
                 <span class="coverage-count">(0/1)</span>
@@ -169,7 +199,7 @@
         <tr class="low">
             <td>
                 <!-- miscellaneous -->
-                <a href="./classes/SpeedTestFileModel.html">src/models/speed-test-file.model.ts</a>
+                        <a href="./classes/SpeedTestFileModel.html">src/models/speed-test-file.model.ts</a>
             </td>
             <td>class</td>
             <td>SpeedTestFileModel</td>
@@ -181,7 +211,7 @@
         <tr class="low">
             <td>
                 <!-- miscellaneous -->
-                <a href="./interfaces/SpeedTestFile.html">src/models/speed-test-file.model.ts</a>
+                        <a href="./interfaces/SpeedTestFile.html">src/models/speed-test-file.model.ts</a>
             </td>
             <td>interface</td>
             <td>SpeedTestFile</td>
@@ -193,7 +223,7 @@
         <tr class="low">
             <td>
                 <!-- miscellaneous -->
-                <a href="./classes/SpeedTestResultsModel.html">src/models/speed-test-results.model.ts</a>
+                        <a href="./classes/SpeedTestResultsModel.html">src/models/speed-test-results.model.ts</a>
             </td>
             <td>class</td>
             <td>SpeedTestResultsModel</td>
@@ -205,7 +235,7 @@
         <tr class="low">
             <td>
                 <!-- miscellaneous -->
-                <a href="./interfaces/SpeedTestResults.html">src/models/speed-test-results.model.ts</a>
+                        <a href="./interfaces/SpeedTestResults.html">src/models/speed-test-results.model.ts</a>
             </td>
             <td>interface</td>
             <td>SpeedTestResults</td>
@@ -217,7 +247,7 @@
         <tr class="low">
             <td>
                 <!-- miscellaneous -->
-                <a href="./classes/SpeedTestSettingsModel.html">src/models/speed-test-settings.model.ts</a>
+                        <a href="./classes/SpeedTestSettingsModel.html">src/models/speed-test-settings.model.ts</a>
             </td>
             <td>class</td>
             <td>SpeedTestSettingsModel</td>
@@ -229,7 +259,7 @@
         <tr class="low">
             <td>
                 <!-- miscellaneous -->
-                <a href="./interfaces/SpeedTestSettings.html">src/models/speed-test-settings.model.ts</a>
+                        <a href="./interfaces/SpeedTestSettings.html">src/models/speed-test-settings.model.ts</a>
             </td>
             <td>interface</td>
             <td>SpeedTestSettings</td>
@@ -238,22 +268,58 @@
                 <span class="coverage-count">(0/4)</span>
             </td>
         </tr>
-        <tr class="good">
+        <tr class="very-good">
             <td>
                 <!-- miscellaneous -->
-                <a href="./injectables/SpeedTestService.html">src/services/speed-test.service.ts</a>
+                        <a href="./interfaces/SpeedTestConfig.html">src/providers/speed-test-config.ts</a>
             </td>
-            <td>injectable</td>
-            <td>SpeedTestService</td>
-            <td align="right" data-sort="53">
-                <span class="coverage-percent">53 %</span>
-                <span class="coverage-count">(8/15)</span>
+            <td>interface</td>
+            <td>SpeedTestConfig</td>
+            <td align="right" data-sort="80">
+                <span class="coverage-percent">80 %</span>
+                <span class="coverage-count">(4/5)</span>
+            </td>
+        </tr>
+        <tr class="very-good">
+            <td>
+                <!-- miscellaneous -->
+                        <a href="./miscellaneous/functions.html#provideSpeedTest">src/providers/speed-test-config.ts</a>
+            </td>
+            <td>function</td>
+            <td>provideSpeedTest</td>
+            <td align="right" data-sort="100">
+                <span class="coverage-percent">100 %</span>
+                <span class="coverage-count">(1/1)</span>
             </td>
         </tr>
         <tr class="low">
             <td>
                 <!-- miscellaneous -->
-                <a href="./interfaces/SpeedTestResult.html">src/services/speed-test.service.ts</a>
+                        <a href="./miscellaneous/variables.html#SPEED_TEST_CONFIG">src/providers/speed-test-config.ts</a>
+            </td>
+            <td>variable</td>
+            <td>SPEED_TEST_CONFIG</td>
+            <td align="right" data-sort="0">
+                <span class="coverage-percent">0 %</span>
+                <span class="coverage-count">(0/1)</span>
+            </td>
+        </tr>
+        <tr class="medium">
+            <td>
+                <!-- miscellaneous -->
+                        <a href="./injectables/SpeedTestService.html">src/services/speed-test.service.ts</a>
+            </td>
+            <td>injectable</td>
+            <td>SpeedTestService</td>
+            <td align="right" data-sort="50">
+                <span class="coverage-percent">50 %</span>
+                <span class="coverage-count">(8/16)</span>
+            </td>
+        </tr>
+        <tr class="low">
+            <td>
+                <!-- miscellaneous -->
+                        <a href="./interfaces/SpeedTestResult.html">src/services/speed-test.service.ts</a>
             </td>
             <td>interface</td>
             <td>SpeedTestResult</td>

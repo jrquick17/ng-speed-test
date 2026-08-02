@@ -122,6 +122,43 @@ this.speedTestService.getMbps(customSettings).subscribe(speed => {
 });
 ```
 
+### Global Configuration
+
+`provideSpeedTest()` sets defaults for every call in your app - the connectivity pre-flight check
+URL, the default test file, and timeouts. It's optional; every field already has a working default.
+
+```typescript
+import { ApplicationConfig } from '@angular/core';
+import { provideSpeedTest } from 'ng-speed-test';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideSpeedTest({
+      // Opt-in only: by default ng-speed-test does not contact any third-party host to verify
+      // connectivity - it trusts navigator.onLine, and an unreachable network still surfaces as
+      // a real error from the file fetch itself. Set this if you want an extra, network-verified
+      // check (e.g. against your own backend) before every speed test.
+      connectivityCheckUrl: 'https://your-api.example.com/ping',
+      connectivityCheckTimeout: 3000, // ms, defaults to 3000
+      file: {
+        path: 'https://your-cdn.example.com/test-file.bin',
+        size: 5_000_000
+      },
+      timeout: 15000 // ms, defaults to 15000
+    })
+  ]
+};
+```
+
+> **Note on the pre-4.x default:** earlier versions hardcoded `https://httpbin.org/get?minimal=true`
+> as the connectivity check, run on every speed test with no opt-out - an outage or rate limit on
+> that third-party host made every consumer's app report itself offline (see
+> [issue #108](https://github.com/jrquick17/ng-speed-test/issues/108)). `provideSpeedTest()` fixes
+> this: no third-party host is contacted unless you configure one.
+
+If you're using `SpeedTestModule` and `NgModule`-based bootstrapping instead, pass the same
+providers array to your root module's `providers` instead of `ApplicationConfig`.
+
 ### Available Test Files
 
 Pre-configured test files hosted on GitHub:

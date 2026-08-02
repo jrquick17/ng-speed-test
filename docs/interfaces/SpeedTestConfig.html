@@ -116,7 +116,7 @@
   <li class="breadcrumb-item">Interfaces</li>
   <li class="breadcrumb-item"
   >
-  SpeedTestSettings</li>
+  SpeedTestConfig</li>
 </ol>
 
 <ul class="nav nav-tabs" role="tablist">
@@ -140,7 +140,7 @@
             <h3>File</h3>
         </p>
         <p class="comment">
-            <code>src/models/speed-test-settings.model.ts</code>
+            <code>src/providers/speed-test-config.ts</code>
         </p>
 
 
@@ -160,6 +160,20 @@
                             <ul class="index-list">
                                 <li>
                                             <span class="modifier">Optional</span>
+                                        <a href="#connectivityCheckTimeout" 
+>
+                                            connectivityCheckTimeout
+                                        </a>
+                                </li>
+                                <li>
+                                            <span class="modifier">Optional</span>
+                                        <a href="#connectivityCheckUrl" 
+>
+                                            connectivityCheckUrl
+                                        </a>
+                                </li>
+                                <li>
+                                            <span class="modifier">Optional</span>
                                         <a href="#file" 
 >
                                             file
@@ -167,16 +181,9 @@
                                 </li>
                                 <li>
                                             <span class="modifier">Optional</span>
-                                        <a href="#iterations" 
+                                        <a href="#timeout" 
 >
-                                            iterations
-                                        </a>
-                                </li>
-                                <li>
-                                            <span class="modifier">Optional</span>
-                                        <a href="#retryDelay" 
->
-                                            retryDelay
+                                            timeout
                                         </a>
                                 </li>
                             </ul>
@@ -194,6 +201,97 @@
                         <tbody>
                                 <tr>
                                     <td class="col-md-4">
+                                        <a name="connectivityCheckTimeout"></a>
+                                        <span class="name "><b>connectivityCheckTimeout</b>
+                                            <a href="#connectivityCheckTimeout">
+                                                <span class="icon ion-ios-link"></span>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-md-4">
+                                        <code>connectivityCheckTimeout:         <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+</code>
+                                    </td>
+                                </tr>
+
+
+                                    <tr>
+                                        <td class="col-md-4">
+                                            <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="col-md-4">
+                                            <i>Optional</i>
+                                        </td>
+                                    </tr>
+
+
+
+
+                            <tr>
+                                <td class="col-md-4">
+                                    <div class="io-description"><p>Timeout in ms for the connectivity check, if connectivityCheckUrl is set. Defaults to 3000.</p>
+</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table table-sm table-bordered">
+                        <tbody>
+                                <tr>
+                                    <td class="col-md-4">
+                                        <a name="connectivityCheckUrl"></a>
+                                        <span class="name "><b>connectivityCheckUrl</b>
+                                            <a href="#connectivityCheckUrl">
+                                                <span class="icon ion-ios-link"></span>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-md-4">
+                                        <code>connectivityCheckUrl:         <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+</code>
+                                    </td>
+                                </tr>
+
+
+                                    <tr>
+                                        <td class="col-md-4">
+                                            <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="col-md-4">
+                                            <i>Optional</i>
+                                        </td>
+                                    </tr>
+
+
+
+
+                            <tr>
+                                <td class="col-md-4">
+                                    <div class="io-description"><p>URL used for the pre-flight connectivity check that runs before every speed test and every
+isOnline() / getNetworkStatus() emission. When not provided, no third-party host is
+contacted for connectivity verification - the library relies on navigator.onLine and on the
+actual file fetch failing (with a real, attributable error) if the network is unreachable.</p>
+</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table table-sm table-bordered">
+                        <tbody>
+                                <tr>
+                                    <td class="col-md-4">
                                         <a name="file"></a>
                                         <span class="name "><b>file</b>
                                             <a href="#file">
@@ -204,7 +302,7 @@
                                 </tr>
                                 <tr>
                                     <td class="col-md-4">
-                                        <code>file:         <code><a href="../interfaces/SpeedTestFile.html" target="_self" >SpeedTestFile</a></code>
+                                        <code>file:         <code><a href="../interfaces/SpeedTestFile.html" target="_self" >Partial&lt;SpeedTestFile&gt;</a></code>
 </code>
                                     </td>
                                 </tr>
@@ -212,7 +310,7 @@
 
                                     <tr>
                                         <td class="col-md-4">
-                                            <i>Type : </i>        <code><a href="../interfaces/SpeedTestFile.html" target="_self" >SpeedTestFile</a></code>
+                                            <i>Type : </i>        <code><a href="../interfaces/SpeedTestFile.html" target="_self" >Partial&lt;SpeedTestFile&gt;</a></code>
 
                                         </td>
                                     </tr>
@@ -226,15 +324,21 @@
 
 
 
+                            <tr>
+                                <td class="col-md-4">
+                                    <div class="io-description"><p>Overrides the built-in default test file for calls that do not supply their own.</p>
+</div>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <table class="table table-sm table-bordered">
                         <tbody>
                                 <tr>
                                     <td class="col-md-4">
-                                        <a name="iterations"></a>
-                                        <span class="name "><b>iterations</b>
-                                            <a href="#iterations">
+                                        <a name="timeout"></a>
+                                        <span class="name "><b>timeout</b>
+                                            <a href="#timeout">
                                                 <span class="icon ion-ios-link"></span>
                                             </a>
                                         </span>
@@ -242,7 +346,7 @@
                                 </tr>
                                 <tr>
                                     <td class="col-md-4">
-                                        <code>iterations:         <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                        <code>timeout:         <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
 </code>
                                     </td>
                                 </tr>
@@ -264,44 +368,12 @@
 
 
 
-                        </tbody>
-                    </table>
-                    <table class="table table-sm table-bordered">
-                        <tbody>
-                                <tr>
-                                    <td class="col-md-4">
-                                        <a name="retryDelay"></a>
-                                        <span class="name "><b>retryDelay</b>
-                                            <a href="#retryDelay">
-                                                <span class="icon ion-ios-link"></span>
-                                            </a>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="col-md-4">
-                                        <code>retryDelay:         <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
-</code>
-                                    </td>
-                                </tr>
-
-
-                                    <tr>
-                                        <td class="col-md-4">
-                                            <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
-
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td class="col-md-4">
-                                            <i>Optional</i>
-                                        </td>
-                                    </tr>
-
-
-
-
+                            <tr>
+                                <td class="col-md-4">
+                                    <div class="io-description"><p>Timeout in ms for the file download of a single iteration. Defaults to 15000.</p>
+</div>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
             </section>
@@ -309,41 +381,38 @@
 
 
     <div class="tab-pane fade  tab-source-code" id="source">
-        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import {SpeedTestFile, SpeedTestFileModel} from &#x27;./speed-test-file.model&#x27;;
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { EnvironmentProviders, InjectionToken, makeEnvironmentProviders } from &#x27;@angular/core&#x27;;
 
-export interface SpeedTestSettings {
-  iterations?: number;
-  file?: SpeedTestFile;
-  retryDelay?: number;
+import { SpeedTestFile } from &#x27;../models/speed-test-file.model&#x27;;
+
+export interface SpeedTestConfig {
+  /**
+   * URL used for the pre-flight connectivity check that runs before every speed test and every
+   * isOnline() / getNetworkStatus() emission. When not provided, no third-party host is
+   * contacted for connectivity verification - the library relies on navigator.onLine and on the
+   * actual file fetch failing (with a real, attributable error) if the network is unreachable.
+   */
+  connectivityCheckUrl?: string;
+  /** Timeout in ms for the connectivity check, if connectivityCheckUrl is set. Defaults to 3000. */
+  connectivityCheckTimeout?: number;
+  /** Overrides the built-in default test file for calls that do not supply their own. */
+  file?: Partial&lt;SpeedTestFile&gt;;
+  /** Timeout in ms for the file download of a single iteration. Defaults to 15000. */
+  timeout?: number;
 }
 
-export class SpeedTestSettingsModel implements SpeedTestSettings {
-  public iterations?: number &#x3D; 3;
-  public file?: SpeedTestFileModel &#x3D; new SpeedTestFileModel();
-  public retryDelay?: number &#x3D; 500;
+export const SPEED_TEST_CONFIG &#x3D; new InjectionToken&lt;SpeedTestConfig&gt;(&#x27;SPEED_TEST_CONFIG&#x27;);
 
-  constructor(settings?: Partial&lt;SpeedTestSettings&gt;) {
-    if (settings) {
-      if (settings.iterations !&#x3D;&#x3D; undefined) {
-        this.iterations &#x3D; settings.iterations;
-      }
-      if (settings.retryDelay !&#x3D;&#x3D; undefined) {
-        this.retryDelay &#x3D; settings.retryDelay;
-      }
-      if (settings.file) {
-        this.file &#x3D; new SpeedTestFileModel();
-        if (settings.file.path !&#x3D;&#x3D; undefined) {
-          this.file.path &#x3D; settings.file.path;
-        }
-        if (settings.file.size !&#x3D;&#x3D; undefined) {
-          this.file.size &#x3D; settings.file.size;
-        }
-        if (settings.file.shouldBustCache !&#x3D;&#x3D; undefined) {
-          this.file.shouldBustCache &#x3D; settings.file.shouldBustCache;
-        }
-      }
-    }
-  }
+/**
+ * Configures SpeedTestService. Optional - every field has a working default and this call is
+ * not required to use the library. Pass connectivityCheckUrl only if you want an extra,
+ * network-verified connectivity check in addition to navigator.onLine; ng-speed-test does not
+ * contact any third-party host on its own unless you configure one here.
+ */
+export function provideSpeedTest(config: SpeedTestConfig &#x3D; {}): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    { provide: SPEED_TEST_CONFIG, useValue: config }
+  ]);
 }
 </code></pre>
     </div>
@@ -382,7 +451,7 @@ export class SpeedTestSettingsModel implements SpeedTestSettings {
        <script>
             var COMPODOC_CURRENT_PAGE_DEPTH = 1;
             var COMPODOC_CURRENT_PAGE_CONTEXT = 'interface';
-            var COMPODOC_CURRENT_PAGE_URL = 'SpeedTestSettings.html';
+            var COMPODOC_CURRENT_PAGE_URL = 'SpeedTestConfig.html';
             var MAX_SEARCH_RESULTS = 15;
        </script>
 

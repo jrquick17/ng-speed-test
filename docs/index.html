@@ -61,6 +61,20 @@
                }
                toggleDarkMode(darkModeState);
           </script>
+          <script>
+              // --- Iframe navigation tracking for Template Playground ---
+              function sendCurrentUrlToParent() {
+                  if (window.parent && window.parent !== window) {
+                      window.parent.postMessage({
+                          type: 'compodoc-iframe-navigate',
+                          url: window.location.pathname + window.location.hash
+                      }, '*');
+                  }
+              }
+              window.addEventListener('hashchange', sendCurrentUrlToParent, false);
+              window.addEventListener('popstate', sendCurrentUrlToParent, false);
+              window.addEventListener('DOMContentLoaded', sendCurrentUrlToParent, false);
+          </script>
 
         <div class="navbar navbar-default navbar-fixed-top d-md-none p-0">
                <div class="d-flex">
@@ -79,8 +93,9 @@
                    <compodoc-menu mode="normal"></compodoc-menu>
                </div>
                <!-- START CONTENT -->
-               <div class="content getting-started">
+               <div class="content readme">
                    <div class="content-data">
+
 
 <h1>ng-speed-test</h1>
 <p><a href="https://www.npmjs.com/package/ng-speed-test"><img src="https://img.shields.io/npm/v/ng-speed-test.svg" alt="npm version" class="img-responsive"></a>
@@ -177,7 +192,38 @@ export class SpeedTestComponent {
 
 this.speedTestService.getMbps(customSettings).subscribe(speed =&gt; {
   console.log(`Speed: ${speed} Mbps`);
-});</code></pre></div><h3>Available Test Files</h3>
+});</code></pre></div><h3>Global Configuration</h3>
+<p><code>provideSpeedTest()</code> sets defaults for every call in your app - the connectivity pre-flight check
+URL, the default test file, and timeouts. It&#39;s optional; every field already has a working default.</p>
+<b>Example :</b><div><pre class="line-numbers"><code class="language-typescript">import { ApplicationConfig } from &#39;&#64;angular/core&#39;;
+import { provideSpeedTest } from &#39;ng-speed-test&#39;;
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideSpeedTest({
+      // Opt-in only: by default ng-speed-test does not contact any third-party host to verify
+      // connectivity - it trusts navigator.onLine, and an unreachable network still surfaces as
+      // a real error from the file fetch itself. Set this if you want an extra, network-verified
+      // check (e.g. against your own backend) before every speed test.
+      connectivityCheckUrl: &#39;https://your-api.example.com/ping&#39;,
+      connectivityCheckTimeout: 3000, // ms, defaults to 3000
+      file: {
+        path: &#39;https://your-cdn.example.com/test-file.bin&#39;,
+        size: 5_000_000
+      },
+      timeout: 15000 // ms, defaults to 15000
+    })
+  ]
+};</code></pre></div><blockquote>
+<p><strong>Note on the pre-4.x default:</strong> earlier versions hardcoded <code>https://httpbin.org/get?minimal=true</code>
+as the connectivity check, run on every speed test with no opt-out - an outage or rate limit on
+that third-party host made every consumer&#39;s app report itself offline (see
+<a href="https://github.com/jrquick17/ng-speed-test/issues/108">issue #108</a>). <code>provideSpeedTest()</code> fixes
+this: no third-party host is contacted unless you configure one.</p>
+</blockquote>
+<p>If you&#39;re using <code>SpeedTestModule</code> and <code>NgModule</code>-based bootstrapping instead, pass the same
+providers array to your root module&#39;s <code>providers</code> instead of <code>ApplicationConfig</code>.</p>
+<h3>Available Test Files</h3>
 <p>Pre-configured test files hosted on GitHub:</p>
 <table class="table table-bordered compodoc-table">
 <thead>
@@ -547,6 +593,9 @@ npm run test</code></pre></div><h2>📄 License</h2>
 
 
 
+
+
+
                    </div><div class="search-results">
     <div class="has-results">
         <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
@@ -572,7 +621,7 @@ npm run test</code></pre></div><h2>📄 License</h2>
 
        <script>
             var COMPODOC_CURRENT_PAGE_DEPTH = 0;
-            var COMPODOC_CURRENT_PAGE_CONTEXT = 'getting-started';
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'readme';
             var COMPODOC_CURRENT_PAGE_URL = 'index.html';
             var MAX_SEARCH_RESULTS = 15;
        </script>

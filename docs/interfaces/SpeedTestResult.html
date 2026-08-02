@@ -61,6 +61,20 @@
                }
                toggleDarkMode(darkModeState);
           </script>
+          <script>
+              // --- Iframe navigation tracking for Template Playground ---
+              function sendCurrentUrlToParent() {
+                  if (window.parent && window.parent !== window) {
+                      window.parent.postMessage({
+                          type: 'compodoc-iframe-navigate',
+                          url: window.location.pathname + window.location.hash
+                      }, '*');
+                  }
+              }
+              window.addEventListener('hashchange', sendCurrentUrlToParent, false);
+              window.addEventListener('popstate', sendCurrentUrlToParent, false);
+              window.addEventListener('DOMContentLoaded', sendCurrentUrlToParent, false);
+          </script>
 
         <div class="navbar navbar-default navbar-fixed-top d-md-none p-0">
                <div class="d-flex">
@@ -81,6 +95,10 @@
                <!-- START CONTENT -->
                <div class="content interface">
                    <div class="content-data">
+
+
+
+
 
 
 
@@ -312,13 +330,14 @@
 
 
     <div class="tab-pane fade  tab-source-code" id="source">
-        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable } from &#x27;@angular/core&#x27;;
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { inject, Injectable } from &#x27;@angular/core&#x27;;
 import { fromEvent, merge, Observable, of, Subscription, throwError } from &#x27;rxjs&#x27;;
 import { map, mergeMap, catchError, timeout, switchMap, startWith } from &#x27;rxjs/operators&#x27;;
 
 import { SpeedTestFileModel } from &#x27;../models/speed-test-file.model&#x27;;
 import { SpeedTestSettingsModel } from &#x27;../models/speed-test-settings.model&#x27;;
 import { SpeedTestResultsModel } from &#x27;../models/speed-test-results.model&#x27;;
+import { SPEED_TEST_CONFIG } from &#x27;../providers/speed-test-config&#x27;;
 
 export interface SpeedTestResult {
     bps: number;
@@ -331,8 +350,9 @@ export interface SpeedTestResult {
     providedIn: &#x27;root&#x27;
 })
 export class SpeedTestService {
-    private readonly DEFAULT_TIMEOUT &#x3D; 15000; // Reduced from 30s to 15s
-    private readonly OFFLINE_CHECK_TIMEOUT &#x3D; 3000; // Quick offline check
+    private readonly config &#x3D; inject(SPEED_TEST_CONFIG, { optional: true }) ?? {};
+    private readonly DEFAULT_TIMEOUT &#x3D; this.config.timeout ?? 15000; // Reduced from 30s to 15s
+    private readonly OFFLINE_CHECK_TIMEOUT &#x3D; this.config.connectivityCheckTimeout ?? 3000; // Quick offline check
 
     constructor() {}
 
@@ -342,12 +362,20 @@ export class SpeedTestService {
     }
 
     /**
-     * Quick connectivity check before running speed test
+     * Quick connectivity check before running speed test.
+     *
+     * Only contacts a third-party host if the consumer opted in via
+     * provideSpeedTest({ connectivityCheckUrl }) - otherwise this trusts navigator.onLine, and an
+     * unreachable network still surfaces as a real, attributable error from the file fetch itself.
      */
     private checkConnectivity(): Observable&lt;boolean&gt; {
         // First check navigator.onLine
         if (!navigator.onLine) {
             return of(false);
+        }
+
+        if (!this.config.connectivityCheckUrl) {
+            return of(true);
         }
 
         // Then do a quick network request to verify actual connectivity
@@ -359,8 +387,7 @@ export class SpeedTestService {
                 observer.complete();
             }, this.OFFLINE_CHECK_TIMEOUT);
 
-            // Use a small, fast endpoint for connectivity check
-            fetch(&#x27;https://httpbin.org/get?minimal&#x3D;true&#x27;, {
+            fetch(this.config.connectivityCheckUrl!, {
                 method: &#x27;HEAD&#x27;,
                 mode: &#x27;no-cors&#x27;,
                 signal: controller.signal,
@@ -455,7 +482,7 @@ export class SpeedTestService {
             mergeMap((testResult: SpeedTestResultsModel) &#x3D;&gt; {
                 allResults.push(testResult);
 
-                if (settings.iterations &#x3D;&#x3D;&#x3D; 1) {
+                if (settings.iterations! &lt;&#x3D; 1) {
                     // Calculate average speed from all valid results
                     const validResults &#x3D; allResults.filter(result &#x3D;&gt; result.speedBps &gt; 0);
 
@@ -484,7 +511,7 @@ export class SpeedTestService {
             throw new Error(&#x27;ng-speed-test: Valid file size is required&#x27;);
         }
 
-        if (settings.iterations &amp;&amp; settings.iterations &lt; 1) {
+        if (settings.iterations !&#x3D;&#x3D; undefined &amp;&amp; settings.iterations &lt; 1) {
             throw new Error(&#x27;ng-speed-test: Iterations must be at least 1&#x27;);
         }
     }
@@ -507,6 +534,9 @@ export class SpeedTestService {
             const initTimeoutId &#x3D; setTimeout(() &#x3D;&gt; {
                 // Create settings with proper merging
                 const defaultSettings &#x3D; new SpeedTestSettingsModel();
+                if (this.config.file) {
+                    defaultSettings.file &#x3D; new SpeedTestFileModel(this.config.file);
+                }
                 const settings &#x3D; this.mergeSettings(defaultSettings, customSettings);
 
                 try {

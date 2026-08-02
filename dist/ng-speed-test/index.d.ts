@@ -1,5 +1,6 @@
-import { Observable } from 'rxjs';
 import * as i0 from '@angular/core';
+import { InjectionToken, EnvironmentProviders } from '@angular/core';
+import { Observable } from 'rxjs';
 import * as i1 from '@angular/common';
 import * as i2 from '@angular/forms';
 
@@ -52,6 +53,30 @@ declare class SpeedTestSettingsModel implements SpeedTestSettings {
     constructor(settings?: Partial<SpeedTestSettings>);
 }
 
+interface SpeedTestConfig {
+    /**
+     * URL used for the pre-flight connectivity check that runs before every speed test and every
+     * isOnline() / getNetworkStatus() emission. When not provided, no third-party host is
+     * contacted for connectivity verification - the library relies on navigator.onLine and on the
+     * actual file fetch failing (with a real, attributable error) if the network is unreachable.
+     */
+    connectivityCheckUrl?: string;
+    /** Timeout in ms for the connectivity check, if connectivityCheckUrl is set. Defaults to 3000. */
+    connectivityCheckTimeout?: number;
+    /** Overrides the built-in default test file for calls that do not supply their own. */
+    file?: Partial<SpeedTestFile>;
+    /** Timeout in ms for the file download of a single iteration. Defaults to 15000. */
+    timeout?: number;
+}
+declare const SPEED_TEST_CONFIG: InjectionToken<SpeedTestConfig>;
+/**
+ * Configures SpeedTestService. Optional - every field has a working default and this call is
+ * not required to use the library. Pass connectivityCheckUrl only if you want an extra,
+ * network-verified connectivity check in addition to navigator.onLine; ng-speed-test does not
+ * contact any third-party host on its own unless you configure one here.
+ */
+declare function provideSpeedTest(config?: SpeedTestConfig): EnvironmentProviders;
+
 interface SpeedTestResult {
     bps: number;
     kbps: number;
@@ -59,12 +84,17 @@ interface SpeedTestResult {
     duration: number;
 }
 declare class SpeedTestService {
+    private readonly config;
     private readonly DEFAULT_TIMEOUT;
     private readonly OFFLINE_CHECK_TIMEOUT;
     constructor();
     private applyCacheBuster;
     /**
-     * Quick connectivity check before running speed test
+     * Quick connectivity check before running speed test.
+     *
+     * Only contacts a third-party host if the consumer opted in via
+     * provideSpeedTest({ connectivityCheckUrl }) - otherwise this trusts navigator.onLine, and an
+     * unreachable network still surfaces as a real, attributable error from the file fetch itself.
      */
     private checkConnectivity;
     private downloadTest;
@@ -112,5 +142,5 @@ declare class SpeedTestModule {
     static ɵinj: i0.ɵɵInjectorDeclaration<SpeedTestModule>;
 }
 
-export { SpeedTestFileModel, SpeedTestModule, SpeedTestResultsModel, SpeedTestService, SpeedTestSettingsModel };
-export type { SpeedTestFile, SpeedTestResult, SpeedTestResults, SpeedTestSettings };
+export { SPEED_TEST_CONFIG, SpeedTestFileModel, SpeedTestModule, SpeedTestResultsModel, SpeedTestService, SpeedTestSettingsModel, provideSpeedTest };
+export type { SpeedTestConfig, SpeedTestFile, SpeedTestResult, SpeedTestResults, SpeedTestSettings };
