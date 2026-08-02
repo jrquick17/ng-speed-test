@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { fromEvent, merge, Observable, of, throwError } from 'rxjs';
+import { fromEvent, merge, Observable, of, Subscription, throwError } from 'rxjs';
 import { map, mergeMap, catchError, timeout, switchMap, startWith } from 'rxjs/operators';
 
 import { SpeedTestFileModel } from '../models/speed-test-file.model';
@@ -187,8 +187,10 @@ export class SpeedTestService {
                 return;
             }
 
+            let downloadSubscription: Subscription | undefined;
+
             // Small delay to ensure proper initialization
-            setTimeout(() => {
+            const initTimeoutId = setTimeout(() => {
                 // Create settings with proper merging
                 const defaultSettings = new SpeedTestSettingsModel();
                 const settings = this.mergeSettings(defaultSettings, customSettings);
@@ -196,7 +198,7 @@ export class SpeedTestService {
                 try {
                     this.validateSettings(settings);
 
-                    this.downloadTest(settings).subscribe({
+                    downloadSubscription = this.downloadTest(settings).subscribe({
                         next: (speedBps) => {
                             observer.next(speedBps);
                             observer.complete();
@@ -209,6 +211,17 @@ export class SpeedTestService {
                     observer.error(error);
                 }
             }, 1);
+
+            // Teardown: runs on unsubscribe (including via takeUntil/timeout upstream, or normal
+            // completion/error). Clears the pending init setTimeout so it can't fire after
+            // teardown, and unsubscribes the inner downloadTest() subscription, which propagates
+            // down through its switchMap/mergeMap chain to the per-iteration fetch Observable and
+            // triggers its own teardown (clearTimeout(fetchTimeout) + abortController.abort()),
+            // actually cancelling the in-flight fetch instead of letting it run to completion.
+            return () => {
+                clearTimeout(initTimeoutId);
+                downloadSubscription?.unsubscribe();
+            };
         });
     }
 
