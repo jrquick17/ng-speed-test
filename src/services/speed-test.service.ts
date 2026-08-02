@@ -114,9 +114,13 @@ export class SpeedTestService {
                             observer.next(testResult);
                             observer.complete();
                         })
-                        .catch(error => {
+                        .catch(() => {
                             clearTimeout(fetchTimeout);
-                            console.warn('Speed test download failed:', error);
+                            // Surfaced via the existing error channel: testResult.error() marks
+                            // this iteration as failed (speedBps stays 0), so it is discarded by
+                            // the `speedBps > 0` filter below rather than logged to the console.
+                            // If every iteration fails, the mergeMap below throws a descriptive
+                            // error that propagates out through the returned Observable.
                             testResult.error();
 
                             const delay = settings.iterations !== 1 ? settings.retryDelay! : 0;
