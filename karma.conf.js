@@ -11,7 +11,6 @@ module.exports = function (config) {
       require('karma-coverage'),
       require('karma-jasmine'),
       require('karma-jasmine-html-reporter'),
-      require('karma-phantomjs-launcher'),
     ],
     client: {
       clearContext: false // leave Jasmine Spec Runner output visible in browser
