@@ -1,10 +1,11 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { fromEvent, merge, Observable, of, Subscription, throwError } from 'rxjs';
 import { map, mergeMap, catchError, timeout, switchMap, startWith } from 'rxjs/operators';
 
 import { SpeedTestFileModel } from '../models/speed-test-file.model';
 import { SpeedTestSettingsModel } from '../models/speed-test-settings.model';
 import { SpeedTestResultsModel } from '../models/speed-test-results.model';
+import { SPEED_TEST_CONFIG } from '../providers/speed-test-config';
 
 export interface SpeedTestResult {
     bps: number;
@@ -17,8 +18,9 @@ export interface SpeedTestResult {
     providedIn: 'root'
 })
 export class SpeedTestService {
-    private readonly DEFAULT_TIMEOUT = 15000; // Reduced from 30s to 15s
-    private readonly OFFLINE_CHECK_TIMEOUT = 3000; // Quick offline check
+    private readonly config = inject(SPEED_TEST_CONFIG, { optional: true }) ?? {};
+    private readonly DEFAULT_TIMEOUT = this.config.timeout ?? 15000; // Reduced from 30s to 15s
+    private readonly OFFLINE_CHECK_TIMEOUT = this.config.connectivityCheckTimeout ?? 3000; // Quick offline check
 
     constructor() {}
 
@@ -28,12 +30,20 @@ export class SpeedTestService {
     }
 
     /**
-     * Quick connectivity check before running speed test
+     * Quick connectivity check before running speed test.
+     *
+     * Only contacts a third-party host if the consumer opted in via
+     * provideSpeedTest({ connectivityCheckUrl }) - otherwise this trusts navigator.onLine, and an
+     * unreachable network still surfaces as a real, attributable error from the file fetch itself.
      */
     private checkConnectivity(): Observable<boolean> {
         // First check navigator.onLine
         if (!navigator.onLine) {
             return of(false);
+        }
+
+        if (!this.config.connectivityCheckUrl) {
+            return of(true);
         }
 
         // Then do a quick network request to verify actual connectivity
@@ -45,8 +55,7 @@ export class SpeedTestService {
                 observer.complete();
             }, this.OFFLINE_CHECK_TIMEOUT);
 
-            // Use a small, fast endpoint for connectivity check
-            fetch('https://httpbin.org/get?minimal=true', {
+            fetch(this.config.connectivityCheckUrl!, {
                 method: 'HEAD',
                 mode: 'no-cors',
                 signal: controller.signal,
@@ -141,7 +150,7 @@ export class SpeedTestService {
             mergeMap((testResult: SpeedTestResultsModel) => {
                 allResults.push(testResult);
 
-                if (settings.iterations === 1) {
+                if (settings.iterations! <= 1) {
                     // Calculate average speed from all valid results
                     const validResults = allResults.filter(result => result.speedBps > 0);
 
@@ -170,7 +179,7 @@ export class SpeedTestService {
             throw new Error('ng-speed-test: Valid file size is required');
         }
 
-        if (settings.iterations && settings.iterations < 1) {
+        if (settings.iterations !== undefined && settings.iterations < 1) {
             throw new Error('ng-speed-test: Iterations must be at least 1');
         }
     }
@@ -193,6 +202,9 @@ export class SpeedTestService {
             const initTimeoutId = setTimeout(() => {
                 // Create settings with proper merging
                 const defaultSettings = new SpeedTestSettingsModel();
+                if (this.config.file) {
+                    defaultSettings.file = new SpeedTestFileModel(this.config.file);
+                }
                 const settings = this.mergeSettings(defaultSettings, customSettings);
 
                 try {

@@ -33,7 +33,7 @@
     "build:link": "npm run build && cd dist/ng-speed-test && npm link",
     "typecheck": "tsc --noEmit -p tsconfig.lib.json",
     "typecheck:demo": "tsc --noEmit -p projects/demo/tsconfig.app.json",
-    "verify": "npm run build && npm run demo:build",
+    "verify": "npm run test && npm run build && npm run demo:build",
     "demo": "ng serve demo",
     "demo:build": "ng build demo --configuration production",
     "docs": "npm run docs:build",
@@ -41,15 +41,15 @@
     "docs:serve": "npm run docs:build -- -s",
     "docs:watch": "npm run docs:build -- -s -w",
     "lint": "echo ng-speed-test: no lint target yet - see .claude/work/CHECKLIST.md B1 && exit 1",
-    "test": "echo ng-speed-test: no test target yet - see .claude/work/CHECKLIST.md B2 && exit 1",
-    "test:watch": "echo ng-speed-test: no test target yet - see .claude/work/CHECKLIST.md B2 && exit 1",
+    "test": "ng test ng-speed-test --watch=false",
+    "test:watch": "ng test ng-speed-test --watch",
     "pack": "npm run build && npm pack ./dist/ng-speed-test --pack-destination ./dist/ng-speed-test",
     "release": "npm run build && npm publish ./dist/ng-speed-test",
     "release:dry": "npm run build && npm publish ./dist/ng-speed-test --dry-run",
     "prepublishOnly": "echo ng-speed-test: do not publish from the repo root - use npm run release && exit 1",
     "preshipit": "git diff --quiet HEAD",
-    "shipit": "npm run build && npm run demo:build && npm run docs:build && npm run release",
-    "shipit:dry": "npm run build && npm run demo:build && npm run docs:build && npm run release:dry",
+    "shipit": "npm run test && npm run build && npm run demo:build && npm run docs:build && npm run release",
+    "shipit:dry": "npm run test && npm run build && npm run demo:build && npm run docs:build && npm run release:dry",
     "clean": "rimraf dist/ng-speed-test",
     "restore:dist": "git checkout -- dist docs && git clean -fd dist docs",
     "clean:all": "rimraf dist/ng-speed-test node_modules && npm ci"
@@ -83,6 +83,7 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "20.3.32",
     "@angular/animations": "20.3.27",
+    "@angular/build": "20.3.32",
     "@angular/cdk": "20.2.14",
     "@angular/cli": "20.3.32",
     "@angular/common": "20.3.27",
@@ -100,6 +101,7 @@
     "angular-eslint": "19.8.1",
     "eslint": "^9.28.0",
     "jasmine-core": "~5.1.0",
+    "jsdom": "^30.0.1",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
@@ -110,6 +112,7 @@
     "rxjs": "^7.8.0",
     "typescript": "~5.8.0",
     "typescript-eslint": "8.33.1",
+    "vitest": "^3.2.7",
     "zone.js": "~0.15.1"
   }
 }

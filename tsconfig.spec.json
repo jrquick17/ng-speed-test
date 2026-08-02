@@ -2,12 +2,13 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
-    "types": [
-      "jasmine"
-    ]
+    "types": [],
+    // Overrides the base "node" resolution: vitest's own .d.ts files transitively reference
+    // vite's "#types/*" package.json subpath imports, which only classic "node" resolution
+    // fails to understand. Scoped to spec compilation only - lib/demo builds are unaffected.
+    "moduleResolution": "bundler"
   },
   "include": [
-    "src/**/*.spec.ts",
-    "src/**/*.d.ts"
+    "src/**/*.spec.ts"
   ]
 }
