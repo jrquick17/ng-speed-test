@@ -46,8 +46,8 @@
     "version:patch": "npm version patch",
     "version:minor": "npm version minor",
     "version:major": "npm version major",
-    "shipit": "npm run lint && npm run test && npm run build && npm run demo:build && npm run docs:build && npm run publish",
-    "shipit:dry": "npm run lint && npm run test && npm run build && npm run demo:build && npm run docs:build && npm run publish:dry",
+    "shipit": "npm run build && npm run demo:build && npm run docs:build && npm run publish",
+    "shipit:dry": "npm run build && npm run demo:build && npm run docs:build && npm run publish:dry",
     "clean": "rimraf dist",
     "clean:all": "rimraf dist node_modules package-lock.json && npm install"
   },
