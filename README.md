@@ -444,10 +444,6 @@ export class NetworkMonitorComponent {
 - Make sure you're importing from `'ng-speed-test'`
 - Check that your Angular version is compatible
 
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
 ### Development Setup
 
 ```bash
