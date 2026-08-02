@@ -473,8 +473,8 @@ unreachable network still surfaces as a real, attributable error from the file f
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="191"
-                                    class="link-to-prism">src/services/speed-test.service.ts:191</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="187"
+                                    class="link-to-prism">src/services/speed-test.service.ts:187</a></div>
                         </td>
                     </tr>
 
@@ -543,15 +543,16 @@ Fails fast if no internet connection is available</p>
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="288"
-                                    class="link-to-prism">src/services/speed-test.service.ts:288</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="285"
+                                    class="link-to-prism">src/services/speed-test.service.ts:285</a></div>
                         </td>
                     </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                        <div class="io-description"><p>Get internet speed in kilobits per second (Kbps)</p>
+                        <div class="io-description"><p>Get internet speed in kilobits per second (Kbps), using the decimal convention
+(1 Kbps = 1,000 bps) that ISPs and other speed test tools use.</p>
 </div>
 
                             <div class="io-description">
@@ -612,15 +613,16 @@ Fails fast if no internet connection is available</p>
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="297"
-                                    class="link-to-prism">src/services/speed-test.service.ts:297</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="295"
+                                    class="link-to-prism">src/services/speed-test.service.ts:295</a></div>
                         </td>
                     </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                        <div class="io-description"><p>Get internet speed in megabits per second (Mbps)</p>
+                        <div class="io-description"><p>Get internet speed in megabits per second (Mbps), using the decimal convention
+(1 Mbps = 1,000,000 bps) that ISPs and other speed test tools use.</p>
 </div>
 
                             <div class="io-description">
@@ -681,8 +683,8 @@ Fails fast if no internet connection is available</p>
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="350"
-                                    class="link-to-prism">src/services/speed-test.service.ts:350</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="348"
+                                    class="link-to-prism">src/services/speed-test.service.ts:348</a></div>
                         </td>
                     </tr>
 
@@ -720,8 +722,8 @@ Fails fast if no internet connection is available</p>
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="306"
-                                    class="link-to-prism">src/services/speed-test.service.ts:306</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="304"
+                                    class="link-to-prism">src/services/speed-test.service.ts:304</a></div>
                         </td>
                     </tr>
 
@@ -789,8 +791,8 @@ Fails fast if no internet connection is available</p>
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="329"
-                                    class="link-to-prism">src/services/speed-test.service.ts:329</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="327"
+                                    class="link-to-prism">src/services/speed-test.service.ts:327</a></div>
                         </td>
                     </tr>
 
@@ -830,8 +832,8 @@ Fails fast if no internet connection is available</p>
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="243"
-                                    class="link-to-prism">src/services/speed-test.service.ts:243</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="239"
+                                    class="link-to-prism">src/services/speed-test.service.ts:239</a></div>
                         </td>
                     </tr>
 
@@ -1161,7 +1163,7 @@ export class SpeedTestService {
                 }
 
                 return new Observable&lt;SpeedTestResultsModel&gt;(observer &#x3D;&gt; {
-                    const testResult &#x3D; new SpeedTestResultsModel(settings.file!.size);
+                    const testResult &#x3D; new SpeedTestResultsModel();
                     const abortController &#x3D; new AbortController();
 
                     let filePath &#x3D; settings.file!.path;
@@ -1191,8 +1193,8 @@ export class SpeedTestService {
                             }
                             return response.blob();
                         })
-                        .then(() &#x3D;&gt; {
-                            testResult.end();
+                        .then(blob &#x3D;&gt; {
+                            testResult.end(blob.size);
                             observer.next(testResult);
                             observer.complete();
                         })
@@ -1246,10 +1248,6 @@ export class SpeedTestService {
     private validateSettings(settings: SpeedTestSettingsModel): void {
         if (!settings.file?.path) {
             throw new Error(&#x27;ng-speed-test: File path is required&#x27;);
-        }
-
-        if (!settings.file?.size || settings.file.size &lt;&#x3D; 0) {
-            throw new Error(&#x27;ng-speed-test: Valid file size is required&#x27;);
         }
 
         if (settings.iterations !&#x3D;&#x3D; undefined &amp;&amp; settings.iterations &lt; 1) {
@@ -1356,20 +1354,22 @@ export class SpeedTestService {
     }
 
     /**
-     * Get internet speed in kilobits per second (Kbps)
+     * Get internet speed in kilobits per second (Kbps), using the decimal convention
+     * (1 Kbps &#x3D; 1,000 bps) that ISPs and other speed test tools use.
      */
     getKbps(settings?: Partial&lt;SpeedTestSettingsModel&gt;): Observable&lt;number&gt; {
         return this.getBps(settings).pipe(
-            map(bps &#x3D;&gt; bps / 1024)
+            map(bps &#x3D;&gt; bps / 1000)
         );
     }
 
     /**
-     * Get internet speed in megabits per second (Mbps)
+     * Get internet speed in megabits per second (Mbps), using the decimal convention
+     * (1 Mbps &#x3D; 1,000,000 bps) that ISPs and other speed test tools use.
      */
     getMbps(settings?: Partial&lt;SpeedTestSettingsModel&gt;): Observable&lt;number&gt; {
         return this.getKbps(settings).pipe(
-            map(kbps &#x3D;&gt; kbps / 1024)
+            map(kbps &#x3D;&gt; kbps / 1000)
         );
     }
 
@@ -1382,8 +1382,8 @@ export class SpeedTestService {
         return this.getBps(settings).pipe(
             map(bps &#x3D;&gt; ({
                 bps,
-                kbps: bps / 1024,
-                mbps: bps / (1024 * 1024),
+                kbps: bps / 1000,
+                mbps: bps / (1000 * 1000),
                 duration: (Date.now() - startTime) / 1000
             })),
             timeout(this.DEFAULT_TIMEOUT + 5000), // Overall timeout slightly longer than individual request timeout

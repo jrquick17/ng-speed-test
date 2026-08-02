@@ -321,9 +321,9 @@ providers array to your root module&#39;s <code>providers</code> instead of <cod
 </tr>
 <tr>
 <td><code>file.size</code></td>
-<td>number</td>
+<td>number | undefined</td>
 <td>4,952,221</td>
-<td>File size in bytes</td>
+<td>Optional hint only - speed is computed from the actual response size, not this value</td>
 </tr>
 <tr>
 <td><code>file.shouldBustCache</code></td>
@@ -535,8 +535,6 @@ export class NetworkMonitorComponent {
 <li>Make sure you&#39;re importing from <code>&#39;ng-speed-test&#39;</code></li>
 <li>Check that your Angular version is compatible</li>
 </ul>
-<h2>🤝 Contributing</h2>
-<p>We welcome contributions! Please see our <a href="CONTRIBUTING.md">Contributing Guide</a> for details.</p>
 <h3>Development Setup</h3>
 <b>Example :</b><div><pre class="line-numbers"><code class="language-bash"># Clone the repository
 git clone https://github.com/jrquick17/ng-speed-test.git

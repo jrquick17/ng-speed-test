@@ -25,25 +25,25 @@ class SpeedTestFileModel {
 }
 
 class SpeedTestResultsModel {
-    constructor(fileSize) {
-        this.fileSize = fileSize;
+    constructor() {
         this.duration = 0;
         this.hasEnded = false;
         this.startTime = null;
         this.endTime = null;
+        this.bytesReceived = 0;
         this.speedBps = 0;
     }
     get speedKbps() {
-        return this.speedBps / 1024;
+        return this.speedBps / 1000;
     }
     get speedMbps() {
-        return this.speedKbps / 1024;
+        return this.speedKbps / 1000;
     }
     _update() {
         if (this.endTime !== null && this.startTime !== null) {
             const milliseconds = this.endTime - this.startTime;
             this.duration = milliseconds / 1000;
-            const bitsLoaded = this.fileSize * 8;
+            const bitsLoaded = this.bytesReceived * 8;
             // Guard against a zero (or negative, e.g. clock anomalies) duration: dividing by it
             // would otherwise produce Infinity/NaN, which would incorrectly pass the
             // `speedBps > 0` validity filter in SpeedTestService.downloadTest(). Falling back to
@@ -51,9 +51,11 @@ class SpeedTestResultsModel {
             this.speedBps = this.duration > 0 ? bitsLoaded / this.duration : 0;
         }
     }
-    end() {
+    /** bytesReceived is the actual response body size (e.g. Blob.size), not the configured file hint. */
+    end(bytesReceived) {
         if (!this.hasEnded) {
             this.hasEnded = true;
+            this.bytesReceived = bytesReceived;
             this.endTime = performance.now();
             this._update();
         }
@@ -173,7 +175,7 @@ class SpeedTestService {
                 return throwError(() => new Error('No internet connection available'));
             }
             return new Observable(observer => {
-                const testResult = new SpeedTestResultsModel(settings.file.size);
+                const testResult = new SpeedTestResultsModel();
                 const abortController = new AbortController();
                 let filePath = settings.file.path;
                 if (settings.file.shouldBustCache) {
@@ -199,8 +201,8 @@ class SpeedTestService {
                     }
                     return response.blob();
                 })
-                    .then(() => {
-                    testResult.end();
+                    .then(blob => {
+                    testResult.end(blob.size);
                     observer.next(testResult);
                     observer.complete();
                 })
@@ -245,9 +247,6 @@ class SpeedTestService {
     validateSettings(settings) {
         if (!settings.file?.path) {
             throw new Error('ng-speed-test: File path is required');
-        }
-        if (!settings.file?.size || settings.file.size <= 0) {
-            throw new Error('ng-speed-test: Valid file size is required');
         }
         if (settings.iterations !== undefined && settings.iterations < 1) {
             throw new Error('ng-speed-test: Iterations must be at least 1');
@@ -339,16 +338,18 @@ class SpeedTestService {
         return mergedSettings;
     }
     /**
-     * Get internet speed in kilobits per second (Kbps)
+     * Get internet speed in kilobits per second (Kbps), using the decimal convention
+     * (1 Kbps = 1,000 bps) that ISPs and other speed test tools use.
      */
     getKbps(settings) {
-        return this.getBps(settings).pipe(map(bps => bps / 1024));
+        return this.getBps(settings).pipe(map(bps => bps / 1000));
     }
     /**
-     * Get internet speed in megabits per second (Mbps)
+     * Get internet speed in megabits per second (Mbps), using the decimal convention
+     * (1 Mbps = 1,000,000 bps) that ISPs and other speed test tools use.
      */
     getMbps(settings) {
-        return this.getKbps(settings).pipe(map(kbps => kbps / 1024));
+        return this.getKbps(settings).pipe(map(kbps => kbps / 1000));
     }
     /**
      * Get comprehensive speed test results with fast failure for offline scenarios
@@ -357,8 +358,8 @@ class SpeedTestService {
         const startTime = Date.now();
         return this.getBps(settings).pipe(map(bps => ({
             bps,
-            kbps: bps / 1024,
-            mbps: bps / (1024 * 1024),
+            kbps: bps / 1000,
+            mbps: bps / (1000 * 1000),
             duration: (Date.now() - startTime) / 1000
         })), timeout(this.DEFAULT_TIMEOUT + 5000), // Overall timeout slightly longer than individual request timeout
         catchError(error => {

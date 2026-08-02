@@ -103,6 +103,44 @@
 <p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <h2>[Unreleased]</h2>
+<h3>Changed</h3>
+<ul>
+<li><strong>Breaking:</strong> <code>getKbps()</code>/<code>getMbps()</code>, <code>SpeedTestResultsModel.speedKbps</code>/<code>speedMbps</code>, and
+<code>getSpeedTestResult()</code>&#39;s <code>kbps</code>/<code>mbps</code> now use the decimal convention (1 Kbps = 1,000 bps, 1 Mbps =
+1,000,000 bps) instead of dividing by 1024, matching the convention used by ISPs, speedtest.net, and
+fast.com. Reported Kbps values increase by a factor of 1024/1000 (2.4% higher than before); reported Mbps
+values increase by a factor of 1024²/1,000,000 = 1.048576 (4.8576% higher than before). <code>getBps()</code>/<code>bps</code> are
+unaffected — bits per second was never unit-ambiguous by <a href="https://github.com/jrquick17">jrquick17</a></li>
+<li><strong>Breaking:</strong> Speed is now computed from the actual number of bytes received (<code>Blob.size</code> of the fetched
+response), not the configured <code>file.size</code>. A redirected, re-encoded, truncated, or otherwise changed file now
+reports its real speed instead of a confidently wrong number. <code>SpeedTestFile.size</code> is now optional and is no
+longer validated or used in the speed calculation — it&#39;s an unused hint kept for backward compatibility.
+<code>SpeedTestResultsModel</code>&#39;s constructor no longer takes a <code>fileSize</code> argument, and <code>end()</code> now takes the actual
+<code>bytesReceived</code> by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h3>Removed</h3>
+<ul>
+<li>Broken README link to a nonexistent <code>CONTRIBUTING.md</code> by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h2>[3.3.0]</h2>
+<h3>Added</h3>
+<ul>
+<li><code>provideSpeedTest()</code>, <code>SpeedTestConfig</code>, and the <code>SPEED_TEST_CONFIG</code> injection token, making the connectivity
+check URL/timeout, default test file, and overall timeout configurable — resolves
+<a href="https://github.com/jrquick17/ng-speed-test/issues/108">issue #108</a> (httpbin 503s reporting every user
+offline) by <a href="https://github.com/jrquick17">jrquick17</a></li>
+<li>First unit test suite for the library, running on Vitest by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li><code>checkConnectivity()</code> no longer contacts <code>httpbin.org</code> (or any third party) by default — it now trusts
+<code>navigator.onLine</code> unless <code>connectivityCheckUrl</code> is explicitly configured by
+<a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h3>Removed</h3>
+<ul>
+<li>Demo&#39;s stale, non-compiling Karma test target and spec by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
 <h2>[3.2.2]</h2>
 <h3>Fixed</h3>
 <ul>
@@ -127,6 +165,76 @@ and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semant
 <a href="https://github.com/jrquick17">jrquick17</a></li>
 <li><code>console.warn</code> call from library code by <a href="https://github.com/jrquick17">jrquick17</a></li>
 <li>Unused <code>karma-phantomjs-launcher</code> require from <code>karma.conf.js</code> by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h2>[3.2.1]</h2>
+<h3>Fixed</h3>
+<ul>
+<li><code>package.json</code> <code>main</code>/<code>exports</code> still referencing <code>bundles/</code>, <code>esm2020</code>, <code>fesm2020</code>, and <code>fesm2015</code> outputs
+that ng-packagr no longer produces by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h2>[3.2.0]</h2>
+<h3>Update</h3>
+<ul>
+<li>Angular 20 by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h2>[3.1.0]</h2>
+<h3>Update</h3>
+<ul>
+<li>Angular 19 by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h2>[3.0.2]</h2>
+<h3>Update</h3>
+<ul>
+<li>Dependencies by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h2>[3.0.1]</h2>
+<h3>Changed</h3>
+<ul>
+<li>Demo face lift by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h3>Update</h3>
+<ul>
+<li>Angular 18; dependencies by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h2>[3.0.0]</h2>
+<h3>Changed</h3>
+<ul>
+<li>Modernized library packaging: ES2022 build targets, a comprehensive <code>exports</code> map, and proper ng-packagr
+project configuration by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h3>Update</h3>
+<ul>
+<li>Angular 17, then Angular 18; dependencies by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h2>[2.6.1]</h2>
+<h3>Fixed</h3>
+<ul>
+<li><code>window is not defined</code> error when the service runs outside a browser context by
+<a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h2>[2.6.0]</h2>
+<h3>Update</h3>
+<ul>
+<li>Dependencies by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h2>[2.5.0]</h2>
+<h3>Update</h3>
+<ul>
+<li>Angular 15; dependencies by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h2>[2.4.0]</h2>
+<h3>Changed</h3>
+<ul>
+<li>Migrated the library build to ng-packagr by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h3>Update</h3>
+<ul>
+<li>Angular 14; dependencies by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h2>[2.3.3]</h2>
+<h3>Update</h3>
+<ul>
+<li>Rebuild and republish; no source changes by <a href="https://github.com/jrquick17">jrquick17</a></li>
 </ul>
 <h2>[2.3.2]</h2>
 <h3>Update</h3>

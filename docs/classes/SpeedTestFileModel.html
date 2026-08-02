@@ -173,6 +173,7 @@
                             </li>
                             <li>
                                     <span class="modifier">Public</span>
+                                    <span class="modifier">Optional</span>
                                 <a href="#size" >size</a>
                             </li>
                         </ul>
@@ -199,7 +200,7 @@
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="10" class="link-to-prism">src/models/speed-test-file.model.ts:10</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="14" class="link-to-prism">src/models/speed-test-file.model.ts:14</a></div>
                             </td>
                         </tr>
 
@@ -267,7 +268,7 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="8" class="link-to-prism">src/models/speed-test-file.model.ts:8</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="12" class="link-to-prism">src/models/speed-test-file.model.ts:12</a></div>
                         </td>
                     </tr>
 
@@ -299,7 +300,7 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="9" class="link-to-prism">src/models/speed-test-file.model.ts:9</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="13" class="link-to-prism">src/models/speed-test-file.model.ts:13</a></div>
                         </td>
                     </tr>
 
@@ -313,6 +314,7 @@
                     <a name="size"></a>
                     <span class="name">
                             <span class="modifier">Public</span>
+                            <span class="modifier">Optional</span>
                         <span ><b>size</b></span>
                         <a href="#size"><span class="icon ion-ios-link"></span></a>
                     </span>
@@ -331,7 +333,7 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="10" class="link-to-prism">src/models/speed-test-file.model.ts:10</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="14" class="link-to-prism">src/models/speed-test-file.model.ts:14</a></div>
                         </td>
                     </tr>
 
@@ -353,13 +355,17 @@
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">export interface SpeedTestFile {
   path: string;
   shouldBustCache: boolean;
-  size: number;
+  /**
+   * Optional hint for the file&#x27;s byte size. No longer used to compute speed - the actual
+   * response body size (Blob.size) is what&#x27;s measured. Safe to omit for a custom path.
+   */
+  size?: number;
 }
 
 export class SpeedTestFileModel implements SpeedTestFile {
   public path: string &#x3D; &#x27;https://raw.githubusercontent.com/jrquick17/ng-speed-test/02c59e4afde67c35a5ba74014b91d44b33c0b3fe/demo/src/assets/5mb.jpg&#x27;;
   public shouldBustCache: boolean &#x3D; true;
-  public size: number &#x3D; 4952221;
+  public size?: number &#x3D; 4952221;
 
   constructor(file?: Partial&lt;SpeedTestFile&gt;) {
     if (file) {

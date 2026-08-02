@@ -7,12 +7,16 @@ import * as i2 from '@angular/forms';
 interface SpeedTestFile {
     path: string;
     shouldBustCache: boolean;
-    size: number;
+    /**
+     * Optional hint for the file's byte size. No longer used to compute speed - the actual
+     * response body size (Blob.size) is what's measured. Safe to omit for a custom path.
+     */
+    size?: number;
 }
 declare class SpeedTestFileModel implements SpeedTestFile {
     path: string;
     shouldBustCache: boolean;
-    size: number;
+    size?: number;
     constructor(file?: Partial<SpeedTestFile>);
 }
 
@@ -21,22 +25,23 @@ interface SpeedTestResults {
     hasEnded: boolean;
     startTime: number | null;
     endTime: number | null;
+    bytesReceived: number;
     speedBps: number;
     speedKbps: number;
     speedMbps: number;
 }
 declare class SpeedTestResultsModel implements SpeedTestResults {
-    private fileSize;
     duration: number;
     hasEnded: boolean;
     startTime: number | null;
     endTime: number | null;
+    bytesReceived: number;
     speedBps: number;
-    constructor(fileSize: number);
     get speedKbps(): number;
     get speedMbps(): number;
     private _update;
-    end(): void;
+    /** bytesReceived is the actual response body size (e.g. Blob.size), not the configured file hint. */
+    end(bytesReceived: number): void;
     error(): void;
     start(): void;
 }
@@ -109,11 +114,13 @@ declare class SpeedTestService {
      */
     private mergeSettings;
     /**
-     * Get internet speed in kilobits per second (Kbps)
+     * Get internet speed in kilobits per second (Kbps), using the decimal convention
+     * (1 Kbps = 1,000 bps) that ISPs and other speed test tools use.
      */
     getKbps(settings?: Partial<SpeedTestSettingsModel>): Observable<number>;
     /**
-     * Get internet speed in megabits per second (Mbps)
+     * Get internet speed in megabits per second (Mbps), using the decimal convention
+     * (1 Mbps = 1,000,000 bps) that ISPs and other speed test tools use.
      */
     getMbps(settings?: Partial<SpeedTestSettingsModel>): Observable<number>;
     /**

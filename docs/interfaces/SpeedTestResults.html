@@ -159,6 +159,12 @@
                         <td class="col-md-4">
                             <ul class="index-list">
                                 <li>
+                                        <a href="#bytesReceived" 
+>
+                                            bytesReceived
+                                        </a>
+                                </li>
+                                <li>
                                         <a href="#duration" 
 >
                                             duration
@@ -211,6 +217,39 @@
 
             <section data-compodoc="block-properties">
                 <h3 id="inputs">Properties</h3>
+                    <table class="table table-sm table-bordered">
+                        <tbody>
+                                <tr>
+                                    <td class="col-md-4">
+                                        <a name="bytesReceived"></a>
+                                        <span class="name "><b>bytesReceived</b>
+                                            <a href="#bytesReceived">
+                                                <span class="icon ion-ios-link"></span>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-md-4">
+                                        <code>bytesReceived:         <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+</code>
+                                    </td>
+                                </tr>
+
+
+                                    <tr>
+                                        <td class="col-md-4">
+                                            <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+
+                                        </td>
+                                    </tr>
+
+
+
+
+
+                        </tbody>
+                    </table>
                     <table class="table table-sm table-bordered">
                         <tbody>
                                 <tr>
@@ -452,6 +491,7 @@
     hasEnded: boolean;
     startTime: number | null;
     endTime: number | null;
+    bytesReceived: number;
     speedBps: number;
     speedKbps: number;
     speedMbps: number;
@@ -462,23 +502,22 @@ export class SpeedTestResultsModel implements SpeedTestResults {
     public hasEnded: boolean &#x3D; false;
     public startTime: number | null &#x3D; null;
     public endTime: number | null &#x3D; null;
+    public bytesReceived: number &#x3D; 0;
     public speedBps: number &#x3D; 0;
 
-    constructor(private fileSize: number) {}
-
     get speedKbps(): number {
-        return this.speedBps / 1024;
+        return this.speedBps / 1000;
     }
 
     get speedMbps(): number {
-        return this.speedKbps / 1024;
+        return this.speedKbps / 1000;
     }
 
     private _update(): void {
         if (this.endTime !&#x3D;&#x3D; null &amp;&amp; this.startTime !&#x3D;&#x3D; null) {
             const milliseconds &#x3D; this.endTime - this.startTime;
             this.duration &#x3D; milliseconds / 1000;
-            const bitsLoaded &#x3D; this.fileSize * 8;
+            const bitsLoaded &#x3D; this.bytesReceived * 8;
             // Guard against a zero (or negative, e.g. clock anomalies) duration: dividing by it
             // would otherwise produce Infinity/NaN, which would incorrectly pass the
             // &#x60;speedBps &gt; 0&#x60; validity filter in SpeedTestService.downloadTest(). Falling back to
@@ -487,9 +526,11 @@ export class SpeedTestResultsModel implements SpeedTestResults {
         }
     }
 
-    end(): void {
+    /** bytesReceived is the actual response body size (e.g. Blob.size), not the configured file hint. */
+    end(bytesReceived: number): void {
         if (!this.hasEnded) {
             this.hasEnded &#x3D; true;
+            this.bytesReceived &#x3D; bytesReceived;
             this.endTime &#x3D; performance.now();
             this._update();
         }
