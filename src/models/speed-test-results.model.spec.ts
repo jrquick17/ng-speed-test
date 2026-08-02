@@ -37,15 +37,15 @@ describe('SpeedTestResultsModel', () => {
         expect(result.hasEnded).toBe(true);
     });
 
-    it('derives speedKbps/speedMbps from speedBps using binary (1024) division', () => {
+    it('derives speedKbps/speedMbps from speedBps using decimal (1000) division', () => {
         vi.mocked(performance.now).mockReturnValueOnce(0).mockReturnValueOnce(1000);
 
         const result = new SpeedTestResultsModel(FILE_SIZE);
         result.start();
         result.end();
 
-        expect(result.speedKbps).toBeCloseTo(result.speedBps / 1024);
-        expect(result.speedMbps).toBeCloseTo(result.speedBps / 1024 / 1024);
+        expect(result.speedKbps).toBeCloseTo(result.speedBps / 1000);
+        expect(result.speedMbps).toBeCloseTo(result.speedBps / 1000 / 1000);
     });
 
     it('falls back to a speed of 0 instead of Infinity when the duration is zero', () => {

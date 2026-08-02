@@ -283,20 +283,22 @@ export class SpeedTestService {
     }
 
     /**
-     * Get internet speed in kilobits per second (Kbps)
+     * Get internet speed in kilobits per second (Kbps), using the decimal convention
+     * (1 Kbps = 1,000 bps) that ISPs and other speed test tools use.
      */
     getKbps(settings?: Partial<SpeedTestSettingsModel>): Observable<number> {
         return this.getBps(settings).pipe(
-            map(bps => bps / 1024)
+            map(bps => bps / 1000)
         );
     }
 
     /**
-     * Get internet speed in megabits per second (Mbps)
+     * Get internet speed in megabits per second (Mbps), using the decimal convention
+     * (1 Mbps = 1,000,000 bps) that ISPs and other speed test tools use.
      */
     getMbps(settings?: Partial<SpeedTestSettingsModel>): Observable<number> {
         return this.getKbps(settings).pipe(
-            map(kbps => kbps / 1024)
+            map(kbps => kbps / 1000)
         );
     }
 
@@ -309,8 +311,8 @@ export class SpeedTestService {
         return this.getBps(settings).pipe(
             map(bps => ({
                 bps,
-                kbps: bps / 1024,
-                mbps: bps / (1024 * 1024),
+                kbps: bps / 1000,
+                mbps: bps / (1000 * 1000),
                 duration: (Date.now() - startTime) / 1000
             })),
             timeout(this.DEFAULT_TIMEOUT + 5000), // Overall timeout slightly longer than individual request timeout

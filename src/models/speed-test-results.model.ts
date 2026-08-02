@@ -18,11 +18,11 @@ export class SpeedTestResultsModel implements SpeedTestResults {
     constructor(private fileSize: number) {}
 
     get speedKbps(): number {
-        return this.speedBps / 1024;
+        return this.speedBps / 1000;
     }
 
     get speedMbps(): number {
-        return this.speedKbps / 1024;
+        return this.speedKbps / 1000;
     }
 
     private _update(): void {

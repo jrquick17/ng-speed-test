@@ -337,20 +337,20 @@ describe('SpeedTestService', () => {
             vi.spyOn(performance, 'now').mockImplementation(() => (elapsed += 1000));
         });
 
-        it('getKbps() divides bps by 1024', async () => {
+        it('getKbps() divides bps by 1000', async () => {
             stubFetch(['ok']);
 
             const kbps = await firstValueFrom(service.getKbps({ iterations: 1, retryDelay: 0, file: testFile }));
 
-            expect(kbps).toBeCloseTo(8_000_000 / 1024);
+            expect(kbps).toBeCloseTo(8_000_000 / 1000);
         });
 
-        it('getMbps() divides bps by 1024 twice', async () => {
+        it('getMbps() divides bps by 1000 twice', async () => {
             stubFetch(['ok']);
 
             const mbps = await firstValueFrom(service.getMbps({ iterations: 1, retryDelay: 0, file: testFile }));
 
-            expect(mbps).toBeCloseTo(8_000_000 / 1024 / 1024);
+            expect(mbps).toBeCloseTo(8_000_000 / 1000 / 1000);
         });
 
         it('getSpeedTestResult() returns bps/kbps/mbps/duration together', async () => {
@@ -361,8 +361,8 @@ describe('SpeedTestService', () => {
             );
 
             expect(result.bps).toBe(8_000_000);
-            expect(result.kbps).toBeCloseTo(8_000_000 / 1024);
-            expect(result.mbps).toBeCloseTo(8_000_000 / 1024 / 1024);
+            expect(result.kbps).toBeCloseTo(8_000_000 / 1000);
+            expect(result.mbps).toBeCloseTo(8_000_000 / 1000 / 1000);
             expect(result.duration).toBeGreaterThanOrEqual(0);
         });
     });

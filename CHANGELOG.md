@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+* **Breaking:** `getKbps()`/`getMbps()`, `SpeedTestResultsModel.speedKbps`/`speedMbps`, and
+  `getSpeedTestResult()`'s `kbps`/`mbps` now use the decimal convention (1 Kbps = 1,000 bps, 1 Mbps =
+  1,000,000 bps) instead of dividing by 1024, matching the convention used by ISPs, speedtest.net, and
+  fast.com. Reported Kbps values increase by a factor of 1024/1000 (2.4% higher than before); reported Mbps
+  values increase by a factor of 1024²/1,000,000 = 1.048576 (4.8576% higher than before). `getBps()`/`bps` are
+  unaffected — bits per second was never unit-ambiguous by [jrquick17](https://github.com/jrquick17)
+
 ### Removed
 * Broken README link to a nonexistent `CONTRIBUTING.md` by [jrquick17](https://github.com/jrquick17)
 
