@@ -5,6 +5,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Removed
+* Broken README link to a nonexistent `CONTRIBUTING.md` by [jrquick17](https://github.com/jrquick17)
+
+## [3.3.0]
+### Added
+* `provideSpeedTest()`, `SpeedTestConfig`, and the `SPEED_TEST_CONFIG` injection token, making the connectivity
+  check URL/timeout, default test file, and overall timeout configurable — resolves
+  [issue #108](https://github.com/jrquick17/ng-speed-test/issues/108) (httpbin 503s reporting every user
+  offline) by [jrquick17](https://github.com/jrquick17)
+* First unit test suite for the library, running on Vitest by [jrquick17](https://github.com/jrquick17)
+
+### Changed
+* `checkConnectivity()` no longer contacts `httpbin.org` (or any third party) by default — it now trusts
+  `navigator.onLine` unless `connectivityCheckUrl` is explicitly configured by
+  [jrquick17](https://github.com/jrquick17)
+
+### Removed
+* Demo's stale, non-compiling Karma test target and spec by [jrquick17](https://github.com/jrquick17)
 
 ## [3.2.2]
 ### Fixed
@@ -27,6 +45,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   [jrquick17](https://github.com/jrquick17)
 * `console.warn` call from library code by [jrquick17](https://github.com/jrquick17)
 * Unused `karma-phantomjs-launcher` require from `karma.conf.js` by [jrquick17](https://github.com/jrquick17)
+
+## [3.2.1]
+### Fixed
+* `package.json` `main`/`exports` still referencing `bundles/`, `esm2020`, `fesm2020`, and `fesm2015` outputs
+  that ng-packagr no longer produces by [jrquick17](https://github.com/jrquick17)
+
+## [3.2.0]
+### Update
+* Angular 20 by [jrquick17](https://github.com/jrquick17)
+
+## [3.1.0]
+### Update
+* Angular 19 by [jrquick17](https://github.com/jrquick17)
+
+## [3.0.2]
+### Update
+* Dependencies by [jrquick17](https://github.com/jrquick17)
+
+## [3.0.1]
+### Changed
+* Demo face lift by [jrquick17](https://github.com/jrquick17)
+
+### Update
+* Angular 18; dependencies by [jrquick17](https://github.com/jrquick17)
+
+## [3.0.0]
+### Changed
+* Modernized library packaging: ES2022 build targets, a comprehensive `exports` map, and proper ng-packagr
+  project configuration by [jrquick17](https://github.com/jrquick17)
+
+### Update
+* Angular 17, then Angular 18; dependencies by [jrquick17](https://github.com/jrquick17)
+
+## [2.6.1]
+### Fixed
+* `window is not defined` error when the service runs outside a browser context by
+  [jrquick17](https://github.com/jrquick17)
+
+## [2.6.0]
+### Update
+* Dependencies by [jrquick17](https://github.com/jrquick17)
+
+## [2.5.0]
+### Update
+* Angular 15; dependencies by [jrquick17](https://github.com/jrquick17)
+
+## [2.4.0]
+### Changed
+* Migrated the library build to ng-packagr by [jrquick17](https://github.com/jrquick17)
+
+### Update
+* Angular 14; dependencies by [jrquick17](https://github.com/jrquick17)
+
+## [2.3.3]
+### Update
+* Rebuild and republish; no source changes by [jrquick17](https://github.com/jrquick17)
 
 ## [2.3.2]
 ### Update
