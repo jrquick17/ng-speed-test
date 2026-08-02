@@ -28,6 +28,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "ng build ng-speed-test",
+    "postbuild": "node scripts/strip-published-engines.mjs",
     "build:watch": "ng build ng-speed-test --watch",
     "build:link": "npm run build && cd dist/ng-speed-test && npm link",
     "typecheck": "tsc --noEmit -p tsconfig.lib.json",
