@@ -28,18 +28,20 @@ export class SpeedTestResultsModel implements SpeedTestResults {
     private _update(): void {
         if (this.endTime !== null && this.startTime !== null) {
             const milliseconds = this.endTime - this.startTime;
-            if (milliseconds !== 0) {
-                this.duration = milliseconds / 1000;
-            }
+            this.duration = milliseconds / 1000;
             const bitsLoaded = this.fileSize * 8;
-            this.speedBps = bitsLoaded / this.duration;
+            // Guard against a zero (or negative, e.g. clock anomalies) duration: dividing by it
+            // would otherwise produce Infinity/NaN, which would incorrectly pass the
+            // `speedBps > 0` validity filter in SpeedTestService.downloadTest(). Falling back to
+            // 0 here keeps the result finite so it is correctly discarded like any other failure.
+            this.speedBps = this.duration > 0 ? bitsLoaded / this.duration : 0;
         }
     }
 
     end(): void {
         if (!this.hasEnded) {
             this.hasEnded = true;
-            this.endTime = Date.now();
+            this.endTime = performance.now();
             this._update();
         }
     }
@@ -53,6 +55,6 @@ export class SpeedTestResultsModel implements SpeedTestResults {
     }
 
     start(): void {
-        this.startTime = Date.now();
+        this.startTime = performance.now();
     }
 }
