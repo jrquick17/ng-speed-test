@@ -56,6 +56,38 @@ function stubFetch(fileOutcomes: FetchOutcome[] = []): ReturnType<typeof vi.fn> 
     return fetchMock;
 }
 
+/**
+ * Builds a mocked Response with a streaming body: `body.getReader()` yields one chunk per entry
+ * in `chunkSizes`, then `{ done: true }`. `blob` rejects if called, so a test can assert the
+ * streaming path (not the pre-D7 blob() path) is what actually ran.
+ */
+function streamResponse(chunkSizes: number[]): {
+    response: Response;
+    readMock: ReturnType<typeof vi.fn>;
+    cancelMock: ReturnType<typeof vi.fn>;
+    blobMock: ReturnType<typeof vi.fn>;
+} {
+    let index = 0;
+    const readMock = vi.fn(() => {
+        if (index < chunkSizes.length) {
+            const value = new Uint8Array(chunkSizes[index]);
+            index++;
+            return Promise.resolve({ done: false, value });
+        }
+        return Promise.resolve({ done: true, value: undefined });
+    });
+    const cancelMock = vi.fn(() => Promise.resolve());
+    const blobMock = vi.fn(() => Promise.reject(new Error('blob() should not be called when a stream body is available')));
+    const response = {
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        body: { getReader: () => ({ read: readMock, cancel: cancelMock }) },
+        blob: blobMock
+    } as unknown as Response;
+    return { response, readMock, cancelMock, blobMock };
+}
+
 function setOnLine(value: boolean): void {
     Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => value });
 }
@@ -119,6 +151,12 @@ describe('SpeedTestService', () => {
             await expect(
                 firstValueFrom(service.getBps({ iterations: -5, file: testFile }))
             ).rejects.toThrow('ng-speed-test: Iterations must be at least 1');
+        });
+
+        it('rejects a maxSampleDuration below 1ms (D7)', async () => {
+            await expect(
+                firstValueFrom(service.getBps({ maxSampleDuration: 0, file: testFile }))
+            ).rejects.toThrow('ng-speed-test: maxSampleDuration must be at least 1');
         });
     });
 
@@ -270,6 +308,89 @@ describe('SpeedTestService', () => {
             );
 
             expect(bps).toBe(8_000_000); // the timed fetch succeeded despite the warm-up failing
+        });
+    });
+
+    describe('readResponseBody() - chunked reading via ReadableStream (D7)', () => {
+        // readResponseBody() is private; reaching in directly (same pattern as C4's mergeFile())
+        // is the only way to test chunk accumulation and progress independent of the outer
+        // downloadTest()/testResult timing machinery.
+        type ReadResponseBodyOptions = { maxDurationMs?: number; onProgress?: (bytesReceived: number, elapsedMs: number) => void };
+
+        function callReadResponseBody(response: Response, options?: ReadResponseBodyOptions): Promise<number> {
+            return (service as unknown as {
+                readResponseBody: (response: Response, options?: ReadResponseBodyOptions) => Promise<number>;
+            }).readResponseBody(response, options);
+        }
+
+        it('accumulates bytes across multiple chunks and reports progress after each one', async () => {
+            const { response, readMock, blobMock } = streamResponse([100, 200, 300]);
+            const progressCalls: Array<[number, number]> = [];
+
+            const bytesReceived = await callReadResponseBody(response, {
+                onProgress: (bytes, elapsedMs) => progressCalls.push([bytes, elapsedMs])
+            });
+
+            expect(bytesReceived).toBe(600);
+            expect(readMock).toHaveBeenCalledTimes(4); // 3 chunks + the final { done: true } read
+            expect(blobMock).not.toHaveBeenCalled();
+            // Running totals prove chunks accumulate rather than only the last chunk being kept.
+            expect(progressCalls.map(([bytes]) => bytes)).toEqual([100, 300, 600]);
+        });
+
+        it('cancels the stream once elapsed time reaches maxDurationMs, resolving with only the bytes read so far', async () => {
+            let elapsed = 0;
+            vi.spyOn(performance, 'now').mockImplementation(() => (elapsed += 1000)); // +1000ms per call
+
+            const { response, readMock, cancelMock } = streamResponse([100, 200, 300, 400]);
+
+            // startTime read = 1000ms; chunk1 elapsed = 2000-1000 = 1000ms (< cap, continues);
+            // chunk2 elapsed = 3000-1000 = 2000ms (>= 1500ms cap, cancels).
+            const bytesReceived = await callReadResponseBody(response, { maxDurationMs: 1500 });
+
+            expect(bytesReceived).toBe(300); // only the first two chunks (100 + 200)
+            expect(readMock).toHaveBeenCalledTimes(2); // chunks 3 and 4 were never read
+            expect(cancelMock).toHaveBeenCalledTimes(1);
+        });
+
+        it('falls back to response.blob() when the response has no streaming body', async () => {
+            const response = { ok: true, status: 200, statusText: 'OK', blob: () => Promise.resolve({ size: 12_345 } as Blob) } as unknown as Response;
+
+            const bytesReceived = await callReadResponseBody(response);
+
+            expect(bytesReceived).toBe(12_345);
+        });
+    });
+
+    describe('duration-based sampling (D7)', () => {
+        beforeEach(() => {
+            let elapsed = 0;
+            vi.spyOn(performance, 'now').mockImplementation(() => (elapsed += 1000));
+        });
+
+        it('a single iteration completes from a partial stream read, without consuming the whole configured file', async () => {
+            const { response, readMock, cancelMock, blobMock } = streamResponse([100, 200, 300, 400]);
+            let fileCallIndex = 0;
+            const fetchMock = vi.fn(() => {
+                if (fileCallIndex++ === 0) {
+                    return Promise.resolve(okResponse()); // D6 warm-up, untimed and unrelated to the stream
+                }
+                return Promise.resolve(response);
+            });
+            vi.stubGlobal('fetch', fetchMock);
+
+            const bps = await firstValueFrom(
+                service.getBps({ iterations: 1, retryDelay: 0, maxSampleDuration: 1500, file: testFile })
+            );
+
+            // See the readResponseBody() cancellation test above for the elapsed-time trace:
+            // 300 bytes read (100 + 200) before the 1500ms cap cancels the read; testResult.end()
+            // then measures a 4s wall-clock duration off the same mocked performance.now() clock,
+            // giving speedBps = 300 * 8 / 4 = 600.
+            expect(bps).toBe(600);
+            expect(readMock).toHaveBeenCalledTimes(2);
+            expect(cancelMock).toHaveBeenCalledTimes(1);
+            expect(blobMock).not.toHaveBeenCalled();
         });
     });
 

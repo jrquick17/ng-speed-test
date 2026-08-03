@@ -140,6 +140,58 @@ export class SpeedTestService {
         });
     }
 
+    /**
+     * Reads a fetch Response body via its ReadableStream (D7), accumulating bytes chunk by chunk
+     * instead of buffering the whole body via response.blob() before anything is measurable.
+     *
+     * `onProgress` fires after every chunk with the running byte total and elapsed milliseconds
+     * since the first chunk - this is the "progress observable mid-request" mechanism the D7
+     * checklist item asks for. It is not yet wired to anything on the public API surface (no
+     * public method accepts a progress callback or emits progress events); a future item can plug
+     * a public-facing progress Observable into this hook without changing how bytes are read.
+     *
+     * If `maxDurationMs` is set, the read stops - via `reader.cancel()` - as soon as elapsed time
+     * reaches it, and the promise resolves with only the bytes read so far. This is what lets a
+     * single iteration finish without downloading the entire configured file: duration-based
+     * sampling rather than always measuring a fixed total. Left undefined (the default), the full
+     * body is read to completion, identical to the pre-D7 behavior.
+     *
+     * Falls back to response.blob() when response.body is unavailable (e.g. a HEAD response, an
+     * opaque no-cors response, or a test double that doesn't model a streaming body) - this keeps
+     * every pre-D7 test's mocked Response working unchanged.
+     */
+    private readResponseBody(
+        response: Response,
+        options: { maxDurationMs?: number; onProgress?: (bytesReceived: number, elapsedMs: number) => void } = {}
+    ): Promise<number> {
+        const reader = response.body?.getReader();
+        if (!reader) {
+            return response.blob().then(blob => blob.size);
+        }
+
+        const startTime = performance.now();
+        let bytesReceived = 0;
+
+        const pump = (): Promise<number> =>
+            reader.read().then(({ done, value }) => {
+                if (done) {
+                    return bytesReceived;
+                }
+
+                bytesReceived += value.byteLength;
+                const elapsedMs = performance.now() - startTime;
+                options.onProgress?.(bytesReceived, elapsedMs);
+
+                if (options.maxDurationMs !== undefined && elapsedMs >= options.maxDurationMs) {
+                    return reader.cancel().then(() => bytesReceived, () => bytesReceived);
+                }
+
+                return pump();
+            });
+
+        return pump();
+    }
+
     private downloadTest(settings: SpeedTestSettingsModel, allResults: SpeedTestResultsModel[] = [], warmedUp = false): Observable<number> {
         // Quick connectivity check first
         return this.checkConnectivity().pipe(
@@ -182,10 +234,10 @@ export class SpeedTestService {
                                 if (!response.ok) {
                                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                                 }
-                                return response.blob();
+                                return this.readResponseBody(response, { maxDurationMs: settings.maxSampleDuration });
                             })
-                            .then(blob => {
-                                testResult.end(blob.size);
+                            .then(bytesReceived => {
+                                testResult.end(bytesReceived);
                                 observer.next(testResult);
                                 observer.complete();
                             })
@@ -244,6 +296,10 @@ export class SpeedTestService {
 
         if (settings.iterations !== undefined && settings.iterations < 1) {
             throw new Error('ng-speed-test: Iterations must be at least 1');
+        }
+
+        if (settings.maxSampleDuration !== undefined && settings.maxSampleDuration < 1) {
+            throw new Error('ng-speed-test: maxSampleDuration must be at least 1');
         }
     }
 
@@ -319,6 +375,11 @@ export class SpeedTestService {
         mergedSettings.retryDelay = customSettings.retryDelay !== undefined
             ? customSettings.retryDelay
             : defaultSettings.retryDelay;
+
+        // Merge maxSampleDuration (D7)
+        mergedSettings.maxSampleDuration = customSettings.maxSampleDuration !== undefined
+            ? customSettings.maxSampleDuration
+            : defaultSettings.maxSampleDuration;
 
         // Merge file settings
         if (customSettings.file) {
