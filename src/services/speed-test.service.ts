@@ -325,14 +325,21 @@ export class SpeedTestService {
             mergedSettings.file = new SpeedTestFileModel();
 
             // Merge file path
+            const pathChanged = customSettings.file.path !== undefined
+                && customSettings.file.path !== defaultSettings.file!.path;
             mergedSettings.file.path = customSettings.file.path !== undefined
                 ? customSettings.file.path
                 : defaultSettings.file!.path;
 
-            // Merge file size
-            mergedSettings.file.size = customSettings.file.size !== undefined
-                ? customSettings.file.size
-                : defaultSettings.file!.size;
+            // Merge file size - the default size describes the default file, so it must not carry
+            // over onto a caller-supplied path it doesn't actually describe (C4)
+            if (customSettings.file.size !== undefined) {
+                mergedSettings.file.size = customSettings.file.size;
+            } else if (pathChanged) {
+                mergedSettings.file.size = undefined;
+            } else {
+                mergedSettings.file.size = defaultSettings.file!.size;
+            }
 
             // Merge shouldBustCache
             mergedSettings.file.shouldBustCache = customSettings.file.shouldBustCache !== undefined

@@ -485,32 +485,53 @@ describe('SpeedTestService', () => {
         });
     });
 
-    describe('known limitations (tracked for milestone C)', () => {
-        beforeEach(() => {
-            let elapsed = 0;
-            vi.spyOn(performance, 'now').mockImplementation(() => (elapsed += 1000));
+    describe('mergeSettings() file.size handling (C4)', () => {
+        // mergeSettings() is private and, since C3, its file.size output has no effect on reported
+        // speed at all - nothing on the public surface observes it. Reaching in directly is the only
+        // way to assert this behavior; every other test in this file exercises private methods only
+        // indirectly, via getBps().
+        function mergeFile(customFile: Partial<SpeedTestFile>): SpeedTestFile {
+            const merged = (service as unknown as {
+                mergeSettings: (
+                    defaultSettings: { file: SpeedTestFileModel },
+                    customSettings?: { file?: Partial<SpeedTestFile> }
+                ) => { file: SpeedTestFile };
+            }).mergeSettings(
+                { file: new SpeedTestFileModel() },
+                { file: customFile }
+            );
+            return merged.file;
+        }
+
+        it('drops the default size hint when only a custom path is supplied', () => {
+            // SpeedTestSettings.file requires the full SpeedTestFile shape, so a path-only object is
+            // only reachable from a loosely-typed (e.g. plain JS) caller - the cast simulates that.
+            const pathOnly = { path: 'https://example.com/my-custom-file.bin' } as unknown as SpeedTestFile;
+
+            const merged = mergeFile(pathOnly);
+
+            expect(merged.path).toBe('https://example.com/my-custom-file.bin');
+            expect(merged.size).toBeUndefined();
         });
 
-        it('C4 - a caller supplying only a custom path silently keeps the default file.size hint (cosmetic only, post-C3)', async () => {
-            const fetchMock = vi.fn(() =>
-                Promise.resolve({
-                    ok: true,
-                    status: 200,
-                    statusText: 'OK',
-                    blob: () => Promise.resolve({ size: 42 } as Blob)
-                } as unknown as Response)
-            );
-            vi.stubGlobal('fetch', fetchMock);
+        it('keeps an explicitly supplied size alongside a custom path', () => {
+            const merged = mergeFile({ path: 'https://example.com/my-custom-file.bin', size: 42 });
 
-            // SpeedTestSettings.file requires the full SpeedTestFile shape, so this is only
-            // reachable from a loosely-typed (e.g. plain JS) caller - the cast simulates that.
-            const pathOnly = { path: 'https://example.com/my-custom-file.bin' } as unknown as SpeedTestFile;
-            const bps = await firstValueFrom(service.getBps({ iterations: 1, retryDelay: 0, file: pathOnly }));
+            expect(merged.path).toBe('https://example.com/my-custom-file.bin');
+            expect(merged.size).toBe(42);
+        });
 
-            // Since C3, the reported speed is unaffected by the stale size hint - it comes from the
-            // real 42-byte body. C4's remaining footgun is now purely cosmetic (a caller reading
-            // settings.file.size back would see the wrong number), not a wrong reported speed.
-            expect(bps).toBe(42 * 8);
+        it('keeps the default size when the path is left at its default and only size is overridden', () => {
+            const merged = mergeFile({ size: 99 });
+
+            expect(merged.path).toBe(new SpeedTestFileModel().path);
+            expect(merged.size).toBe(99);
+        });
+
+        it('keeps the default size when the path is explicitly re-supplied unchanged', () => {
+            const merged = mergeFile({ path: new SpeedTestFileModel().path });
+
+            expect(merged.size).toBe(new SpeedTestFileModel().size);
         });
     });
 
