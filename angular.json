@@ -31,6 +31,14 @@
             "runner": "vitest",
             "buildTarget": "ng-speed-test:build:development"
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts"
+            ]
+          }
         }
       }
     },
@@ -121,6 +129,15 @@
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
             "buildTarget": "demo:build"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/demo/src/**/*.ts",
+              "projects/demo/src/**/*.html"
+            ]
           }
         }
       }

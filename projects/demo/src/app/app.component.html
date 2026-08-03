@@ -11,6 +11,10 @@
             </button>
 
             <span (click)="goToGitHub()"
+                  (keydown.enter)="goToGitHub()"
+                  (keydown.space)="goToGitHub()"
+                  role="button"
+                  tabindex="0"
                   [style.cursor]="isOnline ? 'pointer' : 'default'"
                   [style.opacity]="isOnline ? '1' : '0.6'">
         ng-speed-test
@@ -45,7 +49,7 @@
                 <strong>{{ getConnectionStatusText() }}</strong>
                 <div class="status-details" *ngIf="networkStatus">
                     <small *ngIf="networkStatus.effectiveType">
-                        Connection: {{ networkStatus.effectiveType?.toUpperCase() }}
+                        Connection: {{ networkStatus.effectiveType.toUpperCase() }}
                     </small>
                     <small *ngIf="networkStatus.downlink">
                         Estimated: {{ networkStatus.downlink }} Mbps

@@ -14,6 +14,17 @@ export interface SpeedTestResult {
     duration: number;
 }
 
+interface NetworkInformation {
+    effectiveType?: string;
+    downlink?: number;
+}
+
+interface NavigatorWithConnection extends Navigator {
+    connection?: NetworkInformation;
+    mozConnection?: NetworkInformation;
+    webkitConnection?: NetworkInformation;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -401,9 +412,8 @@ export class SpeedTestService {
      */
     getNetworkStatus(): Observable<{ isOnline: boolean; effectiveType?: string; downlink?: number }> {
         const getConnectionInfo = () => {
-            const connection = (navigator as any).connection ||
-                (navigator as any).mozConnection ||
-                (navigator as any).webkitConnection;
+            const nav = navigator as NavigatorWithConnection;
+            const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
 
             return {
                 isOnline: navigator.onLine,

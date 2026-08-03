@@ -2,6 +2,12 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {interval, Subject, takeUntil} from 'rxjs';
 import {SpeedTestService} from 'ng-speed-test';
 
+interface NetworkStatus {
+  isOnline: boolean;
+  effectiveType?: string;
+  downlink?: number;
+}
+
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
@@ -13,7 +19,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   // Network status
   isOnline = true;
-  networkStatus: any = null;
+  networkStatus: NetworkStatus | null = null;
   lastConnectivityCheck = new Date();
 
   // Speed test state
@@ -140,7 +146,7 @@ export class AppComponent implements OnInit, OnDestroy {
   /**
    * Update connection quality indicators
    */
-  private updateConnectionQuality(status: any): void {
+  private updateConnectionQuality(status: NetworkStatus): void {
     if (!status.isOnline) {
       this.connectionQuality = 'offline';
       this.connectionIcon = '❌';
@@ -305,7 +311,7 @@ export class AppComponent implements OnInit, OnDestroy {
   /**
    * Handle speed test errors with specific messaging
    */
-  private handleSpeedTestError(error: any): void {
+  private handleSpeedTestError(error: unknown): void {
     this.isTracking = false;
     this.progressPercentage = 0;
     this.estimatedTimeRemaining = 0;
@@ -313,15 +319,16 @@ export class AppComponent implements OnInit, OnDestroy {
     console.error('Speed test error:', error);
 
     // Provide specific error messages
-    if (error.message?.includes('No internet connection')) {
+    const message = error instanceof Error ? error.message : '';
+    if (message.includes('No internet connection')) {
       this.errorMessage = '❌ No internet connection detected';
       this.isOnline = false;
-    } else if (error.message?.includes('timed out')) {
+    } else if (message.includes('timed out')) {
       this.errorMessage = '⏱️ Speed test timed out - connection may be very slow';
-    } else if (error.message?.includes('Failed to fetch')) {
+    } else if (message.includes('Failed to fetch')) {
       this.errorMessage = '🔗 Failed to reach test server - check your connection';
     } else {
-      this.errorMessage = `⚠️ Speed test failed: ${error.message || 'Unknown error'}`;
+      this.errorMessage = `⚠️ Speed test failed: ${message || 'Unknown error'}`;
     }
 
     // Trigger connectivity recheck
