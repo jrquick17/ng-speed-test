@@ -1,4 +1,4 @@
-import { Injector, runInInjectionContext } from '@angular/core';
+import { Injector, PLATFORM_ID, runInInjectionContext } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -67,9 +67,12 @@ function setOnLine(value: boolean): void {
  * wiring EnvironmentProviders into an injector is Angular's own responsibility, not this
  * library's; what these tests need to verify is that the service reads the token correctly.
  */
-function createService(config?: SpeedTestConfig): SpeedTestService {
+function createService(config?: SpeedTestConfig, platformId: 'browser' | 'server' = 'browser'): SpeedTestService {
     const injector = Injector.create({
-        providers: config ? [{ provide: SPEED_TEST_CONFIG, useValue: config }] : []
+        providers: [
+            ...(config ? [{ provide: SPEED_TEST_CONFIG, useValue: config }] : []),
+            { provide: PLATFORM_ID, useValue: platformId }
+        ]
     });
     return runInInjectionContext(injector, () => new SpeedTestService());
 }
@@ -553,6 +556,40 @@ describe('SpeedTestService', () => {
                 const value = await firstValueFrom(service.isOnline());
 
                 expect(value).toBe(false);
+            });
+        });
+
+        describe('on the server (SSR, B4)', () => {
+            it('reports true once and completes without touching window/navigator', async () => {
+                service = createService(undefined, 'server');
+                const fetchMock = vi.fn();
+                vi.stubGlobal('fetch', fetchMock);
+
+                const value = await firstValueFrom(service.isOnline());
+
+                expect(value).toBe(true);
+                expect(fetchMock).not.toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe('getNetworkStatus()', () => {
+        it('reports the current connection info in the browser', async () => {
+            const value = await firstValueFrom(service.getNetworkStatus());
+
+            expect(value.isOnline).toBe(true);
+        });
+
+        describe('on the server (SSR, B4)', () => {
+            it('reports { isOnline: true } once and completes without touching window/navigator', async () => {
+                service = createService(undefined, 'server');
+                const fetchMock = vi.fn();
+                vi.stubGlobal('fetch', fetchMock);
+
+                const value = await firstValueFrom(service.getNetworkStatus());
+
+                expect(value).toEqual({ isOnline: true });
+                expect(fetchMock).not.toHaveBeenCalled();
             });
         });
     });

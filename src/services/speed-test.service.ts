@@ -1,4 +1,5 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { fromEvent, merge, Observable, of, Subscription, throwError } from 'rxjs';
 import { map, mergeMap, catchError, timeout, switchMap, startWith } from 'rxjs/operators';
 
@@ -29,6 +30,7 @@ interface NavigatorWithConnection extends Navigator {
     providedIn: 'root'
 })
 export class SpeedTestService {
+    private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
     private readonly config = inject(SPEED_TEST_CONFIG, { optional: true }) ?? {};
     private readonly DEFAULT_TIMEOUT = this.config.timeout ?? 15000; // Reduced from 30s to 15s
     private readonly OFFLINE_CHECK_TIMEOUT = this.config.connectivityCheckTimeout ?? 3000; // Quick offline check
@@ -387,9 +389,17 @@ export class SpeedTestService {
     }
 
     /**
-     * Check if the browser is online with enhanced detection
+     * Check if the browser is online with enhanced detection.
+     *
+     * On the server (SSR) there is no `window`/`navigator` to observe, so this reports `true`
+     * once and completes rather than touching either - there is no real network signal to read
+     * during a server render.
      */
     isOnline(): Observable<boolean> {
+        if (!this.isBrowser) {
+            return of(true);
+        }
+
         return merge(
             fromEvent(window, 'offline').pipe(map(() => false)),
             fromEvent(window, 'online').pipe(map(() => true)),
@@ -408,9 +418,17 @@ export class SpeedTestService {
     }
 
     /**
-     * Monitor network connection status with enhanced detection
+     * Monitor network connection status with enhanced detection.
+     *
+     * On the server (SSR) there is no `window`/`navigator` to observe, so this reports
+     * `{ isOnline: true }` once and completes rather than touching either - `effectiveType`/
+     * `downlink` are left undefined since there is no connection to read during a server render.
      */
     getNetworkStatus(): Observable<{ isOnline: boolean; effectiveType?: string; downlink?: number }> {
+        if (!this.isBrowser) {
+            return of({ isOnline: true });
+        }
+
         const getConnectionInfo = () => {
             const nav = navigator as NavigatorWithConnection;
             const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
