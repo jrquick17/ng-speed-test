@@ -1,0 +1,850 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>ng-speed-test</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+	   <link rel="stylesheet" href="../styles/style.css">
+        <link rel="stylesheet" href="../styles/dark.css">
+    </head>
+    <body>
+          <script>
+               // Blocking script to avoid flickering dark mode
+               // Dark mode toggle button
+               var useDark = window.matchMedia('(prefers-color-scheme: dark)');
+               var darkModeState = useDark.matches;
+               var $darkModeToggleSwitchers = document.querySelectorAll('.dark-mode-switch input');
+               var $darkModeToggles = document.querySelectorAll('.dark-mode-switch');
+               var darkModeStateLocal = localStorage.getItem('compodoc_darkmode-state');
+
+               function checkToggle(check) {
+                    for (var i = 0; i < $darkModeToggleSwitchers.length; i++) {
+                         $darkModeToggleSwitchers[i].checked = check;
+                    }
+               }
+
+               function toggleDarkMode(state) {
+                    if (window.localStorage) {
+                         localStorage.setItem('compodoc_darkmode-state', state);
+                    }
+
+                    checkToggle(state);
+
+                    const hasClass = document.body.classList.contains('dark');
+
+                    if (state) {
+                         for (var i = 0; i < $darkModeToggles.length; i++) {
+                              $darkModeToggles[i].classList.add('dark');
+                         }
+                         if (!hasClass) {
+                              document.body.classList.add('dark');
+                         }
+                    } else {
+                         for (var i = 0; i < $darkModeToggles.length; i++) {
+                              $darkModeToggles[i].classList.remove('dark');
+                         }
+                         if (hasClass) {
+                              document.body.classList.remove('dark');
+                         }
+                    }
+               }
+
+               useDark.addEventListener('change', function (evt) {
+                    toggleDarkMode(evt.matches);
+               });
+               if (darkModeStateLocal) {
+                    darkModeState = darkModeStateLocal === 'true';
+               }
+               toggleDarkMode(darkModeState);
+          </script>
+          <script>
+              // --- Iframe navigation tracking for Template Playground ---
+              function sendCurrentUrlToParent() {
+                  if (window.parent && window.parent !== window) {
+                      window.parent.postMessage({
+                          type: 'compodoc-iframe-navigate',
+                          url: window.location.pathname + window.location.hash
+                      }, '*');
+                  }
+              }
+              window.addEventListener('hashchange', sendCurrentUrlToParent, false);
+              window.addEventListener('popstate', sendCurrentUrlToParent, false);
+              window.addEventListener('DOMContentLoaded', sendCurrentUrlToParent, false);
+          </script>
+
+        <div class="navbar navbar-default navbar-fixed-top d-md-none p-0">
+               <div class="d-flex">
+                    <a href="../" class="navbar-brand">ng-speed-test</a>
+                    <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+               </div>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="d-none d-md-block menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content interface">
+                   <div class="content-data">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Interfaces</li>
+  <li class="breadcrumb-item"
+  >
+  NetworkStatus</li>
+</ol>
+
+<ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item">
+            <a href="#info" 
+                class="nav-link"
+                class="nav-link active"
+                role="tab" id="info-tab" data-bs-toggle="tab" data-link="info">Info</a>
+        </li>
+        <li class="nav-item">
+            <a href="#source" 
+                class="nav-link"
+                
+                role="tab" id="source-tab" data-bs-toggle="tab" data-link="source">Source</a>
+        </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade active in" id="info">
+        <p class="comment">
+            <h3>File</h3>
+        </p>
+        <p class="comment">
+            <code>projects/demo/src/app/app.component.ts</code>
+        </p>
+
+
+
+
+        <section data-compodoc="block-index">
+            <h3 id="index">Index</h3>
+            <table class="table table-sm table-bordered index-table">
+                <tbody>
+                    <tr>
+                        <td class="col-md-4">
+                            <h6><b>Properties</b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <ul class="index-list">
+                                <li>
+                                            <span class="modifier">Optional</span>
+                                        <a href="#downlink" 
+>
+                                            downlink
+                                        </a>
+                                </li>
+                                <li>
+                                            <span class="modifier">Optional</span>
+                                        <a href="#effectiveType" 
+>
+                                            effectiveType
+                                        </a>
+                                </li>
+                                <li>
+                                        <a href="#isOnline" 
+>
+                                            isOnline
+                                        </a>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+
+
+            <section data-compodoc="block-properties">
+                <h3 id="inputs">Properties</h3>
+                    <table class="table table-sm table-bordered">
+                        <tbody>
+                                <tr>
+                                    <td class="col-md-4">
+                                        <a name="downlink"></a>
+                                        <span class="name "><b>downlink</b>
+                                            <a href="#downlink">
+                                                <span class="icon ion-ios-link"></span>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-md-4">
+                                        <code>downlink:         <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+</code>
+                                    </td>
+                                </tr>
+
+
+                                    <tr>
+                                        <td class="col-md-4">
+                                            <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="col-md-4">
+                                            <i>Optional</i>
+                                        </td>
+                                    </tr>
+
+
+
+
+                        </tbody>
+                    </table>
+                    <table class="table table-sm table-bordered">
+                        <tbody>
+                                <tr>
+                                    <td class="col-md-4">
+                                        <a name="effectiveType"></a>
+                                        <span class="name "><b>effectiveType</b>
+                                            <a href="#effectiveType">
+                                                <span class="icon ion-ios-link"></span>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-md-4">
+                                        <code>effectiveType:         <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+</code>
+                                    </td>
+                                </tr>
+
+
+                                    <tr>
+                                        <td class="col-md-4">
+                                            <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="col-md-4">
+                                            <i>Optional</i>
+                                        </td>
+                                    </tr>
+
+
+
+
+                        </tbody>
+                    </table>
+                    <table class="table table-sm table-bordered">
+                        <tbody>
+                                <tr>
+                                    <td class="col-md-4">
+                                        <a name="isOnline"></a>
+                                        <span class="name "><b>isOnline</b>
+                                            <a href="#isOnline">
+                                                <span class="icon ion-ios-link"></span>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-md-4">
+                                        <code>isOnline:         <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+</code>
+                                    </td>
+                                </tr>
+
+
+                                    <tr>
+                                        <td class="col-md-4">
+                                            <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                                        </td>
+                                    </tr>
+
+
+
+
+
+                        </tbody>
+                    </table>
+            </section>
+    </div>
+
+
+    <div class="tab-pane fade  tab-source-code" id="source">
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import {Component, OnDestroy, OnInit} from &#x27;@angular/core&#x27;;
+import {interval, Subject, takeUntil} from &#x27;rxjs&#x27;;
+import {SpeedTestService} from &#x27;ng-speed-test&#x27;;
+
+interface NetworkStatus {
+  isOnline: boolean;
+  effectiveType?: string;
+  downlink?: number;
+}
+
+@Component({
+    selector: &#x27;app-root&#x27;,
+    templateUrl: &#x27;./app.component.html&#x27;,
+    styleUrls: [&#x27;./app.component.scss&#x27;],
+    standalone: false
+})
+export class AppComponent implements OnInit, OnDestroy {
+  private destroy$ &#x3D; new Subject&lt;void&gt;();
+
+  // Network status
+  isOnline &#x3D; true;
+  networkStatus: NetworkStatus | null &#x3D; null;
+  lastConnectivityCheck &#x3D; new Date();
+
+  // Speed test state
+  title &#x3D; &#x27;ng-speed-test-demo&#x27;;
+  hasTracked &#x3D; false;
+  isTracking &#x3D; false;
+  iterations &#x3D; 1;
+  speeds: number[] &#x3D; [];
+
+  // Enhanced UI state
+  currentIteration &#x3D; 0;
+  progressPercentage &#x3D; 0;
+  estimatedTimeRemaining &#x3D; 0;
+  errorMessage &#x3D; &#x27;&#x27;;
+  lastTestDuration &#x3D; 0;
+  averageSpeed &#x3D; 0;
+
+  // Connection quality indicators
+  connectionQuality &#x3D; &#x27;unknown&#x27;;
+  connectionIcon &#x3D; &#x27;🔄&#x27;;
+
+  constructor(private speedTestService: SpeedTestService) {}
+
+  ngOnInit(): void {
+    this.initializeNetworkMonitoring();
+    this.startPeriodicConnectivityCheck();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Initialize comprehensive network monitoring
+   */
+  private initializeNetworkMonitoring(): void {
+    // Enhanced network status monitoring
+    this.speedTestService.getNetworkStatus()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (status) &#x3D;&gt; {
+            this.networkStatus &#x3D; status;
+            this.isOnline &#x3D; status.isOnline;
+            this.lastConnectivityCheck &#x3D; new Date();
+            this.updateConnectionQuality(status);
+
+            // Clear error if connection restored
+            if (this.isOnline &amp;&amp; this.errorMessage.includes(&#x27;connection&#x27;)) {
+              this.errorMessage &#x3D; &#x27;&#x27;;
+            }
+
+            console.log(&#x27;Network status updated:&#x27;, status);
+          },
+          error: (error) &#x3D;&gt; {
+            console.warn(&#x27;Network monitoring error:&#x27;, error);
+            this.isOnline &#x3D; false;
+            this.setOfflineState();
+          }
+        });
+
+    // Basic online/offline detection as fallback
+    this.speedTestService.isOnline()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (online) &#x3D;&gt; {
+            if (this.isOnline !&#x3D;&#x3D; online) {
+              this.isOnline &#x3D; online;
+              this.lastConnectivityCheck &#x3D; new Date();
+
+              if (!online) {
+                this.setOfflineState();
+              } else {
+                this.errorMessage &#x3D; &#x27;&#x27;;
+                this.connectionIcon &#x3D; &#x27;✅&#x27;;
+              }
+            }
+          },
+          error: () &#x3D;&gt; {
+            this.setOfflineState();
+          }
+        });
+  }
+
+  /**
+   * Periodic connectivity verification
+   */
+  private startPeriodicConnectivityCheck(): void {
+    // Check connectivity every 30 seconds
+    interval(30000)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() &#x3D;&gt; {
+          if (this.isOnline) {
+            this.speedTestService.isOnline()
+                .pipe(takeUntil(this.destroy$))
+                .subscribe({
+                  next: (online) &#x3D;&gt; {
+                    if (!online &amp;&amp; this.isOnline) {
+                      this.setOfflineState();
+                    }
+                  },
+                  error: () &#x3D;&gt; {
+                    this.setOfflineState();
+                  }
+                });
+          }
+        });
+  }
+
+  /**
+   * Set offline state and stop any running tests
+   */
+  private setOfflineState(): void {
+    this.isOnline &#x3D; false;
+    this.connectionIcon &#x3D; &#x27;❌&#x27;;
+    this.connectionQuality &#x3D; &#x27;offline&#x27;;
+
+    if (this.isTracking) {
+      this.isTracking &#x3D; false;
+      this.errorMessage &#x3D; &#x27;Connection lost during speed test&#x27;;
+    }
+  }
+
+  /**
+   * Update connection quality indicators
+   */
+  private updateConnectionQuality(status: NetworkStatus): void {
+    if (!status.isOnline) {
+      this.connectionQuality &#x3D; &#x27;offline&#x27;;
+      this.connectionIcon &#x3D; &#x27;❌&#x27;;
+      return;
+    }
+
+    // Use connection info if available
+    if (status.effectiveType) {
+      switch (status.effectiveType) {
+        case &#x27;slow-2g&#x27;:
+          this.connectionQuality &#x3D; &#x27;very poor&#x27;;
+          this.connectionIcon &#x3D; &#x27;🐌&#x27;;
+          break;
+        case &#x27;2g&#x27;:
+          this.connectionQuality &#x3D; &#x27;poor&#x27;;
+          this.connectionIcon &#x3D; &#x27;📶&#x27;;
+          break;
+        case &#x27;3g&#x27;:
+          this.connectionQuality &#x3D; &#x27;fair&#x27;;
+          this.connectionIcon &#x3D; &#x27;📶📶&#x27;;
+          break;
+        case &#x27;4g&#x27;:
+          this.connectionQuality &#x3D; &#x27;good&#x27;;
+          this.connectionIcon &#x3D; &#x27;📶📶📶&#x27;;
+          break;
+        default:
+          this.connectionQuality &#x3D; &#x27;excellent&#x27;;
+          this.connectionIcon &#x3D; &#x27;🚀&#x27;;
+      }
+    } else {
+      this.connectionQuality &#x3D; &#x27;unknown&#x27;;
+      this.connectionIcon &#x3D; &#x27;✅&#x27;;
+    }
+  }
+
+  /**
+   * Navigate to GitHub with connectivity check
+   */
+  goToGitHub(): void {
+    if (!this.isOnline) {
+      this.errorMessage &#x3D; &#x27;Cannot open GitHub - no internet connection&#x27;;
+      return;
+    }
+    window.open(&#x27;https://github.com/jrquick17/ng-speed-test&#x27;, &#x27;_blank&#x27;);
+  }
+
+  /**
+   * Enhanced speed test with better error handling and progress
+   */
+  trackSpeed(): void {
+    // Pre-flight checks
+    if (!this.preFlightCheck()) {
+      return;
+    }
+
+    this.initializeSpeedTest();
+    this.runSingleSpeedTest();
+  }
+
+  /**
+   * Run a single speed test iteration
+   */
+  private runSingleSpeedTest(): void {
+    const testStartTime &#x3D; Date.now();
+
+    this.speedTestService.getMbps({
+      iterations: 1,
+      retryDelay: 1500
+    }).subscribe({
+      next: (speed) &#x3D;&gt; {
+        this.handleSpeedTestSuccess(speed, testStartTime);
+      },
+      error: (error) &#x3D;&gt; {
+        this.handleSpeedTestError(error);
+      }
+    });
+  }
+
+  /**
+   * Pre-flight connectivity and validation checks
+   */
+  private preFlightCheck(): boolean {
+    // Clear previous errors
+    this.errorMessage &#x3D; &#x27;&#x27;;
+
+    // Check if already running
+    if (this.isTracking) {
+      this.errorMessage &#x3D; &#x27;Speed test already in progress&#x27;;
+      return false;
+    }
+
+    // Validate iterations
+    if (this.iterations &gt; 100) {
+      this.iterations &#x3D; 100;
+      this.errorMessage &#x3D; &#x27;Maximum 100 iterations allowed&#x27;;
+    }
+
+    if (this.iterations &lt; 1) {
+      this.iterations &#x3D; 1;
+      this.errorMessage &#x3D; &#x27;Minimum 1 iteration required&#x27;;
+    }
+
+    // Critical: Check connectivity
+    if (!this.isOnline) {
+      this.errorMessage &#x3D; &#x27;No internet connection detected. Please check your connection and try again.&#x27;;
+      return false;
+    }
+
+    // Check if connection is too slow for reliable testing
+    if (this.connectionQuality &#x3D;&#x3D;&#x3D; &#x27;very poor&#x27;) {
+      this.errorMessage &#x3D; &#x27;Connection appears very slow. Results may be unreliable.&#x27;;
+      // Still allow the test but warn user
+    }
+
+    return true;
+  }
+
+  /**
+   * Initialize speed test state
+   */
+  private initializeSpeedTest(): void {
+    // Reset state for new test
+    this.speeds &#x3D; [];
+    this.hasTracked &#x3D; false;
+    this.isTracking &#x3D; true;
+    this.currentIteration &#x3D; 0;
+    this.progressPercentage &#x3D; 0;
+    this.estimatedTimeRemaining &#x3D; this.iterations * 3; // Rough estimate
+    this.errorMessage &#x3D; &#x27;&#x27;;
+  }
+
+  /**
+   * Handle successful speed test result
+   */
+  private handleSpeedTestSuccess(speed: number, testStartTime: number): void {
+    const testDuration &#x3D; (Date.now() - testStartTime) / 1000;
+
+    this.speeds.unshift(speed);
+    this.currentIteration++;
+    this.progressPercentage &#x3D; (this.currentIteration / this.iterations) * 100;
+
+    // Update time estimates
+    this.lastTestDuration &#x3D; testDuration;
+    const remainingTests &#x3D; this.iterations - this.currentIteration;
+    this.estimatedTimeRemaining &#x3D; remainingTests * testDuration;
+
+    if (this.currentIteration &lt; this.iterations) {
+      // Continue testing
+      setTimeout(() &#x3D;&gt; {
+        if (this.isOnline) {
+          this.runSingleSpeedTest();
+        } else {
+          this.handleSpeedTestError(new Error(&#x27;Connection lost during test&#x27;));
+        }
+      }, 100);
+    } else {
+      // Test complete
+      this.completeSpeedTest();
+    }
+  }
+
+  /**
+   * Handle speed test errors with specific messaging
+   */
+  private handleSpeedTestError(error: unknown): void {
+    this.isTracking &#x3D; false;
+    this.progressPercentage &#x3D; 0;
+    this.estimatedTimeRemaining &#x3D; 0;
+
+    console.error(&#x27;Speed test error:&#x27;, error);
+
+    // Provide specific error messages
+    const message &#x3D; error instanceof Error ? error.message : &#x27;&#x27;;
+    if (message.includes(&#x27;No internet connection&#x27;)) {
+      this.errorMessage &#x3D; &#x27;❌ No internet connection detected&#x27;;
+      this.isOnline &#x3D; false;
+    } else if (message.includes(&#x27;timed out&#x27;)) {
+      this.errorMessage &#x3D; &#x27;⏱️ Speed test timed out - connection may be very slow&#x27;;
+    } else if (message.includes(&#x27;Failed to fetch&#x27;)) {
+      this.errorMessage &#x3D; &#x27;🔗 Failed to reach test server - check your connection&#x27;;
+    } else {
+      this.errorMessage &#x3D; &#x60;⚠️ Speed test failed: ${message || &#x27;Unknown error&#x27;}&#x60;;
+    }
+
+    // Trigger connectivity recheck
+    this.recheckConnectivity();
+  }
+
+  /**
+   * Complete speed test and calculate statistics
+   */
+  private completeSpeedTest(): void {
+    this.isTracking &#x3D; false;
+    this.hasTracked &#x3D; true;
+    this.progressPercentage &#x3D; 100;
+    this.estimatedTimeRemaining &#x3D; 0;
+
+    // Calculate average speed
+    if (this.speeds.length &gt; 0) {
+      this.averageSpeed &#x3D; this.speeds.reduce((a, b) &#x3D;&gt; a + b, 0) / this.speeds.length;
+    }
+
+    // Update connection quality based on speed results
+    this.updateConnectionQualityFromSpeed();
+  }
+
+  /**
+   * Update connection quality based on actual speed test results
+   */
+  private updateConnectionQualityFromSpeed(): void {
+    if (this.averageSpeed &lt; 1) {
+      this.connectionQuality &#x3D; &#x27;very poor&#x27;;
+      this.connectionIcon &#x3D; &#x27;🐌&#x27;;
+    } else if (this.averageSpeed &lt; 5) {
+      this.connectionQuality &#x3D; &#x27;poor&#x27;;
+      this.connectionIcon &#x3D; &#x27;📶&#x27;;
+    } else if (this.averageSpeed &lt; 25) {
+      this.connectionQuality &#x3D; &#x27;fair&#x27;;
+      this.connectionIcon &#x3D; &#x27;📶📶&#x27;;
+    } else if (this.averageSpeed &lt; 100) {
+      this.connectionQuality &#x3D; &#x27;good&#x27;;
+      this.connectionIcon &#x3D; &#x27;📶📶📶&#x27;;
+    } else {
+      this.connectionQuality &#x3D; &#x27;excellent&#x27;;
+      this.connectionIcon &#x3D; &#x27;🚀&#x27;;
+    }
+  }
+
+  /**
+   * Force connectivity recheck
+   */
+  recheckConnectivity(): void {
+    this.connectionIcon &#x3D; &#x27;🔄&#x27;;
+    this.speedTestService.isOnline()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (online) &#x3D;&gt; {
+            this.isOnline &#x3D; online;
+            this.lastConnectivityCheck &#x3D; new Date();
+            if (online) {
+              this.errorMessage &#x3D; &#x27;&#x27;;
+              this.connectionIcon &#x3D; &#x27;✅&#x27;;
+            } else {
+              this.setOfflineState();
+            }
+          },
+          error: () &#x3D;&gt; {
+            this.setOfflineState();
+          }
+        });
+  }
+
+  /**
+   * Get formatted speed for display
+   */
+  getFormattedSpeed(speed: number): string {
+    return speed?.toFixed(2) || &#x27;0.00&#x27;;
+  }
+
+  /**
+   * Get maximum speed from results
+   */
+  getMaxSpeed(): number {
+    return this.speeds.length &gt; 0 ? Math.max(...this.speeds) : 0;
+  }
+
+  /**
+   * Get minimum speed from results
+   */
+  getMinSpeed(): number {
+    return this.speeds.length &gt; 0 ? Math.min(...this.speeds) : 0;
+  }
+
+  /**
+   * Get speed range
+   */
+  getSpeedRange(): number {
+    return this.getMaxSpeed() - this.getMinSpeed();
+  }
+
+  /**
+   * Get progress bar max value
+   */
+  getProgressBarMax(): number {
+    return this.getMaxSpeed() * 1.1;
+  }
+
+  /**
+   * Get connection status text
+   */
+  getConnectionStatusText(): string {
+    if (!this.isOnline) {
+      return &#x27;Offline&#x27;;
+    }
+    return &#x60;Online - ${this.connectionQuality} ${this.connectionIcon}&#x60;;
+  }
+
+  /**
+   * Get progress text for speed test
+   */
+  getProgressText(): string {
+    if (!this.isTracking) return &#x27;&#x27;;
+
+    const remaining &#x3D; Math.ceil(this.estimatedTimeRemaining);
+    return &#x60;Testing... ${this.currentIteration}/${this.iterations} (${remaining}s remaining)&#x60;;
+  }
+
+  /**
+   * Clear error message
+   */
+  clearError(): void {
+    this.errorMessage &#x3D; &#x27;&#x27;;
+  }
+}
+</code></pre>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+          <label class="dark-mode-switch">
+               <input type="checkbox">
+               <span class="slider">
+                    <svg class="slider-icon" viewBox="0 0 24 24" fill="none" height="20" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+                    </svg>
+               </span>
+          </label>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 1;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'interface';
+            var COMPODOC_CURRENT_PAGE_URL = 'NetworkStatus.html';
+            var MAX_SEARCH_RESULTS = 15;
+       </script>
+
+       <script>
+               $darkModeToggleSwitchers = document.querySelectorAll('.dark-mode-switch input');
+               checkToggle(darkModeState);
+               if ($darkModeToggleSwitchers.length > 0) {
+                    for (var i = 0; i < $darkModeToggleSwitchers.length; i++) {
+                         $darkModeToggleSwitchers[i].addEventListener('change', function (event) {
+                              darkModeState = !darkModeState;
+                              toggleDarkMode(darkModeState);
+                         });
+                    }
+               }
+          </script>
+
+       <script src="../js/libs/custom-elements.min.js"></script>
+       <script src="../js/libs/lit-html.js"></script>
+
+       <script src="../js/menu-wc.js" defer></script>
+       <script nomodule src="../js/menu-wc_es5.js" defer></script>
+
+       <script src="../js/libs/bootstrap-native.js"></script>
+
+       <script src="../js/libs/es6-shim.min.js"></script>
+       <script src="../js/libs/EventDispatcher.js"></script>
+       <script src="../js/libs/promise.min.js"></script>
+
+       <script src="../js/compodoc.js"></script>
+
+       <script src="../js/tabs.js"></script>
+       <script src="../js/menu.js"></script>
+       <script src="../js/libs/clipboard.min.js"></script>
+       <script src="../js/libs/prism.js"></script>
+       <script src="../js/sourceCode.js"></script>
+          <script src="../js/search/search.js"></script>
+          <script src="../js/search/lunr.min.js"></script>
+          <script src="../js/search/search-lunr.js"></script>
+          <script src="../js/search/search_index.js"></script>
+       <script src="../js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>

@@ -321,15 +321,21 @@ providers array to your root module&#39;s <code>providers</code> instead of <cod
 </tr>
 <tr>
 <td><code>file.size</code></td>
-<td>number | undefined</td>
+<td>number</td>
 <td>4,952,221</td>
-<td>Optional hint only - speed is computed from the actual response size, not this value</td>
+<td>Size in bytes of the test file, used to compute speed</td>
 </tr>
 <tr>
 <td><code>file.shouldBustCache</code></td>
 <td>boolean</td>
 <td>true</td>
 <td>Add cache-busting parameter</td>
+</tr>
+<tr>
+<td><code>maxSampleDuration</code></td>
+<td>number | undefined</td>
+<td>undefined</td>
+<td>Optional cap (ms) on how long a single iteration reads the response body. Once elapsed time since the first byte reaches this value, the read is cancelled and speed is computed from the bytes received so far - lets an iteration finish without downloading the whole file. Undefined (default) reads the full body, unchanged from prior versions.</td>
 </tr>
 </tbody>
 </table>

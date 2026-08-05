@@ -7,16 +7,12 @@ import * as i2 from '@angular/forms';
 interface SpeedTestFile {
     path: string;
     shouldBustCache: boolean;
-    /**
-     * Optional hint for the file's byte size. No longer used to compute speed - the actual
-     * response body size (Blob.size) is what's measured. Safe to omit for a custom path.
-     */
-    size?: number;
+    size: number;
 }
 declare class SpeedTestFileModel implements SpeedTestFile {
     path: string;
     shouldBustCache: boolean;
-    size?: number;
+    size: number;
     constructor(file?: Partial<SpeedTestFile>);
 }
 
@@ -31,17 +27,29 @@ interface SpeedTestResults {
     speedMbps: number;
 }
 declare class SpeedTestResultsModel implements SpeedTestResults {
+    private fileSize;
     duration: number;
     hasEnded: boolean;
     startTime: number | null;
     endTime: number | null;
     bytesReceived: number;
     speedBps: number;
+    constructor(fileSize: number);
     get speedKbps(): number;
     get speedMbps(): number;
     private _update;
-    /** bytesReceived is the actual response body size (e.g. Blob.size), not the configured file hint. */
-    end(bytesReceived: number): void;
+    /**
+     * Reverting C3 (3.4.1): speed is once again computed from the configured `fileSize` by
+     * default, matching v3.3.0 exactly - `end()` with no argument (every call site except the
+     * one below) behaves identically to pre-3.4.0.
+     *
+     * `bytesReceived`, if passed, is used instead. This one exception exists only to support
+     * `maxSampleDuration` (D7, not part of C3, kept on purpose): when a read is cancelled early,
+     * `fileSize` describes the whole configured file, not what was actually sampled, so dividing
+     * by it would wildly overstate speed. Only the caller opting into `maxSampleDuration` passes
+     * a value here; everyone else keeps the reverted, file-size-based behavior unchanged.
+     */
+    end(bytesReceived?: number): void;
     error(): void;
     start(): void;
 }
@@ -50,11 +58,20 @@ interface SpeedTestSettings {
     iterations?: number;
     file?: SpeedTestFile;
     retryDelay?: number;
+    /**
+     * Optional cap, in milliseconds, on how long a single iteration reads the response body for
+     * (D7). Once elapsed time since the first byte reaches this value, the read is cancelled and
+     * the iteration's speed is computed from the bytes received so far instead of waiting for the
+     * full file. Undefined (the default) preserves prior behavior: the full response body is
+     * always read to completion.
+     */
+    maxSampleDuration?: number;
 }
 declare class SpeedTestSettingsModel implements SpeedTestSettings {
     iterations?: number;
     file?: SpeedTestFileModel;
     retryDelay?: number;
+    maxSampleDuration?: number;
     constructor(settings?: Partial<SpeedTestSettings>);
 }
 
@@ -89,9 +106,11 @@ interface SpeedTestResult {
     duration: number;
 }
 declare class SpeedTestService {
+    private readonly isBrowser;
     private readonly config;
     private readonly DEFAULT_TIMEOUT;
     private readonly OFFLINE_CHECK_TIMEOUT;
+    private readonly WARM_UP_TIMEOUT;
     constructor();
     private applyCacheBuster;
     /**
@@ -102,6 +121,34 @@ declare class SpeedTestService {
      * unreachable network still surfaces as a real, attributable error from the file fetch itself.
      */
     private checkConnectivity;
+    /**
+     * Runs one untimed GET against the configured file before the first timed iteration, so
+     * DNS lookup / TLS handshake / TCP slow-start aren't counted as transfer time on that first
+     * measurement (D6). The response is discarded and any failure here is swallowed - a real
+     * connectivity problem still surfaces from the timed fetch that follows.
+     */
+    private warmUp;
+    /**
+     * Reads a fetch Response body via its ReadableStream (D7), accumulating bytes chunk by chunk
+     * instead of buffering the whole body via response.blob() before anything is measurable.
+     *
+     * `onProgress` fires after every chunk with the running byte total and elapsed milliseconds
+     * since the first chunk - this is the "progress observable mid-request" mechanism the D7
+     * checklist item asks for. It is not yet wired to anything on the public API surface (no
+     * public method accepts a progress callback or emits progress events); a future item can plug
+     * a public-facing progress Observable into this hook without changing how bytes are read.
+     *
+     * If `maxDurationMs` is set, the read stops - via `reader.cancel()` - as soon as elapsed time
+     * reaches it, and the promise resolves with only the bytes read so far. This is what lets a
+     * single iteration finish without downloading the entire configured file: duration-based
+     * sampling rather than always measuring a fixed total. Left undefined (the default), the full
+     * body is read to completion, identical to the pre-D7 behavior.
+     *
+     * Falls back to response.blob() when response.body is unavailable (e.g. a HEAD response, an
+     * opaque no-cors response, or a test double that doesn't model a streaming body) - this keeps
+     * every pre-D7 test's mocked Response working unchanged.
+     */
+    private readResponseBody;
     private downloadTest;
     private validateSettings;
     /**
@@ -114,13 +161,11 @@ declare class SpeedTestService {
      */
     private mergeSettings;
     /**
-     * Get internet speed in kilobits per second (Kbps), using the decimal convention
-     * (1 Kbps = 1,000 bps) that ISPs and other speed test tools use.
+     * Get internet speed in kilobits per second (Kbps)
      */
     getKbps(settings?: Partial<SpeedTestSettingsModel>): Observable<number>;
     /**
-     * Get internet speed in megabits per second (Mbps), using the decimal convention
-     * (1 Mbps = 1,000,000 bps) that ISPs and other speed test tools use.
+     * Get internet speed in megabits per second (Mbps)
      */
     getMbps(settings?: Partial<SpeedTestSettingsModel>): Observable<number>;
     /**
@@ -128,11 +173,19 @@ declare class SpeedTestService {
      */
     getSpeedTestResult(settings?: Partial<SpeedTestSettingsModel>): Observable<SpeedTestResult>;
     /**
-     * Check if the browser is online with enhanced detection
+     * Check if the browser is online with enhanced detection.
+     *
+     * On the server (SSR) there is no `window`/`navigator` to observe, so this reports `true`
+     * once and completes rather than touching either - there is no real network signal to read
+     * during a server render.
      */
     isOnline(): Observable<boolean>;
     /**
-     * Monitor network connection status with enhanced detection
+     * Monitor network connection status with enhanced detection.
+     *
+     * On the server (SSR) there is no `window`/`navigator` to observe, so this reports
+     * `{ isOnline: true }` once and completes rather than touching either - `effectiveType`/
+     * `downlink` are left undefined since there is no connection to read during a server render.
      */
     getNetworkStatus(): Observable<{
         isOnline: boolean;

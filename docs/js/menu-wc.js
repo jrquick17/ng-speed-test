@@ -211,6 +211,15 @@ customElements.define('compodoc-menu', class extends HTMLElement {
                                 <a href="interfaces/CompoDocConfig.html" data-type="entity-link" >CompoDocConfig</a>
                             </li>
                             <li class="link">
+                                <a href="interfaces/NavigatorWithConnection.html" data-type="entity-link" >NavigatorWithConnection</a>
+                            </li>
+                            <li class="link">
+                                <a href="interfaces/NetworkInformation.html" data-type="entity-link" >NetworkInformation</a>
+                            </li>
+                            <li class="link">
+                                <a href="interfaces/NetworkStatus.html" data-type="entity-link" >NetworkStatus</a>
+                            </li>
+                            <li class="link">
                                 <a href="interfaces/Session.html" data-type="entity-link" >Session</a>
                             </li>
                             <li class="link">

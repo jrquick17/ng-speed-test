@@ -241,6 +241,54 @@
     </table>
 </section>
 
+            <section data-compodoc="block-constructor">
+    <h3 id="constructor">Constructor</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+<code>constructor(fileSize: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="18" class="link-to-prism">src/models/speed-test-results.model.ts:18</a></div>
+                            </td>
+                        </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                            <div>
+                                    <b>Parameters :</b>
+                                    <table class="params">
+                                        <thead>
+                                            <tr>
+                                                <td>Name</td>
+                                                    <td>Type</td>
+                                                <td>Optional</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                <tr>
+                                                        <td>fileSize</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</section>
 
             <section data-compodoc="block-properties">
     
@@ -461,15 +509,15 @@
             <tr>
                 <td class="col-md-4">
                         <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>_update()</code>
+                    <code>_update(bytesLoaded: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
                 </td>
             </tr>
 
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="28"
-                                    class="link-to-prism">src/models/speed-test-results.model.ts:28</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="30"
+                                    class="link-to-prism">src/models/speed-test-results.model.ts:30</a></div>
                         </td>
                     </tr>
 
@@ -477,10 +525,40 @@
             <tr>
                 <td class="col-md-4">
 
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>bytesLoaded</td>
+                                            <td>
+                                                            <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         <div class="io-description">
                             <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
 
                         </div>
+                            <div class="io-description">
+                                
+                            </div>
                 </td>
             </tr>
         </tbody>
@@ -498,22 +576,29 @@
             </tr>
             <tr>
                 <td class="col-md-4">
-<code>end(bytesReceived: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+<code>end(bytesReceived?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
                 </td>
             </tr>
 
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="42"
-                                    class="link-to-prism">src/models/speed-test-results.model.ts:42</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="54"
+                                    class="link-to-prism">src/models/speed-test-results.model.ts:54</a></div>
                         </td>
                     </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                        <div class="io-description"><p>bytesReceived is the actual response body size (e.g. Blob.size), not the configured file hint.</p>
+                        <div class="io-description"><p>Reverting C3 (3.4.1): speed is once again computed from the configured <code>fileSize</code> by
+default, matching v3.3.0 exactly - <code>end()</code> with no argument (every call site except the
+one below) behaves identically to pre-3.4.0.</p>
+<p><code>bytesReceived</code>, if passed, is used instead. This one exception exists only to support
+<code>maxSampleDuration</code> (D7, not part of C3, kept on purpose): when a read is cancelled early,
+<code>fileSize</code> describes the whole configured file, not what was actually sampled, so dividing
+by it would wildly overstate speed. Only the caller opting into <code>maxSampleDuration</code> passes
+a value here; everyone else keeps the reverted, file-size-based behavior unchanged.</p>
 </div>
 
                             <div class="io-description">
@@ -535,7 +620,7 @@
                                             </td>
 
                                             <td>
-                                                    No
+                                                    Yes
                                             </td>
 
 
@@ -574,8 +659,8 @@
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="51"
-                                    class="link-to-prism">src/models/speed-test-results.model.ts:51</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="63"
+                                    class="link-to-prism">src/models/speed-test-results.model.ts:63</a></div>
                         </td>
                     </tr>
 
@@ -611,8 +696,8 @@
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="59"
-                                    class="link-to-prism">src/models/speed-test-results.model.ts:59</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="71"
+                                    class="link-to-prism">src/models/speed-test-results.model.ts:71</a></div>
                         </td>
                     </tr>
 
@@ -654,7 +739,7 @@
                 </tr>
                             <tr>
                                 <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="20" class="link-to-prism">src/models/speed-test-results.model.ts:20</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="22" class="link-to-prism">src/models/speed-test-results.model.ts:22</a></div>
                                 </td>
                             </tr>
 
@@ -676,7 +761,7 @@
                 </tr>
                             <tr>
                                 <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="24" class="link-to-prism">src/models/speed-test-results.model.ts:24</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="26" class="link-to-prism">src/models/speed-test-results.model.ts:26</a></div>
                                 </td>
                             </tr>
 
@@ -706,19 +791,21 @@ export class SpeedTestResultsModel implements SpeedTestResults {
     public bytesReceived: number &#x3D; 0;
     public speedBps: number &#x3D; 0;
 
+    constructor(private fileSize: number) {}
+
     get speedKbps(): number {
-        return this.speedBps / 1000;
+        return this.speedBps / 1024;
     }
 
     get speedMbps(): number {
-        return this.speedKbps / 1000;
+        return this.speedKbps / 1024;
     }
 
-    private _update(): void {
+    private _update(bytesLoaded: number): void {
         if (this.endTime !&#x3D;&#x3D; null &amp;&amp; this.startTime !&#x3D;&#x3D; null) {
             const milliseconds &#x3D; this.endTime - this.startTime;
             this.duration &#x3D; milliseconds / 1000;
-            const bitsLoaded &#x3D; this.bytesReceived * 8;
+            const bitsLoaded &#x3D; bytesLoaded * 8;
             // Guard against a zero (or negative, e.g. clock anomalies) duration: dividing by it
             // would otherwise produce Infinity/NaN, which would incorrectly pass the
             // &#x60;speedBps &gt; 0&#x60; validity filter in SpeedTestService.downloadTest(). Falling back to
@@ -727,13 +814,23 @@ export class SpeedTestResultsModel implements SpeedTestResults {
         }
     }
 
-    /** bytesReceived is the actual response body size (e.g. Blob.size), not the configured file hint. */
-    end(bytesReceived: number): void {
+    /**
+     * Reverting C3 (3.4.1): speed is once again computed from the configured &#x60;fileSize&#x60; by
+     * default, matching v3.3.0 exactly - &#x60;end()&#x60; with no argument (every call site except the
+     * one below) behaves identically to pre-3.4.0.
+     *
+     * &#x60;bytesReceived&#x60;, if passed, is used instead. This one exception exists only to support
+     * &#x60;maxSampleDuration&#x60; (D7, not part of C3, kept on purpose): when a read is cancelled early,
+     * &#x60;fileSize&#x60; describes the whole configured file, not what was actually sampled, so dividing
+     * by it would wildly overstate speed. Only the caller opting into &#x60;maxSampleDuration&#x60; passes
+     * a value here; everyone else keeps the reverted, file-size-based behavior unchanged.
+     */
+    end(bytesReceived?: number): void {
         if (!this.hasEnded) {
             this.hasEnded &#x3D; true;
-            this.bytesReceived &#x3D; bytesReceived;
+            this.bytesReceived &#x3D; bytesReceived !&#x3D;&#x3D; undefined ? bytesReceived : this.fileSize;
             this.endTime &#x3D; performance.now();
-            this._update();
+            this._update(this.bytesReceived);
         }
     }
 
@@ -741,7 +838,7 @@ export class SpeedTestResultsModel implements SpeedTestResults {
         if (!this.hasEnded) {
             this.hasEnded &#x3D; true;
             this.endTime &#x3D; null;
-            this._update();
+            this._update(this.bytesReceived);
         }
     }
 

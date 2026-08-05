@@ -1,8 +1,8 @@
 import * as i0 from '@angular/core';
-import { InjectionToken, makeEnvironmentProviders, inject, Injectable, NgModule } from '@angular/core';
+import { InjectionToken, makeEnvironmentProviders, inject, PLATFORM_ID, Injectable, NgModule } from '@angular/core';
+import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { of, Observable, throwError, merge, fromEvent } from 'rxjs';
 import { switchMap, mergeMap, map, timeout, catchError, startWith } from 'rxjs/operators';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 class SpeedTestFileModel {
@@ -25,7 +25,8 @@ class SpeedTestFileModel {
 }
 
 class SpeedTestResultsModel {
-    constructor() {
+    constructor(fileSize) {
+        this.fileSize = fileSize;
         this.duration = 0;
         this.hasEnded = false;
         this.startTime = null;
@@ -34,16 +35,16 @@ class SpeedTestResultsModel {
         this.speedBps = 0;
     }
     get speedKbps() {
-        return this.speedBps / 1000;
+        return this.speedBps / 1024;
     }
     get speedMbps() {
-        return this.speedKbps / 1000;
+        return this.speedKbps / 1024;
     }
-    _update() {
+    _update(bytesLoaded) {
         if (this.endTime !== null && this.startTime !== null) {
             const milliseconds = this.endTime - this.startTime;
             this.duration = milliseconds / 1000;
-            const bitsLoaded = this.bytesReceived * 8;
+            const bitsLoaded = bytesLoaded * 8;
             // Guard against a zero (or negative, e.g. clock anomalies) duration: dividing by it
             // would otherwise produce Infinity/NaN, which would incorrectly pass the
             // `speedBps > 0` validity filter in SpeedTestService.downloadTest(). Falling back to
@@ -51,20 +52,30 @@ class SpeedTestResultsModel {
             this.speedBps = this.duration > 0 ? bitsLoaded / this.duration : 0;
         }
     }
-    /** bytesReceived is the actual response body size (e.g. Blob.size), not the configured file hint. */
+    /**
+     * Reverting C3 (3.4.1): speed is once again computed from the configured `fileSize` by
+     * default, matching v3.3.0 exactly - `end()` with no argument (every call site except the
+     * one below) behaves identically to pre-3.4.0.
+     *
+     * `bytesReceived`, if passed, is used instead. This one exception exists only to support
+     * `maxSampleDuration` (D7, not part of C3, kept on purpose): when a read is cancelled early,
+     * `fileSize` describes the whole configured file, not what was actually sampled, so dividing
+     * by it would wildly overstate speed. Only the caller opting into `maxSampleDuration` passes
+     * a value here; everyone else keeps the reverted, file-size-based behavior unchanged.
+     */
     end(bytesReceived) {
         if (!this.hasEnded) {
             this.hasEnded = true;
-            this.bytesReceived = bytesReceived;
+            this.bytesReceived = bytesReceived !== undefined ? bytesReceived : this.fileSize;
             this.endTime = performance.now();
-            this._update();
+            this._update(this.bytesReceived);
         }
     }
     error() {
         if (!this.hasEnded) {
             this.hasEnded = true;
             this.endTime = null;
-            this._update();
+            this._update(this.bytesReceived);
         }
     }
     start() {
@@ -77,12 +88,16 @@ class SpeedTestSettingsModel {
         this.iterations = 3;
         this.file = new SpeedTestFileModel();
         this.retryDelay = 500;
+        this.maxSampleDuration = undefined;
         if (settings) {
             if (settings.iterations !== undefined) {
                 this.iterations = settings.iterations;
             }
             if (settings.retryDelay !== undefined) {
                 this.retryDelay = settings.retryDelay;
+            }
+            if (settings.maxSampleDuration !== undefined) {
+                this.maxSampleDuration = settings.maxSampleDuration;
             }
             if (settings.file) {
                 this.file = new SpeedTestFileModel();
@@ -115,9 +130,11 @@ function provideSpeedTest(config = {}) {
 
 class SpeedTestService {
     constructor() {
+        this.isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
         this.config = inject(SPEED_TEST_CONFIG, { optional: true }) ?? {};
         this.DEFAULT_TIMEOUT = this.config.timeout ?? 15000; // Reduced from 30s to 15s
         this.OFFLINE_CHECK_TIMEOUT = this.config.connectivityCheckTimeout ?? 3000; // Quick offline check
+        this.WARM_UP_TIMEOUT = 3000; // Fixed, short budget - independent of the configurable download timeout
     }
     applyCacheBuster(path) {
         const separator = path.includes('?') ? '&' : '?';
@@ -168,14 +185,100 @@ class SpeedTestService {
             };
         });
     }
-    downloadTest(settings, allResults = []) {
+    /**
+     * Runs one untimed GET against the configured file before the first timed iteration, so
+     * DNS lookup / TLS handshake / TCP slow-start aren't counted as transfer time on that first
+     * measurement (D6). The response is discarded and any failure here is swallowed - a real
+     * connectivity problem still surfaces from the timed fetch that follows.
+     */
+    warmUp(settings) {
+        return new Observable(observer => {
+            const abortController = new AbortController();
+            let filePath = settings.file.path;
+            if (settings.file.shouldBustCache) {
+                filePath = this.applyCacheBuster(filePath);
+            }
+            // Mirrors the real download's fetchTimeout below: complete directly from the timeout
+            // rather than waiting on the fetch promise to settle after abort() - a fetch that
+            // never reacts to its AbortSignal (e.g. one that hangs indefinitely) would otherwise
+            // never let this warm-up finish.
+            const warmUpTimeout = setTimeout(() => {
+                abortController.abort();
+                observer.next();
+                observer.complete();
+            }, this.WARM_UP_TIMEOUT);
+            fetch(filePath, {
+                method: 'GET',
+                signal: abortController.signal,
+                cache: 'no-cache'
+            })
+                .then(response => response.blob())
+                .catch(() => {
+                // Ignored - a real problem still surfaces from the timed fetch that follows.
+            })
+                .finally(() => {
+                clearTimeout(warmUpTimeout);
+                observer.next();
+                observer.complete();
+            });
+            return () => {
+                clearTimeout(warmUpTimeout);
+                abortController.abort();
+            };
+        });
+    }
+    /**
+     * Reads a fetch Response body via its ReadableStream (D7), accumulating bytes chunk by chunk
+     * instead of buffering the whole body via response.blob() before anything is measurable.
+     *
+     * `onProgress` fires after every chunk with the running byte total and elapsed milliseconds
+     * since the first chunk - this is the "progress observable mid-request" mechanism the D7
+     * checklist item asks for. It is not yet wired to anything on the public API surface (no
+     * public method accepts a progress callback or emits progress events); a future item can plug
+     * a public-facing progress Observable into this hook without changing how bytes are read.
+     *
+     * If `maxDurationMs` is set, the read stops - via `reader.cancel()` - as soon as elapsed time
+     * reaches it, and the promise resolves with only the bytes read so far. This is what lets a
+     * single iteration finish without downloading the entire configured file: duration-based
+     * sampling rather than always measuring a fixed total. Left undefined (the default), the full
+     * body is read to completion, identical to the pre-D7 behavior.
+     *
+     * Falls back to response.blob() when response.body is unavailable (e.g. a HEAD response, an
+     * opaque no-cors response, or a test double that doesn't model a streaming body) - this keeps
+     * every pre-D7 test's mocked Response working unchanged.
+     */
+    readResponseBody(response, options = {}) {
+        const reader = response.body?.getReader();
+        if (!reader) {
+            return response.blob().then(blob => blob.size);
+        }
+        const startTime = performance.now();
+        let bytesReceived = 0;
+        const pump = () => reader.read().then(({ done, value }) => {
+            if (done) {
+                return bytesReceived;
+            }
+            bytesReceived += value.byteLength;
+            const elapsedMs = performance.now() - startTime;
+            options.onProgress?.(bytesReceived, elapsedMs);
+            if (options.maxDurationMs !== undefined && elapsedMs >= options.maxDurationMs) {
+                return reader.cancel().then(() => bytesReceived, () => bytesReceived);
+            }
+            return pump();
+        });
+        return pump();
+    }
+    downloadTest(settings, allResults = [], warmedUp = false) {
         // Quick connectivity check first
         return this.checkConnectivity().pipe(switchMap(isConnected => {
             if (!isConnected) {
                 return throwError(() => new Error('No internet connection available'));
             }
-            return new Observable(observer => {
-                const testResult = new SpeedTestResultsModel();
+            // Warm up once, before the first timed iteration - skipped on the recursive
+            // calls for iterations 2+ within the same getBps() call (warmedUp === true).
+            const warmUp$ = warmedUp ? of(undefined) : this.warmUp(settings);
+            return warmUp$.pipe(switchMap(() => new Observable(observer => {
+                const testResult = new SpeedTestResultsModel(settings.file.size);
                 const abortController = new AbortController();
                 let filePath = settings.file.path;
                 if (settings.file.shouldBustCache) {
@@ -199,10 +302,15 @@ class SpeedTestService {
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                     }
-                    return response.blob();
+                    return this.readResponseBody(response, { maxDurationMs: settings.maxSampleDuration });
                 })
-                    .then(blob => {
-                    testResult.end(blob.size);
+                    .then(bytesReceived => {
+                    // Reverted C3 (3.4.1): the default speed calculation goes back to
+                    // the configured file.size, matching v3.3.0. bytesReceived is
+                    // only passed through when maxSampleDuration is set - see
+                    // SpeedTestResultsModel.end()'s doc for why that opt-in case has
+                    // to keep using the actual bytes read.
+                    testResult.end(settings.maxSampleDuration !== undefined ? bytesReceived : undefined);
                     observer.next(testResult);
                     observer.complete();
                 })
@@ -225,7 +333,7 @@ class SpeedTestService {
                     clearTimeout(fetchTimeout);
                     abortController.abort();
                 };
-            });
+            })));
         }), mergeMap((testResult) => {
             allResults.push(testResult);
             if (settings.iterations <= 1) {
@@ -240,7 +348,7 @@ class SpeedTestService {
             }
             else {
                 settings.iterations--;
-                return this.downloadTest(settings, allResults);
+                return this.downloadTest(settings, allResults, true);
             }
         }));
     }
@@ -248,8 +356,14 @@ class SpeedTestService {
         if (!settings.file?.path) {
             throw new Error('ng-speed-test: File path is required');
         }
+        if (!settings.file?.size || settings.file.size <= 0) {
+            throw new Error('ng-speed-test: Valid file size is required');
+        }
         if (settings.iterations !== undefined && settings.iterations < 1) {
             throw new Error('ng-speed-test: Iterations must be at least 1');
+        }
+        if (settings.maxSampleDuration !== undefined && settings.maxSampleDuration < 1) {
+            throw new Error('ng-speed-test: maxSampleDuration must be at least 1');
         }
     }
     /**
@@ -316,17 +430,37 @@ class SpeedTestService {
         mergedSettings.retryDelay = customSettings.retryDelay !== undefined
             ? customSettings.retryDelay
             : defaultSettings.retryDelay;
+        // Merge maxSampleDuration (D7)
+        mergedSettings.maxSampleDuration = customSettings.maxSampleDuration !== undefined
+            ? customSettings.maxSampleDuration
+            : defaultSettings.maxSampleDuration;
         // Merge file settings
         if (customSettings.file) {
             mergedSettings.file = new SpeedTestFileModel();
             // Merge file path
+            const pathChanged = customSettings.file.path !== undefined
+                && customSettings.file.path !== defaultSettings.file.path;
             mergedSettings.file.path = customSettings.file.path !== undefined
                 ? customSettings.file.path
                 : defaultSettings.file.path;
-            // Merge file size
-            mergedSettings.file.size = customSettings.file.size !== undefined
-                ? customSettings.file.size
-                : defaultSettings.file.size;
+            // Merge file size - the default size describes the default file, so it must not carry
+            // over onto a caller-supplied path it doesn't actually describe (C4). Since C3's
+            // revert (3.4.1) made file.size drive the reported speed again, a path change left
+            // with no size resolves to undefined here and validateSettings() now rejects it with
+            // a clear error, rather than silently reporting a speed computed against the wrong file.
+            if (customSettings.file.size !== undefined) {
+                mergedSettings.file.size = customSettings.file.size;
+            }
+            else if (pathChanged) {
+                // SpeedTestFile.size is required (reverted C3, 3.4.1), so this is a deliberately
+                // invalid intermediate value - validateSettings() rejects it with a clear error
+                // before it can reach a fetch, rather than silently computing a wrong speed
+                // against the caller's actual file using the default's stale size.
+                mergedSettings.file.size = undefined;
+            }
+            else {
+                mergedSettings.file.size = defaultSettings.file.size;
+            }
             // Merge shouldBustCache
             mergedSettings.file.shouldBustCache = customSettings.file.shouldBustCache !== undefined
                 ? customSettings.file.shouldBustCache
@@ -338,18 +472,16 @@ class SpeedTestService {
         return mergedSettings;
     }
     /**
-     * Get internet speed in kilobits per second (Kbps), using the decimal convention
-     * (1 Kbps = 1,000 bps) that ISPs and other speed test tools use.
+     * Get internet speed in kilobits per second (Kbps)
      */
     getKbps(settings) {
-        return this.getBps(settings).pipe(map(bps => bps / 1000));
+        return this.getBps(settings).pipe(map(bps => bps / 1024));
     }
     /**
-     * Get internet speed in megabits per second (Mbps), using the decimal convention
-     * (1 Mbps = 1,000,000 bps) that ISPs and other speed test tools use.
+     * Get internet speed in megabits per second (Mbps)
      */
     getMbps(settings) {
-        return this.getKbps(settings).pipe(map(kbps => kbps / 1000));
+        return this.getKbps(settings).pipe(map(kbps => kbps / 1024));
     }
     /**
      * Get comprehensive speed test results with fast failure for offline scenarios
@@ -358,8 +490,8 @@ class SpeedTestService {
         const startTime = Date.now();
         return this.getBps(settings).pipe(map(bps => ({
             bps,
-            kbps: bps / 1000,
-            mbps: bps / (1000 * 1000),
+            kbps: bps / 1024,
+            mbps: bps / (1024 * 1024),
             duration: (Date.now() - startTime) / 1000
         })), timeout(this.DEFAULT_TIMEOUT + 5000), // Overall timeout slightly longer than individual request timeout
         catchError(error => {
@@ -370,9 +502,16 @@ class SpeedTestService {
         }));
     }
     /**
-     * Check if the browser is online with enhanced detection
+     * Check if the browser is online with enhanced detection.
+     *
+     * On the server (SSR) there is no `window`/`navigator` to observe, so this reports `true`
+     * once and completes rather than touching either - there is no real network signal to read
+     * during a server render.
      */
     isOnline() {
+        if (!this.isBrowser) {
+            return of(true);
+        }
         return merge(fromEvent(window, 'offline').pipe(map(() => false)), fromEvent(window, 'online').pipe(map(() => true)), of(navigator.onLine)).pipe(startWith(navigator.onLine), 
         // Verify actual connectivity for online state
         switchMap(browserOnline => {
@@ -384,13 +523,19 @@ class SpeedTestService {
         }));
     }
     /**
-     * Monitor network connection status with enhanced detection
+     * Monitor network connection status with enhanced detection.
+     *
+     * On the server (SSR) there is no `window`/`navigator` to observe, so this reports
+     * `{ isOnline: true }` once and completes rather than touching either - `effectiveType`/
+     * `downlink` are left undefined since there is no connection to read during a server render.
      */
     getNetworkStatus() {
+        if (!this.isBrowser) {
+            return of({ isOnline: true });
+        }
         const getConnectionInfo = () => {
-            const connection = navigator.connection ||
-                navigator.mozConnection ||
-                navigator.webkitConnection;
+            const nav = navigator;
+            const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
             return {
                 isOnline: navigator.onLine,
                 effectiveType: connection?.effectiveType,
