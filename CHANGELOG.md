@@ -6,6 +6,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.0]
+### Added
+* A warm-up iteration now runs once, before the first timed measurement: an untimed request against the
+  configured file whose response is discarded, so DNS lookup / TLS handshake / TCP slow-start land before
+  timing starts instead of being counted as transfer time. Warmed-up results are equal to or higher than
+  before, never lower — most noticeable with `iterations: 1`, where there was previously nothing to average
+  the deflated first sample against by [jrquick17](https://github.com/jrquick17)
+* SSR guards on `isOnline()`/`getNetworkStatus()` — both now report a safe single-emission default
+  (`isOnline(): true`, `getNetworkStatus(): { isOnline: true }`) when evaluated during a server render instead
+  of throwing on the missing `window`/`navigator` by [jrquick17](https://github.com/jrquick17)
+* The response body is now read via its `ReadableStream` (`response.body.getReader()`), accumulating bytes
+  chunk by chunk instead of buffering the whole body via `response.blob()` first. This enables a new opt-in
+  `SpeedTestSettings.maxSampleDuration` (ms): once elapsed time since the first byte reaches this value, the
+  read is cancelled and the iteration completes from a partial download instead of always requiring the full
+  configured file. Left unset (the default), behavior is unchanged — the full body is always read to
+  completion by [jrquick17](https://github.com/jrquick17)
+* Real ESLint configuration (`eslint.config.js`, flat config) for both the library and demo projects —
+  `npm run lint` is a working command again, and now gates `verify`/`shipit`/`shipit:dry` by
+  [jrquick17](https://github.com/jrquick17)
+
+### Fixed
+* `mergeSettings()` no longer silently keeps the default file's stale `size` (`4,952,221`) when a caller
+  changes `file.path` without also supplying `file.size`. It now clears the merged `size` instead, which
+  `validateSettings()` correctly rejects with `ng-speed-test: Valid file size is required` — a caller who
+  previously got a confidently wrong reported speed for their custom file now gets a clear error asking them
+  to supply `size`, rather than a silently incorrect number by [jrquick17](https://github.com/jrquick17)
+
 ## [3.4.1]
 ### Fixed
 * **Reverts two breaking changes that were released in `3.4.0`, a minor.** `3.4.0` shipped a decimal-vs-binary
