@@ -244,7 +244,7 @@ this.speedTestService.getNetworkStatus().subscribe(status => {
 | `iterations` | number | 3 | Number of tests to run for averaging |
 | `retryDelay` | number | 500 | Milliseconds to wait between retries |
 | `file.path` | string | GitHub 5MB image | URL of test file |
-| `file.size` | number \| undefined | 4,952,221 | Optional hint only - speed is computed from the actual response size, not this value |
+| `file.size` | number | 4,952,221 | Size in bytes of the test file, used to compute speed |
 | `file.shouldBustCache` | boolean | true | Add cache-busting parameter |
 | `maxSampleDuration` | number \| undefined | undefined | Optional cap (ms) on how long a single iteration reads the response body. Once elapsed time since the first byte reaches this value, the read is cancelled and speed is computed from the bytes received so far - lets an iteration finish without downloading the whole file. Undefined (default) reads the full body, unchanged from prior versions. |
 

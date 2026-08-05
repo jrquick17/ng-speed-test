@@ -206,7 +206,7 @@ export class SpeedTestService {
 
                 return warmUp$.pipe(
                     switchMap(() => new Observable<SpeedTestResultsModel>(observer => {
-                        const testResult = new SpeedTestResultsModel();
+                        const testResult = new SpeedTestResultsModel(settings.file!.size);
                         const abortController = new AbortController();
 
                         let filePath = settings.file!.path;
@@ -237,7 +237,12 @@ export class SpeedTestService {
                                 return this.readResponseBody(response, { maxDurationMs: settings.maxSampleDuration });
                             })
                             .then(bytesReceived => {
-                                testResult.end(bytesReceived);
+                                // Reverted C3 (3.4.1): the default speed calculation goes back to
+                                // the configured file.size, matching v3.3.0. bytesReceived is
+                                // only passed through when maxSampleDuration is set - see
+                                // SpeedTestResultsModel.end()'s doc for why that opt-in case has
+                                // to keep using the actual bytes read.
+                                testResult.end(settings.maxSampleDuration !== undefined ? bytesReceived : undefined);
                                 observer.next(testResult);
                                 observer.complete();
                             })
@@ -292,6 +297,10 @@ export class SpeedTestService {
     private validateSettings(settings: SpeedTestSettingsModel): void {
         if (!settings.file?.path) {
             throw new Error('ng-speed-test: File path is required');
+        }
+
+        if (!settings.file?.size || settings.file.size <= 0) {
+            throw new Error('ng-speed-test: Valid file size is required');
         }
 
         if (settings.iterations !== undefined && settings.iterations < 1) {
@@ -393,11 +402,18 @@ export class SpeedTestService {
                 : defaultSettings.file!.path;
 
             // Merge file size - the default size describes the default file, so it must not carry
-            // over onto a caller-supplied path it doesn't actually describe (C4)
+            // over onto a caller-supplied path it doesn't actually describe (C4). Since C3's
+            // revert (3.4.1) made file.size drive the reported speed again, a path change left
+            // with no size resolves to undefined here and validateSettings() now rejects it with
+            // a clear error, rather than silently reporting a speed computed against the wrong file.
             if (customSettings.file.size !== undefined) {
                 mergedSettings.file.size = customSettings.file.size;
             } else if (pathChanged) {
-                mergedSettings.file.size = undefined;
+                // SpeedTestFile.size is required (reverted C3, 3.4.1), so this is a deliberately
+                // invalid intermediate value - validateSettings() rejects it with a clear error
+                // before it can reach a fetch, rather than silently computing a wrong speed
+                // against the caller's actual file using the default's stale size.
+                mergedSettings.file.size = undefined as unknown as number;
             } else {
                 mergedSettings.file.size = defaultSettings.file!.size;
             }
@@ -414,22 +430,20 @@ export class SpeedTestService {
     }
 
     /**
-     * Get internet speed in kilobits per second (Kbps), using the decimal convention
-     * (1 Kbps = 1,000 bps) that ISPs and other speed test tools use.
+     * Get internet speed in kilobits per second (Kbps)
      */
     getKbps(settings?: Partial<SpeedTestSettingsModel>): Observable<number> {
         return this.getBps(settings).pipe(
-            map(bps => bps / 1000)
+            map(bps => bps / 1024)
         );
     }
 
     /**
-     * Get internet speed in megabits per second (Mbps), using the decimal convention
-     * (1 Mbps = 1,000,000 bps) that ISPs and other speed test tools use.
+     * Get internet speed in megabits per second (Mbps)
      */
     getMbps(settings?: Partial<SpeedTestSettingsModel>): Observable<number> {
         return this.getKbps(settings).pipe(
-            map(kbps => kbps / 1000)
+            map(kbps => kbps / 1024)
         );
     }
 
@@ -442,8 +456,8 @@ export class SpeedTestService {
         return this.getBps(settings).pipe(
             map(bps => ({
                 bps,
-                kbps: bps / 1000,
-                mbps: bps / (1000 * 1000),
+                kbps: bps / 1024,
+                mbps: bps / (1024 * 1024),
                 duration: (Date.now() - startTime) / 1000
             })),
             timeout(this.DEFAULT_TIMEOUT + 5000), // Overall timeout slightly longer than individual request timeout

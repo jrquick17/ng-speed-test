@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SpeedTestResultsModel } from './speed-test-results.model';
 
 describe('SpeedTestResultsModel', () => {
-    const BYTES_RECEIVED = 1_000_000; // bytes -> 8,000,000 bits
+    const FILE_SIZE = 1_000_000; // bytes -> 8,000,000 bits
 
     beforeEach(() => {
         vi.spyOn(performance, 'now');
@@ -14,7 +14,7 @@ describe('SpeedTestResultsModel', () => {
     });
 
     it('starts with zeroed/unset defaults', () => {
-        const result = new SpeedTestResultsModel();
+        const result = new SpeedTestResultsModel(FILE_SIZE);
 
         expect(result.hasEnded).toBe(false);
         expect(result.startTime).toBeNull();
@@ -24,38 +24,49 @@ describe('SpeedTestResultsModel', () => {
         expect(result.speedBps).toBe(0);
     });
 
-    it('computes duration and speed from the elapsed time between start() and end(), using the bytes actually received', () => {
+    it('computes duration and speed from the elapsed time between start() and end(), using the configured fileSize (reverted C3, 3.4.1)', () => {
         vi.mocked(performance.now).mockReturnValueOnce(1000).mockReturnValueOnce(2000);
 
-        const result = new SpeedTestResultsModel();
+        const result = new SpeedTestResultsModel(FILE_SIZE);
         result.start();
-        result.end(BYTES_RECEIVED);
+        result.end();
 
         expect(result.startTime).toBe(1000);
         expect(result.endTime).toBe(2000);
         expect(result.duration).toBe(1); // 1000ms -> 1s
-        expect(result.bytesReceived).toBe(BYTES_RECEIVED);
+        expect(result.bytesReceived).toBe(FILE_SIZE);
         expect(result.speedBps).toBe(8_000_000); // 8,000,000 bits / 1s
         expect(result.hasEnded).toBe(true);
     });
 
-    it('derives speedKbps/speedMbps from speedBps using decimal (1000) division', () => {
+    it('end(bytesReceived) uses the passed byte count instead of fileSize - the maxSampleDuration (D7) opt-out from the fileSize revert', () => {
+        vi.mocked(performance.now).mockReturnValueOnce(1000).mockReturnValueOnce(2000);
+
+        const result = new SpeedTestResultsModel(FILE_SIZE);
+        result.start();
+        result.end(500); // far smaller than FILE_SIZE - simulates a maxSampleDuration-capped partial read
+
+        expect(result.bytesReceived).toBe(500);
+        expect(result.speedBps).toBe(4_000); // 500 bytes * 8 bits / 1s, not FILE_SIZE-based
+    });
+
+    it('derives speedKbps/speedMbps from speedBps using binary (1024) division', () => {
         vi.mocked(performance.now).mockReturnValueOnce(0).mockReturnValueOnce(1000);
 
-        const result = new SpeedTestResultsModel();
+        const result = new SpeedTestResultsModel(FILE_SIZE);
         result.start();
-        result.end(BYTES_RECEIVED);
+        result.end();
 
-        expect(result.speedKbps).toBeCloseTo(result.speedBps / 1000);
-        expect(result.speedMbps).toBeCloseTo(result.speedBps / 1000 / 1000);
+        expect(result.speedKbps).toBeCloseTo(result.speedBps / 1024);
+        expect(result.speedMbps).toBeCloseTo(result.speedBps / 1024 / 1024);
     });
 
     it('falls back to a speed of 0 instead of Infinity when the duration is zero', () => {
         vi.mocked(performance.now).mockReturnValueOnce(500).mockReturnValueOnce(500);
 
-        const result = new SpeedTestResultsModel();
+        const result = new SpeedTestResultsModel(FILE_SIZE);
         result.start();
-        result.end(BYTES_RECEIVED);
+        result.end();
 
         expect(result.duration).toBe(0);
         expect(result.speedBps).toBe(0);
@@ -67,20 +78,20 @@ describe('SpeedTestResultsModel', () => {
             .mockReturnValueOnce(1000) // start()
             .mockReturnValueOnce(2000); // first end()
 
-        const result = new SpeedTestResultsModel();
+        const result = new SpeedTestResultsModel(FILE_SIZE);
         result.start();
-        result.end(BYTES_RECEIVED);
+        result.end();
         result.end(500); // performance.now() would return 3000 here if called again
 
         expect(result.endTime).toBe(2000);
-        expect(result.bytesReceived).toBe(BYTES_RECEIVED);
+        expect(result.bytesReceived).toBe(FILE_SIZE);
         expect(result.speedBps).toBe(8_000_000);
     });
 
     it('error() marks the iteration ended with a null endTime and a discardable speed of 0', () => {
         vi.mocked(performance.now).mockReturnValueOnce(1000);
 
-        const result = new SpeedTestResultsModel();
+        const result = new SpeedTestResultsModel(FILE_SIZE);
         result.start();
         result.error();
 
@@ -93,9 +104,9 @@ describe('SpeedTestResultsModel', () => {
     it('ignores error() once already ended by a successful end()', () => {
         vi.mocked(performance.now).mockReturnValueOnce(1000).mockReturnValueOnce(2000);
 
-        const result = new SpeedTestResultsModel();
+        const result = new SpeedTestResultsModel(FILE_SIZE);
         result.start();
-        result.end(BYTES_RECEIVED);
+        result.end();
         result.error();
 
         expect(result.endTime).toBe(2000);

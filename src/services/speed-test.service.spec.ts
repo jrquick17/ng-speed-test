@@ -17,7 +17,12 @@ function requestUrl(input: RequestInfo | URL): string {
     return typeof input === 'string' ? input : input.toString();
 }
 
-/** bodySize defaults to testFile.size so existing bps assertions (8,000,000) stay deterministic. */
+/**
+ * bodySize defaults to testFile.size; since the C3 revert (3.4.1) reported speed is computed
+ * from the configured file.size rather than the response body, so bodySize itself no longer
+ * drives bps in the default path - it only matters for the response.blob() fallback path in
+ * readResponseBody(), and for tests that deliberately mismatch it against file.size.
+ */
 function okResponse(bodySize = testFile.size): Response {
     return { ok: true, status: 200, statusText: 'OK', blob: () => Promise.resolve({ size: bodySize } as Blob) } as unknown as Response;
 }
@@ -133,12 +138,16 @@ describe('SpeedTestService', () => {
             ).rejects.toThrow('ng-speed-test: File path is required');
         });
 
-        it('does not reject a zero, negative, or missing file size - size is only an optional hint (C3)', async () => {
-            stubFetch(['ok']);
-
+        it('rejects a zero file size (reverted C3, 3.4.1 - size drives the reported speed again)', async () => {
             await expect(
-                firstValueFrom(service.getBps({ iterations: 1, retryDelay: 0, file: { ...testFile, size: 0 } }))
-            ).resolves.not.toThrow();
+                firstValueFrom(service.getBps({ iterations: 1, file: { ...testFile, size: 0 } }))
+            ).rejects.toThrow('ng-speed-test: Valid file size is required');
+        });
+
+        it('rejects a negative file size', async () => {
+            await expect(
+                firstValueFrom(service.getBps({ iterations: 1, file: { ...testFile, size: -5 } }))
+            ).rejects.toThrow('ng-speed-test: Valid file size is required');
         });
 
         it('rejects an iteration count of 0 instead of hanging (regression)', async () => {
@@ -262,27 +271,21 @@ describe('SpeedTestService', () => {
             vi.spyOn(performance, 'now').mockImplementation(() => (elapsed += 1000));
         });
 
-        it('runs one untimed warm-up fetch before the timed iteration and excludes it from the reported speed', async () => {
-            let callIndex = 0;
-            const fetchMock = vi.fn(() => {
-                // The warm-up's body is wildly different from the timed fetch's - if it leaked
-                // into the measurement, the assertion below would catch it.
-                const bodySize = callIndex++ === 0 ? 999_999_999 : 500;
-                return Promise.resolve({
-                    ok: true,
-                    status: 200,
-                    statusText: 'OK',
-                    blob: () => Promise.resolve({ size: bodySize } as Blob)
-                } as unknown as Response);
-            });
-            vi.stubGlobal('fetch', fetchMock);
+        it('runs one untimed warm-up fetch before the timed iteration and excludes its timing from the reported speed', async () => {
+            // Since the reverted C3 (3.4.1) means speed is computed from the configured
+            // file.size rather than the response body, a differing warm-up body size can no
+            // longer be used as the leak signal here - the only observable effect a warm-up leak
+            // could have left is on timing (start()/end() only run around the timed fetch), which
+            // the fixed-per-call performance.now() mock and the deterministic file.size-based bps
+            // below already cover.
+            const fetchMock = stubFetch(['ok']);
 
             const bps = await firstValueFrom(
                 service.getBps({ iterations: 1, retryDelay: 0, file: testFile })
             );
 
             expect(fetchMock).toHaveBeenCalledTimes(2);
-            expect(bps).toBe(4_000); // 500 bytes * 8 bits / 1s - the timed fetch's body, not the warm-up's
+            expect(bps).toBe(8_000_000); // 1,000,000 bytes (testFile.size) * 8 bits / 1s
         });
 
         it('warms up only once across multiple iterations in the same getBps() call', async () => {
@@ -530,20 +533,20 @@ describe('SpeedTestService', () => {
             vi.spyOn(performance, 'now').mockImplementation(() => (elapsed += 1000));
         });
 
-        it('getKbps() divides bps by 1000', async () => {
+        it('getKbps() divides bps by 1024', async () => {
             stubFetch(['ok']);
 
             const kbps = await firstValueFrom(service.getKbps({ iterations: 1, retryDelay: 0, file: testFile }));
 
-            expect(kbps).toBeCloseTo(8_000_000 / 1000);
+            expect(kbps).toBeCloseTo(8_000_000 / 1024);
         });
 
-        it('getMbps() divides bps by 1000 twice', async () => {
+        it('getMbps() divides bps by 1024 twice', async () => {
             stubFetch(['ok']);
 
             const mbps = await firstValueFrom(service.getMbps({ iterations: 1, retryDelay: 0, file: testFile }));
 
-            expect(mbps).toBeCloseTo(8_000_000 / 1000 / 1000);
+            expect(mbps).toBeCloseTo(8_000_000 / 1024 / 1024);
         });
 
         it('getSpeedTestResult() returns bps/kbps/mbps/duration together', async () => {
@@ -554,22 +557,25 @@ describe('SpeedTestService', () => {
             );
 
             expect(result.bps).toBe(8_000_000);
-            expect(result.kbps).toBeCloseTo(8_000_000 / 1000);
-            expect(result.mbps).toBeCloseTo(8_000_000 / 1000 / 1000);
+            expect(result.kbps).toBeCloseTo(8_000_000 / 1024);
+            expect(result.mbps).toBeCloseTo(8_000_000 / 1024 / 1024);
             expect(result.duration).toBeGreaterThanOrEqual(0);
         });
     });
 
-    describe('computes speed from bytes actually received (C3)', () => {
+    describe('computes speed from the configured file.size (reverted C3, 3.4.1)', () => {
         beforeEach(() => {
             let elapsed = 0;
             vi.spyOn(performance, 'now').mockImplementation(() => (elapsed += 1000));
         });
 
-        it('uses the actual response body size, not the configured file.size hint', async () => {
+        it('uses the configured file.size, ignoring a mismatched actual response body size', async () => {
             const fetchMock = vi.fn(() =>
-                // The response body is far smaller than the configured size hint - a redirected,
-                // truncated, or re-encoded file. downloadTest() now trusts the real bytes received.
+                // The response body is far smaller than the configured size - e.g. a redirected,
+                // truncated, or re-encoded file. C3 (3.4.0) made downloadTest() trust the real
+                // bytes received in this case; that was leaked to npm as an undisclosed breaking
+                // change in a minor and is reverted here (3.4.1) back to v3.3.0's behavior: the
+                // configured hint always wins, by default.
                 Promise.resolve({
                     ok: true,
                     status: 200,
@@ -580,37 +586,28 @@ describe('SpeedTestService', () => {
             vi.stubGlobal('fetch', fetchMock);
 
             const bps = await firstValueFrom(
-                service.getBps({ iterations: 1, retryDelay: 0, file: testFile }) // testFile.size = 1,000,000 (unused hint)
+                service.getBps({ iterations: 1, retryDelay: 0, file: testFile }) // testFile.size = 1,000,000
             );
 
-            expect(bps).toBe(4_000); // 500 bytes * 8 bits / 1s - matches the real body, not the size hint
+            expect(bps).toBe(8_000_000); // 1,000,000 bytes * 8 bits / 1s - the configured size, not the 500-byte body
         });
 
-        it('does not require file.size at all - an omitted hint still reports correctly', async () => {
-            const fetchMock = vi.fn(() =>
-                Promise.resolve({
-                    ok: true,
-                    status: 200,
-                    statusText: 'OK',
-                    blob: () => Promise.resolve({ size: 250_000 } as Blob)
-                } as unknown as Response)
-            );
-            vi.stubGlobal('fetch', fetchMock);
+        it('rejects an omitted file.size instead of silently reporting a wrong speed', async () => {
+            const noSizeFile = { path: testFile.path, shouldBustCache: false } as unknown as SpeedTestFile;
 
-            const noSizeFile = { path: testFile.path, shouldBustCache: false };
-            const bps = await firstValueFrom(
-                service.getBps({ iterations: 1, retryDelay: 0, file: noSizeFile })
-            );
-
-            expect(bps).toBe(2_000_000); // 250,000 bytes * 8 bits / 1s
+            await expect(
+                firstValueFrom(service.getBps({ iterations: 1, retryDelay: 0, file: noSizeFile }))
+            ).rejects.toThrow('ng-speed-test: Valid file size is required');
         });
     });
 
     describe('mergeSettings() file.size handling (C4)', () => {
-        // mergeSettings() is private and, since C3, its file.size output has no effect on reported
-        // speed at all - nothing on the public surface observes it. Reaching in directly is the only
-        // way to assert this behavior; every other test in this file exercises private methods only
-        // indirectly, via getBps().
+        // mergeSettings() is private. Since C3's revert (3.4.1), its file.size output once again
+        // drives the reported speed directly, so this behavior matters more than ever - a path
+        // change left with no size now surfaces as a validateSettings() rejection (see the
+        // "computes speed from the configured file.size" describe block above) rather than a
+        // silently wrong number. Reaching in directly is the only way to assert the merge itself;
+        // every other test in this file exercises private methods only indirectly, via getBps().
         function mergeFile(customFile: Partial<SpeedTestFile>): SpeedTestFile {
             const merged = (service as unknown as {
                 mergeSettings: (
