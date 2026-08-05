@@ -103,6 +103,35 @@
 <p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <h2>[Unreleased]</h2>
+<h2>[3.5.0]</h2>
+<h3>Added</h3>
+<ul>
+<li>A warm-up iteration now runs once, before the first timed measurement: an untimed request against the
+configured file whose response is discarded, so DNS lookup / TLS handshake / TCP slow-start land before
+timing starts instead of being counted as transfer time. Warmed-up results are equal to or higher than
+before, never lower — most noticeable with <code>iterations: 1</code>, where there was previously nothing to average
+the deflated first sample against by <a href="https://github.com/jrquick17">jrquick17</a></li>
+<li>SSR guards on <code>isOnline()</code>/<code>getNetworkStatus()</code> — both now report a safe single-emission default
+(<code>isOnline(): true</code>, <code>getNetworkStatus(): { isOnline: true }</code>) when evaluated during a server render instead
+of throwing on the missing <code>window</code>/<code>navigator</code> by <a href="https://github.com/jrquick17">jrquick17</a></li>
+<li>The response body is now read via its <code>ReadableStream</code> (<code>response.body.getReader()</code>), accumulating bytes
+chunk by chunk instead of buffering the whole body via <code>response.blob()</code> first. This enables a new opt-in
+<code>SpeedTestSettings.maxSampleDuration</code> (ms): once elapsed time since the first byte reaches this value, the
+read is cancelled and the iteration completes from a partial download instead of always requiring the full
+configured file. Left unset (the default), behavior is unchanged — the full body is always read to
+completion by <a href="https://github.com/jrquick17">jrquick17</a></li>
+<li>Real ESLint configuration (<code>eslint.config.js</code>, flat config) for both the library and demo projects —
+<code>npm run lint</code> is a working command again, and now gates <code>verify</code>/<code>shipit</code>/<code>shipit:dry</code> by
+<a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li><code>mergeSettings()</code> no longer silently keeps the default file&#39;s stale <code>size</code> (<code>4,952,221</code>) when a caller
+changes <code>file.path</code> without also supplying <code>file.size</code>. It now clears the merged <code>size</code> instead, which
+<code>validateSettings()</code> correctly rejects with <code>ng-speed-test: Valid file size is required</code> — a caller who
+previously got a confidently wrong reported speed for their custom file now gets a clear error asking them
+to supply <code>size</code>, rather than a silently incorrect number by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
 <h2>[3.4.1]</h2>
 <h3>Fixed</h3>
 <ul>
