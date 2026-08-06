@@ -103,6 +103,28 @@
 <p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <h2>[Unreleased]</h2>
+<h2>[3.6.0]</h2>
+<h3>Changed</h3>
+<ul>
+<li>Upgraded the workspace toolchain from Angular 20 to Angular 21 (<code>@angular/core</code>/<code>cli</code>/<code>cdk</code>/<code>material</code>/etc.,
+TypeScript, <code>angular-eslint</code>, <code>vitest</code>). This is a tooling/build upgrade, not a change to the library&#39;s public
+API or runtime behavior — no source in <code>src/</code> changed. Widened <code>peerDependencies</code> for <code>@angular/common</code> and
+<code>@angular/core</code> to additionally accept <code>^21.0.0</code>, alongside the existing <code>^16.0.0</code> through <code>^20.0.0</code> by
+<a href="https://github.com/jrquick17">jrquick17</a></li>
+<li>Migrated the demo app&#39;s bootstrap to Angular 21&#39;s <code>applicationProviders</code> bootstrap option and its template to
+the modern <code>@if</code>/<code>@for</code> block control-flow syntax (replacing <code>*ngIf</code>/<code>*ngFor</code>), via <code>ng update</code>&#39;s official
+migration schematics — no behavior change, same rendered output by
+<a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li><code>tsconfig.json</code>&#39;s <code>moduleResolution</code> moved from <code>&quot;node&quot;</code> (classic) to <code>&quot;bundler&quot;</code>, required for Angular
+Material 21&#39;s package.json <code>&quot;exports&quot;</code>-map-based subpath resolution (e.g. <code>@angular/material/icon</code>), which
+the old resolution mode cannot read at all by <a href="https://github.com/jrquick17">jrquick17</a></li>
+<li>The library&#39;s <code>build</code> architect now uses <code>@angular/build:ng-packagr</code> instead of the legacy
+<code>@angular-devkit/build-angular:ng-packagr</code>, resolving an &quot;unsupported buildTarget&quot; warning from the
+<code>unit-test</code> architect by <a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
 <h2>[3.5.0]</h2>
 <h3>Added</h3>
 <ul>

@@ -20,7 +20,7 @@ A modern, lightweight Angular library for testing internet connection speed with
 - 🎨 **TypeScript Support** - Full type definitions included
 - 📱 **Mobile Friendly** - Works on all devices and browsers
 - 🔧 **Highly Configurable** - Customize file sizes, iterations, and retry logic
-- 🆕 **Angular 16-20 Compatible** - Works with latest Angular versions
+- 🆕 **Angular 16-21 Compatible** - Works with latest Angular versions
 
 ## 📋 Table of Contents
 
@@ -424,7 +424,7 @@ export class NetworkMonitorComponent {
 
 | ng-speed-test | Angular |
 |---------------|---------|
-| 3.x | 16, 17, 18, 19, 20 |
+| 3.x | 16, 17, 18, 19, 20, 21 |
 | 2.x | 12, 13, 14, 15 |
 | 1.x | 8, 9, 10, 11 |
 

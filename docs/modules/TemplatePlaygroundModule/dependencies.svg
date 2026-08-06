@@ -28,13 +28,13 @@
 <title>cluster_TemplatePlaygroundModule_providers</title>
 <polygon fill="none" stroke="black" points="238,-78 238,-130 817,-130 817,-78 238,-78"/>
 </g>
-<g id="clust6" class="cluster">
-<title>cluster_TemplatePlaygroundModule_bootstrap</title>
-<polygon fill="none" stroke="black" points="316,-208 316,-260 534,-260 534,-208 316,-208"/>
-</g>
 <g id="clust2" class="cluster">
 <title>cluster_TemplatePlaygroundModule_declarations</title>
 <polygon fill="none" stroke="black" points="16,-78 16,-130 230,-130 230,-78 16,-78"/>
+</g>
+<g id="clust6" class="cluster">
+<title>cluster_TemplatePlaygroundModule_bootstrap</title>
+<polygon fill="none" stroke="black" points="316,-208 316,-260 534,-260 534,-208 316,-208"/>
 </g>
 <!-- TemplatePlaygroundComponent -->
 <g id="node1" class="node">
