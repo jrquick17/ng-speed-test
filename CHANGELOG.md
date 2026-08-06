@@ -6,6 +6,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.0]
+### Changed
+* Upgraded the workspace toolchain from Angular 20 to Angular 21 (`@angular/core`/`cli`/`cdk`/`material`/etc.,
+  TypeScript, `angular-eslint`, `vitest`). This is a tooling/build upgrade, not a change to the library's public
+  API or runtime behavior — no source in `src/` changed. Widened `peerDependencies` for `@angular/common` and
+  `@angular/core` to additionally accept `^21.0.0`, alongside the existing `^16.0.0` through `^20.0.0` by
+  [jrquick17](https://github.com/jrquick17)
+* Migrated the demo app's bootstrap to Angular 21's `applicationProviders` bootstrap option and its template to
+  the modern `@if`/`@for` block control-flow syntax (replacing `*ngIf`/`*ngFor`), via `ng update`'s official
+  migration schematics — no behavior change, same rendered output by
+  [jrquick17](https://github.com/jrquick17)
+
+### Fixed
+* `tsconfig.json`'s `moduleResolution` moved from `"node"` (classic) to `"bundler"`, required for Angular
+  Material 21's package.json `"exports"`-map-based subpath resolution (e.g. `@angular/material/icon`), which
+  the old resolution mode cannot read at all by [jrquick17](https://github.com/jrquick17)
+* The library's `build` architect now uses `@angular/build:ng-packagr` instead of the legacy
+  `@angular-devkit/build-angular:ng-packagr`, resolving an "unsupported buildTarget" warning from the
+  `unit-test` architect by [jrquick17](https://github.com/jrquick17)
+
 ## [3.5.0]
 ### Added
 * A warm-up iteration now runs once, before the first timed measurement: an untimed request against the
