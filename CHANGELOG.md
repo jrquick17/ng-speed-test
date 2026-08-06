@@ -6,6 +6,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.7.0]
+### Changed
+* Upgraded the workspace toolchain from Angular 21 to Angular 22 (`@angular/core`/`cli`/`cdk`/`material`/etc.,
+  TypeScript 6.0, `angular-eslint`). Tooling/build upgrade only, not a change to the library's public API or
+  runtime behavior — no source in `src/` changed. Widened `peerDependencies` for `@angular/common` and
+  `@angular/core` to additionally accept `^22.0.0`, alongside the existing `^16.0.0` through `^21.0.0` by
+  [jrquick17](https://github.com/jrquick17)
+* **Minimum supported Node.js version increased**: `^22.22.3 || ^24.15.0 || >=26.0.0` (Node 20.x is no longer
+  supported as of Angular 22's own toolchain requirement) by [jrquick17](https://github.com/jrquick17)
+* Migrated the demo app off the deprecated `@angular-devkit/build-angular` Webpack-based builders entirely, onto
+  `@angular/build:application`/`dev-server`/`extract-i18n` (esbuild/Vite-based), via `ng update`'s official
+  `use-application-builder` migration. Explicitly set `outputPath.browser: ""` to keep the demo's build output
+  landing directly in `dist/demo/` (the new builder's default is `dist/demo/browser/`, which would have broken
+  the deployed site at https://ng-speed-test.jrquick.com without a hosting-config change to match) by
+  [jrquick17](https://github.com/jrquick17)
+* Added `changeDetection: ChangeDetectionStrategy.Eager` to the demo's `AppComponent`, via `ng update`'s
+  migration — Angular 22 changed the implicit default change-detection strategy for new components; this keeps
+  the existing component's pre-v22 behavior explicit rather than silently changing on upgrade by
+  [jrquick17](https://github.com/jrquick17)
+
+### Fixed
+* `tsconfig.json` now sets `"ignoreDeprecations": "6.0"` — TypeScript 6.0 deprecates the `baseUrl` compiler
+  option (used here for the demo's `paths` mapping that consumes the built library from `dist/ng-speed-test`
+  rather than `node_modules`), and will remove it entirely in TypeScript 7.0. This is a stopgap, not a fix — a
+  real migration off `baseUrl`-relative `paths` resolution is tracked as a follow-up item by
+  [jrquick17](https://github.com/jrquick17)
+* Several `tsconfig*.json` files gained `angularCompilerOptions.extendedDiagnostics` suppressions for
+  `nullishCoalescingNotNullable`/`optionalChainNotNullable`, via `ng update`'s migration — these became stricter
+  template diagnostics in Angular 22; suppressing them preserves pre-v22 template type-checking behavior by
+  [jrquick17](https://github.com/jrquick17)
+
 ## [3.6.0]
 ### Changed
 * Upgraded the workspace toolchain from Angular 20 to Angular 21 (`@angular/core`/`cli`/`cdk`/`material`/etc.,

@@ -53,6 +53,12 @@ module.exports = tseslint.config(
       // components/inject() is a separate, larger piece of work, not part of restoring lint.
       "@angular-eslint/prefer-standalone": "off",
       "@angular-eslint/prefer-inject": "off",
+      // AppComponent uses ChangeDetectionStrategy.Eager (C9, Angular 22 hop) - the official
+      // ng update migration's deliberate choice to preserve pre-v22 default change-detection
+      // behavior without auditing whether the component's subscription-based state mutations
+      // are OnPush-safe. Adopting OnPush is a separate, real behavior change, not part of an
+      // Angular-version upgrade that's supposed to be behaviorally inert.
+      "@angular-eslint/prefer-on-push-component-change-detection": "off",
     },
   },
   {
