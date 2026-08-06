@@ -103,6 +103,39 @@
 <p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <h2>[Unreleased]</h2>
+<h2>[3.7.0]</h2>
+<h3>Changed</h3>
+<ul>
+<li>Upgraded the workspace toolchain from Angular 21 to Angular 22 (<code>@angular/core</code>/<code>cli</code>/<code>cdk</code>/<code>material</code>/etc.,
+TypeScript 6.0, <code>angular-eslint</code>). Tooling/build upgrade only, not a change to the library&#39;s public API or
+runtime behavior — no source in <code>src/</code> changed. Widened <code>peerDependencies</code> for <code>@angular/common</code> and
+<code>@angular/core</code> to additionally accept <code>^22.0.0</code>, alongside the existing <code>^16.0.0</code> through <code>^21.0.0</code> by
+<a href="https://github.com/jrquick17">jrquick17</a></li>
+<li><strong>Minimum supported Node.js version increased</strong>: <code>^22.22.3 || ^24.15.0 || &gt;=26.0.0</code> (Node 20.x is no longer
+supported as of Angular 22&#39;s own toolchain requirement) by <a href="https://github.com/jrquick17">jrquick17</a></li>
+<li>Migrated the demo app off the deprecated <code>@angular-devkit/build-angular</code> Webpack-based builders entirely, onto
+<code>@angular/build:application</code>/<code>dev-server</code>/<code>extract-i18n</code> (esbuild/Vite-based), via <code>ng update</code>&#39;s official
+<code>use-application-builder</code> migration. Explicitly set <code>outputPath.browser: &quot;&quot;</code> to keep the demo&#39;s build output
+landing directly in <code>dist/demo/</code> (the new builder&#39;s default is <code>dist/demo/browser/</code>, which would have broken
+the deployed site at <a href="https://ng-speed-test.jrquick.com">https://ng-speed-test.jrquick.com</a> without a hosting-config change to match) by
+<a href="https://github.com/jrquick17">jrquick17</a></li>
+<li>Added <code>changeDetection: ChangeDetectionStrategy.Eager</code> to the demo&#39;s <code>AppComponent</code>, via <code>ng update</code>&#39;s
+migration — Angular 22 changed the implicit default change-detection strategy for new components; this keeps
+the existing component&#39;s pre-v22 behavior explicit rather than silently changing on upgrade by
+<a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li><code>tsconfig.json</code> now sets <code>&quot;ignoreDeprecations&quot;: &quot;6.0&quot;</code> — TypeScript 6.0 deprecates the <code>baseUrl</code> compiler
+option (used here for the demo&#39;s <code>paths</code> mapping that consumes the built library from <code>dist/ng-speed-test</code>
+rather than <code>node_modules</code>), and will remove it entirely in TypeScript 7.0. This is a stopgap, not a fix — a
+real migration off <code>baseUrl</code>-relative <code>paths</code> resolution is tracked as a follow-up item by
+<a href="https://github.com/jrquick17">jrquick17</a></li>
+<li>Several <code>tsconfig*.json</code> files gained <code>angularCompilerOptions.extendedDiagnostics</code> suppressions for
+<code>nullishCoalescingNotNullable</code>/<code>optionalChainNotNullable</code>, via <code>ng update</code>&#39;s migration — these became stricter
+template diagnostics in Angular 22; suppressing them preserves pre-v22 template type-checking behavior by
+<a href="https://github.com/jrquick17">jrquick17</a></li>
+</ul>
 <h2>[3.6.0]</h2>
 <h3>Changed</h3>
 <ul>

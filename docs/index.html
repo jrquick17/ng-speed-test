@@ -114,7 +114,7 @@
 <li>🎨 <strong>TypeScript Support</strong> - Full type definitions included</li>
 <li>📱 <strong>Mobile Friendly</strong> - Works on all devices and browsers</li>
 <li>🔧 <strong>Highly Configurable</strong> - Customize file sizes, iterations, and retry logic</li>
-<li>🆕 <strong>Angular 16-21 Compatible</strong> - Works with latest Angular versions</li>
+<li>🆕 <strong>Angular 16-22 Compatible</strong> - Works with latest Angular versions</li>
 </ul>
 <h2>📋 Table of Contents</h2>
 <ul>
@@ -127,10 +127,11 @@
 <li><a href="#-contributing">Contributing</a></li>
 </ul>
 <h2>🚀 Installation</h2>
-<p>Requires Node.js <code>^20.19.0 || ^22.12.0 || &gt;=24.0.0</code> (the Angular CLI toolchain used to build this package enforces
-this range). An older Node, such as <code>20.5.x</code>, will pass <code>npm install</code> but fail on <code>ng build</code>/<code>ng serve</code>/etc. with
-the CLI&#39;s own version-check error — this project&#39;s <code>engines</code> field and <code>.nvmrc</code> will additionally surface an
-<code>EBADENGINE</code> warning during install so the mismatch isn&#39;t a surprise.</p>
+<p>Requires Node.js <code>^22.22.3 || ^24.15.0 || &gt;=26.0.0</code> (the Angular CLI toolchain used to build this package
+enforces this range — Node 20.x is no longer supported as of Angular 22). An older Node, such as <code>22.12.x</code>, will
+pass <code>npm install</code> but fail on <code>ng build</code>/<code>ng serve</code>/etc. with the CLI&#39;s own version-check error — this project&#39;s
+<code>engines</code> field and <code>.nvmrc</code> will additionally surface an <code>EBADENGINE</code> warning during install so the mismatch
+isn&#39;t a surprise.</p>
 <b>Example :</b><div><pre class="line-numbers"><code class="language-bash">npm install ng-speed-test --save</code></pre></div><h2>⚡ Quick Start</h2>
 <h3>1. Import the Module</h3>
 <p>Add <code>SpeedTestModule</code> to your app module:</p>
@@ -511,7 +512,7 @@ export class NetworkMonitorComponent {
 <tbody>
 <tr>
 <td>3.x</td>
-<td>16, 17, 18, 19, 20, 21</td>
+<td>16, 17, 18, 19, 20, 21, 22</td>
 </tr>
 <tr>
 <td>2.x</td>

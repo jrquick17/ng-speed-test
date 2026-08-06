@@ -20,7 +20,7 @@ A modern, lightweight Angular library for testing internet connection speed with
 - 🎨 **TypeScript Support** - Full type definitions included
 - 📱 **Mobile Friendly** - Works on all devices and browsers
 - 🔧 **Highly Configurable** - Customize file sizes, iterations, and retry logic
-- 🆕 **Angular 16-21 Compatible** - Works with latest Angular versions
+- 🆕 **Angular 16-22 Compatible** - Works with latest Angular versions
 
 ## 📋 Table of Contents
 
@@ -34,10 +34,11 @@ A modern, lightweight Angular library for testing internet connection speed with
 
 ## 🚀 Installation
 
-Requires Node.js `^20.19.0 || ^22.12.0 || >=24.0.0` (the Angular CLI toolchain used to build this package enforces
-this range). An older Node, such as `20.5.x`, will pass `npm install` but fail on `ng build`/`ng serve`/etc. with
-the CLI's own version-check error — this project's `engines` field and `.nvmrc` will additionally surface an
-`EBADENGINE` warning during install so the mismatch isn't a surprise.
+Requires Node.js `^22.22.3 || ^24.15.0 || >=26.0.0` (the Angular CLI toolchain used to build this package
+enforces this range — Node 20.x is no longer supported as of Angular 22). An older Node, such as `22.12.x`, will
+pass `npm install` but fail on `ng build`/`ng serve`/etc. with the CLI's own version-check error — this project's
+`engines` field and `.nvmrc` will additionally surface an `EBADENGINE` warning during install so the mismatch
+isn't a surprise.
 
 ```bash
 npm install ng-speed-test --save
@@ -424,7 +425,7 @@ export class NetworkMonitorComponent {
 
 | ng-speed-test | Angular |
 |---------------|---------|
-| 3.x | 16, 17, 18, 19, 20, 21 |
+| 3.x | 16, 17, 18, 19, 20, 21, 22 |
 | 2.x | 12, 13, 14, 15 |
 | 1.x | 8, 9, 10, 11 |
 

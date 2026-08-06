@@ -303,7 +303,7 @@
 
 
     <div class="tab-pane fade  tab-source-code" id="source">
-        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import {Component, OnDestroy, OnInit} from &#x27;@angular/core&#x27;;
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import {Component, OnDestroy, OnInit, ChangeDetectionStrategy} from &#x27;@angular/core&#x27;;
 import {interval, Subject, takeUntil} from &#x27;rxjs&#x27;;
 import {SpeedTestService} from &#x27;ng-speed-test&#x27;;
 
@@ -317,6 +317,7 @@ interface NetworkStatus {
     selector: &#x27;app-root&#x27;,
     templateUrl: &#x27;./app.component.html&#x27;,
     styleUrls: [&#x27;./app.component.scss&#x27;],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class AppComponent implements OnInit, OnDestroy {
