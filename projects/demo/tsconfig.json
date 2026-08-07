@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "paths": {
-      "ng-speed-test": ["dist/ng-speed-test"]
+      "ng-speed-test": ["../../dist/ng-speed-test"]
     }
   },
   "include": [
