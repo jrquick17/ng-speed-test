@@ -4,7 +4,7 @@
 [![npm license](https://img.shields.io/npm/l/ng-speed-test.svg)](https://www.npmjs.com/package/ng-speed-test/)
 [![npm downloads](https://img.shields.io/npm/dt/ng-speed-test.svg)](https://www.npmjs.com/package/ng-speed-test)
 [![npm monthly downloads](https://img.shields.io/npm/dm/ng-speed-test.svg)](https://www.npmjs.com/package/ng-speed-test)
-[![Angular](https://img.shields.io/badge/Angular-16%2B-red.svg)](https://angular.io/)
+[![Angular](https://img.shields.io/badge/Angular-20%2B-red.svg)](https://angular.io/)
 
 A modern, lightweight Angular library for testing internet connection speed with built-in network monitoring.
 
@@ -20,7 +20,7 @@ A modern, lightweight Angular library for testing internet connection speed with
 - 🎨 **TypeScript Support** - Full type definitions included
 - 📱 **Mobile Friendly** - Works on all devices and browsers
 - 🔧 **Highly Configurable** - Customize file sizes, iterations, and retry logic
-- 🆕 **Angular 16-22 Compatible** - Works with latest Angular versions
+- 🆕 **Angular 20-22 Compatible** - Works with latest Angular versions
 
 ## 📋 Table of Contents
 
@@ -214,6 +214,41 @@ this.speedTestService.getBps().subscribe(speed => {
 });
 ```
 
+### Signals API
+
+Every core method above also has a signal-based equivalent, for consumers who prefer signals over
+`Observable`s. Each returns a `Signal<T | undefined>` (or `Signal<SpeedTestResult | undefined>` for
+`getSpeedTestResultSignal()`) that starts `undefined` and updates once the test completes:
+
+```typescript
+export class SpeedTestComponent {
+  private readonly speedTestService = inject(SpeedTestService);
+
+  // Call as a field initializer (or pass an explicit Injector) - these use toSignal()
+  // internally, which needs an injection context to clean up its subscription automatically.
+  mbps = this.speedTestService.getMbpsSignal();
+}
+```
+
+```html
+@if (mbps() === undefined) {
+  <p>Testing...</p>
+} @else {
+  <p>Speed: {{ mbps() }} Mbps</p>
+}
+```
+
+- `getBpsSignal(settings?, injector?)`
+- `getKbpsSignal(settings?, injector?)`
+- `getMbpsSignal(settings?, injector?)`
+- `getSpeedTestResultSignal(settings?, injector?)`
+
+If the underlying test fails, reading the signal after that point rethrows the error (the standard
+behavior of Angular's `toSignal()`). These work correctly in zoneless applications - the underlying
+signal write doesn't depend on `NgZone` - and are compatible with Angular 20 through 22 (they
+deliberately don't use Angular's newer `resource()`/`rxResource()` primitives, which only became
+stable at Angular 22.0).
+
 ### Network Monitoring
 
 #### `isOnline()`
@@ -242,10 +277,10 @@ this.speedTestService.getNetworkStatus().subscribe(status => {
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `iterations` | number | 3 | Number of tests to run for averaging |
+| `iterations` | number | 3 | Number of tests to run; the reported speed is the median of the successful results |
 | `retryDelay` | number | 500 | Milliseconds to wait between retries |
 | `file.path` | string | GitHub 5MB image | URL of test file |
-| `file.size` | number | 4,952,221 | Size in bytes of the test file, used to compute speed |
+| `file.size` | number \| undefined | 4,952,221 | Optional hint only - speed is computed from the actual response size, not this value |
 | `file.shouldBustCache` | boolean | true | Add cache-busting parameter |
 | `maxSampleDuration` | number \| undefined | undefined | Optional cap (ms) on how long a single iteration reads the response body. Once elapsed time since the first byte reaches this value, the read is cancelled and speed is computed from the bytes received so far - lets an iteration finish without downloading the whole file. Undefined (default) reads the full body, unchanged from prior versions. |
 
@@ -425,6 +460,7 @@ export class NetworkMonitorComponent {
 
 | ng-speed-test | Angular |
 |---------------|---------|
+| 4.x | 20, 21, 22 |
 | 3.x | 16, 17, 18, 19, 20, 21, 22 |
 | 2.x | 12, 13, 14, 15 |
 | 1.x | 8, 9, 10, 11 |

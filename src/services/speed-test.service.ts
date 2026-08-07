@@ -1,4 +1,5 @@
-import { inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { inject, Injectable, Injector, PLATFORM_ID, Signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
 import { fromEvent, merge, Observable, of, Subscription, throwError } from 'rxjs';
 import { map, mergeMap, catchError, timeout, switchMap, startWith } from 'rxjs/operators';
@@ -192,6 +193,24 @@ export class SpeedTestService {
         return pump();
     }
 
+    /**
+     * Middle value of the sorted valid results, or the average of the two middle values when the
+     * count is even (D8, re-applied for real in 4.0.0 after the checklist previously claimed this
+     * landed when the code still used a plain arithmetic mean). Chosen over a trimmed mean: the
+     * default `iterations` is 3, too small to trim an equal count off both ends and still have
+     * more than one sample left, whereas a median degrades gracefully at any count - 1 iteration
+     * returns that value unchanged, 2 average both (identical to a mean at n=2), and only at 3+
+     * does it diverge, which is exactly where a single outlier can be outvoted instead of dragging
+     * the result toward it.
+     */
+    private median(values: number[]): number {
+        const sorted = [...values].sort((a, b) => a - b);
+        const mid = Math.floor(sorted.length / 2);
+        return sorted.length % 2 !== 0
+            ? sorted[mid]
+            : (sorted[mid - 1] + sorted[mid]) / 2;
+    }
+
     private downloadTest(settings: SpeedTestSettingsModel, allResults: SpeedTestResultsModel[] = [], warmedUp = false): Observable<number> {
         // Quick connectivity check first
         return this.checkConnectivity().pipe(
@@ -206,7 +225,7 @@ export class SpeedTestService {
 
                 return warmUp$.pipe(
                     switchMap(() => new Observable<SpeedTestResultsModel>(observer => {
-                        const testResult = new SpeedTestResultsModel(settings.file!.size);
+                        const testResult = new SpeedTestResultsModel();
                         const abortController = new AbortController();
 
                         let filePath = settings.file!.path;
@@ -237,12 +256,7 @@ export class SpeedTestService {
                                 return this.readResponseBody(response, { maxDurationMs: settings.maxSampleDuration });
                             })
                             .then(bytesReceived => {
-                                // Reverted C3 (3.4.1): the default speed calculation goes back to
-                                // the configured file.size, matching v3.3.0. bytesReceived is
-                                // only passed through when maxSampleDuration is set - see
-                                // SpeedTestResultsModel.end()'s doc for why that opt-in case has
-                                // to keep using the actual bytes read.
-                                testResult.end(settings.maxSampleDuration !== undefined ? bytesReceived : undefined);
+                                testResult.end(bytesReceived);
                                 observer.next(testResult);
                                 observer.complete();
                             })
@@ -275,17 +289,13 @@ export class SpeedTestService {
                 allResults.push(testResult);
 
                 if (settings.iterations! <= 1) {
-                    // Calculate average speed from all valid results
                     const validResults = allResults.filter(result => result.speedBps > 0);
 
                     if (validResults.length === 0) {
                         return throwError(() => new Error('All speed test iterations failed - no internet connection or server unreachable'));
                     }
 
-                    const totalSpeed = validResults.reduce((sum, result) => sum + result.speedBps, 0);
-                    const averageSpeed = totalSpeed / validResults.length;
-
-                    return of(averageSpeed);
+                    return of(this.median(validResults.map(result => result.speedBps)));
                 } else {
                     settings.iterations!--;
                     return this.downloadTest(settings, allResults, true);
@@ -297,10 +307,6 @@ export class SpeedTestService {
     private validateSettings(settings: SpeedTestSettingsModel): void {
         if (!settings.file?.path) {
             throw new Error('ng-speed-test: File path is required');
-        }
-
-        if (!settings.file?.size || settings.file.size <= 0) {
-            throw new Error('ng-speed-test: Valid file size is required');
         }
 
         if (settings.iterations !== undefined && settings.iterations < 1) {
@@ -366,6 +372,27 @@ export class SpeedTestService {
     }
 
     /**
+     * Signal-based equivalent of `getBps()` (C5). Starts `undefined` and updates once the test
+     * completes; if the test fails, reading the signal after that point rethrows the error, same
+     * as `toSignal()`'s standard behavior for a source that errors.
+     *
+     * Must be called within an injection context - e.g. as a component field initializer
+     * (`speed = this.speedTestService.getBpsSignal();`) - or pass an explicit `injector`
+     * otherwise. This is what lets the underlying subscription clean up automatically via the
+     * calling component's `DestroyRef` rather than needing manual unsubscription.
+     *
+     * Uses `toSignal()`, not Angular's newer `resource()`/`rxResource()` - those only became
+     * stable `@publicApi` at Angular 22.0, and this library still supports Angular 20/21.
+     * `toSignal()` writes plain signals directly, independent of `NgZone`, so this works
+     * correctly in a zoneless application - verified in `speed-test.service.spec.ts`.
+     */
+    getBpsSignal(customSettings?: Partial<SpeedTestSettingsModel>, injector?: Injector): Signal<number | undefined> {
+        return injector
+            ? toSignal(this.getBps(customSettings), { injector })
+            : toSignal(this.getBps(customSettings));
+    }
+
+    /**
      * Properly merge custom settings with defaults
      */
     private mergeSettings(defaultSettings: SpeedTestSettingsModel, customSettings?: Partial<SpeedTestSettingsModel>): SpeedTestSettingsModel {
@@ -402,18 +429,14 @@ export class SpeedTestService {
                 : defaultSettings.file!.path;
 
             // Merge file size - the default size describes the default file, so it must not carry
-            // over onto a caller-supplied path it doesn't actually describe (C4). Since C3's
-            // revert (3.4.1) made file.size drive the reported speed again, a path change left
-            // with no size resolves to undefined here and validateSettings() now rejects it with
-            // a clear error, rather than silently reporting a speed computed against the wrong file.
+            // over onto a caller-supplied path it doesn't actually describe (C4). Since C3, size
+            // is only a cosmetic hint (speed is computed from the actual bytes received), so this
+            // just keeps what a caller reads back from merged settings accurate - it has no effect
+            // on the reported speed either way.
             if (customSettings.file.size !== undefined) {
                 mergedSettings.file.size = customSettings.file.size;
             } else if (pathChanged) {
-                // SpeedTestFile.size is required (reverted C3, 3.4.1), so this is a deliberately
-                // invalid intermediate value - validateSettings() rejects it with a clear error
-                // before it can reach a fetch, rather than silently computing a wrong speed
-                // against the caller's actual file using the default's stale size.
-                mergedSettings.file.size = undefined as unknown as number;
+                mergedSettings.file.size = undefined;
             } else {
                 mergedSettings.file.size = defaultSettings.file!.size;
             }
@@ -430,21 +453,43 @@ export class SpeedTestService {
     }
 
     /**
-     * Get internet speed in kilobits per second (Kbps)
+     * Get internet speed in kilobits per second (Kbps), using the decimal convention
+     * (1 Kbps = 1,000 bps) that ISPs and other speed test tools use.
      */
     getKbps(settings?: Partial<SpeedTestSettingsModel>): Observable<number> {
         return this.getBps(settings).pipe(
-            map(bps => bps / 1024)
+            map(bps => bps / 1000)
         );
     }
 
     /**
-     * Get internet speed in megabits per second (Mbps)
+     * Signal-based equivalent of `getKbps()` (C5). See `getBpsSignal()`'s doc for the injection
+     * context requirement and the `toSignal()`-over-`resource()` rationale.
+     */
+    getKbpsSignal(settings?: Partial<SpeedTestSettingsModel>, injector?: Injector): Signal<number | undefined> {
+        return injector
+            ? toSignal(this.getKbps(settings), { injector })
+            : toSignal(this.getKbps(settings));
+    }
+
+    /**
+     * Get internet speed in megabits per second (Mbps), using the decimal convention
+     * (1 Mbps = 1,000,000 bps) that ISPs and other speed test tools use.
      */
     getMbps(settings?: Partial<SpeedTestSettingsModel>): Observable<number> {
         return this.getKbps(settings).pipe(
-            map(kbps => kbps / 1024)
+            map(kbps => kbps / 1000)
         );
+    }
+
+    /**
+     * Signal-based equivalent of `getMbps()` (C5). See `getBpsSignal()`'s doc for the injection
+     * context requirement and the `toSignal()`-over-`resource()` rationale.
+     */
+    getMbpsSignal(settings?: Partial<SpeedTestSettingsModel>, injector?: Injector): Signal<number | undefined> {
+        return injector
+            ? toSignal(this.getMbps(settings), { injector })
+            : toSignal(this.getMbps(settings));
     }
 
     /**
@@ -456,8 +501,8 @@ export class SpeedTestService {
         return this.getBps(settings).pipe(
             map(bps => ({
                 bps,
-                kbps: bps / 1024,
-                mbps: bps / (1024 * 1024),
+                kbps: bps / 1000,
+                mbps: bps / (1000 * 1000),
                 duration: (Date.now() - startTime) / 1000
             })),
             timeout(this.DEFAULT_TIMEOUT + 5000), // Overall timeout slightly longer than individual request timeout
@@ -468,6 +513,16 @@ export class SpeedTestService {
                 return throwError(() => error);
             })
         );
+    }
+
+    /**
+     * Signal-based equivalent of `getSpeedTestResult()` (C5). See `getBpsSignal()`'s doc for the
+     * injection context requirement and the `toSignal()`-over-`resource()` rationale.
+     */
+    getSpeedTestResultSignal(settings?: Partial<SpeedTestSettingsModel>, injector?: Injector): Signal<SpeedTestResult | undefined> {
+        return injector
+            ? toSignal(this.getSpeedTestResult(settings), { injector })
+            : toSignal(this.getSpeedTestResult(settings));
     }
 
     /**

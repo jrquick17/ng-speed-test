@@ -17,21 +17,19 @@ export class SpeedTestResultsModel implements SpeedTestResults {
     public bytesReceived: number = 0;
     public speedBps: number = 0;
 
-    constructor(private fileSize: number) {}
-
     get speedKbps(): number {
-        return this.speedBps / 1024;
+        return this.speedBps / 1000;
     }
 
     get speedMbps(): number {
-        return this.speedKbps / 1024;
+        return this.speedKbps / 1000;
     }
 
-    private _update(bytesLoaded: number): void {
+    private _update(): void {
         if (this.endTime !== null && this.startTime !== null) {
             const milliseconds = this.endTime - this.startTime;
             this.duration = milliseconds / 1000;
-            const bitsLoaded = bytesLoaded * 8;
+            const bitsLoaded = this.bytesReceived * 8;
             // Guard against a zero (or negative, e.g. clock anomalies) duration: dividing by it
             // would otherwise produce Infinity/NaN, which would incorrectly pass the
             // `speedBps > 0` validity filter in SpeedTestService.downloadTest(). Falling back to
@@ -41,22 +39,19 @@ export class SpeedTestResultsModel implements SpeedTestResults {
     }
 
     /**
-     * Reverting C3 (3.4.1): speed is once again computed from the configured `fileSize` by
-     * default, matching v3.3.0 exactly - `end()` with no argument (every call site except the
-     * one below) behaves identically to pre-3.4.0.
-     *
-     * `bytesReceived`, if passed, is used instead. This one exception exists only to support
-     * `maxSampleDuration` (D7, not part of C3, kept on purpose): when a read is cancelled early,
-     * `fileSize` describes the whole configured file, not what was actually sampled, so dividing
-     * by it would wildly overstate speed. Only the caller opting into `maxSampleDuration` passes
-     * a value here; everyone else keeps the reverted, file-size-based behavior unchanged.
+     * bytesReceived is the actual response body size (e.g. Blob.size, or the accumulated total
+     * from readResponseBody()), not the configured file.size hint. Speed is always computed from
+     * this - a redirected, re-encoded, truncated, or otherwise changed file reports its real
+     * speed instead of a confidently wrong number derived from the configured hint (C3, re-applied
+     * for real in 4.0.0 after first landing in error as an undisclosed breaking change in 3.4.0
+     * and being reverted in 3.4.1 - see CHANGELOG.md).
      */
-    end(bytesReceived?: number): void {
+    end(bytesReceived: number): void {
         if (!this.hasEnded) {
             this.hasEnded = true;
-            this.bytesReceived = bytesReceived !== undefined ? bytesReceived : this.fileSize;
+            this.bytesReceived = bytesReceived;
             this.endTime = performance.now();
-            this._update(this.bytesReceived);
+            this._update();
         }
     }
 
@@ -64,7 +59,7 @@ export class SpeedTestResultsModel implements SpeedTestResults {
         if (!this.hasEnded) {
             this.hasEnded = true;
             this.endTime = null;
-            this._update(this.bytesReceived);
+            this._update();
         }
     }
 
