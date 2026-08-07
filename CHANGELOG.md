@@ -6,6 +6,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0]
+### Changed
+* **Breaking:** `getKbps()`/`getMbps()`, `SpeedTestResultsModel.speedKbps`/`speedMbps`, and
+  `getSpeedTestResult()`'s `kbps`/`mbps` now use the decimal convention (1 Kbps = 1,000 bps, 1 Mbps =
+  1,000,000 bps) instead of dividing by 1024, matching the convention used by ISPs, speedtest.net, and
+  fast.com. Reported Kbps values increase by a factor of 1024/1000 = 1.024× (2.4% higher than `3.x`); reported
+  Mbps values increase by a factor of 1024²/1,000,000 = 1.048576× (4.8576% higher than `3.x`). `getBps()`/`bps`
+  are unaffected — bits per second was never unit-ambiguous. This first shipped in error as an undisclosed
+  breaking change in the `3.4.0` minor, was reverted in `3.4.1`, and is re-applied here correctly gated behind
+  a major, with this note, by [jrquick17](https://github.com/jrquick17)
+* **Breaking:** Speed is now computed from the actual number of bytes received (the real transferred size of
+  the response body), not the configured `file.size`. A redirected, re-encoded, truncated, or otherwise
+  changed file now reports its real speed instead of a confidently wrong number derived from the configured
+  hint. For a correctly-configured `file.size` matching the real file, this is usually unchanged; the
+  difference only shows up when the served file doesn't actually match the hint. `SpeedTestFile.size` is now
+  optional and is no longer validated or used in the speed calculation — it's an unused hint kept for
+  informational purposes only. `SpeedTestResultsModel`'s constructor no longer takes a `fileSize` argument,
+  and `end()` now takes the actual `bytesReceived`. This first shipped in error as an undisclosed breaking
+  change in the `3.4.0` minor, was reverted in `3.4.1`, and is re-applied here correctly gated behind a major,
+  with this note, by [jrquick17](https://github.com/jrquick17)
+* **Breaking:** Multi-iteration results (`iterations` > 1, the default is 3) are now aggregated with the
+  median instead of the arithmetic mean. At `iterations <= 2` the reported number is unchanged (median and
+  mean agree there); at `iterations >= 3`, a single divergent iteration — a network blip or a burst of extra
+  throughput — now has little to no influence on the result, instead of dragging it toward the outlier. There
+  is no fixed conversion ratio; the size of the change is data-dependent (zero when iterations happen to
+  agree, largest when exactly one iteration was a severe outlier) by [jrquick17](https://github.com/jrquick17)
+* **Breaking:** `peerDependencies` for `@angular/common`/`@angular/core` narrowed from
+  `^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^20.0.0 || ^21.0.0 || ^22.0.0` to
+  `^20.0.0 || ^21.0.0 || ^22.0.0`. Consumers on Angular 16 through 19 cannot install `^4.0.0` — stay on the
+  latest `3.x` release, or upgrade your application to Angular 20+ first, by
+  [jrquick17](https://github.com/jrquick17)
+
+### Added
+* Signal-based equivalents of every core method: `getBpsSignal()`, `getKbpsSignal()`, `getMbpsSignal()`, and
+  `getSpeedTestResultSignal()`. Each is a thin wrapper returning a `Signal<T | undefined>` that starts
+  `undefined` and updates once the test completes; each takes the same settings argument as its `Observable`
+  counterpart plus an optional trailing `injector` parameter. Must be called within an injection context
+  (e.g. a component field initializer) unless an explicit `injector` is passed. Verified to work correctly in
+  zoneless applications by [jrquick17](https://github.com/jrquick17)
+
+### Migration notes
+If you're upgrading from `3.x`:
+* **Displayed Kbps/Mbps values will increase** (~2.4% / ~4.86%) even with no code changes, because of the
+  decimal-vs-binary unit change above. This is a display change, not a regression — bps/`getBps()` is
+  unaffected, and the new numbers match what other speed test tools report for the same connection.
+* **Reported speed may change** if your configured `file.size` doesn't match the real size of the file being
+  served (e.g. behind a redirect, or after re-encoding). If your `file.size` matches the real file, expect no
+  change. `file.size` is now optional — omitting it is fully supported and no longer affects validation.
+* **Multi-iteration results may differ slightly** (`iterations >= 3`, the default) if any of your recent runs
+  had an outlier iteration — the median discounts it where the old mean didn't. Single-iteration
+  (`iterations: 1`) and two-iteration results are unaffected.
+* **`peerDependencies` no longer include Angular 16-19.** If your app is on one of those versions, `npm
+  install ng-speed-test@^4` will fail to resolve — either stay on `ng-speed-test@^3` or upgrade Angular first.
+* Everything else — the `Observable`-returning API surface, `provideSpeedTest()`, connectivity monitoring,
+  warm-up/streaming/duration-sampling behavior from `3.5.0`/`3.6.0`/`3.7.0` — is unchanged.
+
 ## [3.7.0]
 ### Changed
 * Upgraded the workspace toolchain from Angular 21 to Angular 22 (`@angular/core`/`cli`/`cdk`/`material`/etc.,

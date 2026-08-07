@@ -1,6 +1,6 @@
 {
   "name": "ng-speed-test",
-  "version": "3.7.0",
+  "version": "4.0.0",
   "description": "Angular library for testing internet connection speed",
   "readme": "README.md",
   "homepage": "https://ng-speed-test.jrquick.com",
