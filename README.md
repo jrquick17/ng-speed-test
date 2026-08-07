@@ -15,6 +15,7 @@ A modern, lightweight Angular library for testing internet connection speed with
 ## ✨ Features
 
 - 🎯 **Accurate Speed Testing** - Uses multiple iterations for reliable results
+- 📡 **Latency & Jitter** - Time-to-first-byte and its variance across iterations, not just throughput
 - 🔄 **Network Status Monitoring** - Real-time online/offline detection
 - ⚡ **Modern Fetch API** - Better performance and error handling
 - 🎨 **TypeScript Support** - Full type definitions included
@@ -176,7 +177,7 @@ Pre-configured test files hosted on GitHub:
 ### Core Methods
 
 #### `getSpeedTestResult(settings?)`
-Returns comprehensive speed test results with duration info.
+Returns comprehensive speed test results with duration, latency, and jitter info.
 
 ```typescript
 this.speedTestService.getSpeedTestResult().subscribe(result => {
@@ -184,8 +185,22 @@ this.speedTestService.getSpeedTestResult().subscribe(result => {
   console.log('Duration:', result.duration, 'seconds');
   console.log('Bits per second:', result.bps);
   console.log('Kilobits per second:', result.kbps);
+  console.log('Latency (TTFB):', result.latency, 'ms');
+  console.log('Jitter:', result.jitter, 'ms');
 });
 ```
+
+##### Result Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `bps` / `kbps` / `mbps` | number | Download speed, at increasing unit scale (decimal, not binary) |
+| `duration` | number | Total time the test took, in **seconds** |
+| `latency` | number | Time-to-first-byte, in **milliseconds** - the median across the iterations that succeeded. `0` if none did |
+| `jitter` | number | Variance between iterations' latency, in **milliseconds** (population standard deviation). `0` when fewer than 2 iterations succeeded - there's nothing to compare |
+
+`latency`/`jitter` are milliseconds while `duration` is seconds - TTFB is normally a two- or
+three-digit millisecond figure, so seconds would round it away.
 
 #### `getMbps(settings?)`
 Get speed in megabits per second.
@@ -343,6 +358,14 @@ import { SpeedTestService } from 'ng-speed-test';
             <strong>{{ lastResult.duration | number:'1.2-2' }}</strong>
             <span>seconds</span>
           </div>
+          <div class="result-item">
+            <strong>{{ lastResult.latency | number:'1.0-0' }}</strong>
+            <span>ms latency</span>
+          </div>
+          <div class="result-item">
+            <strong>{{ lastResult.jitter | number:'1.0-0' }}</strong>
+            <span>ms jitter</span>
+          </div>
         </div>
       </div>
     </div>
@@ -354,7 +377,7 @@ import { SpeedTestService } from 'ng-speed-test';
     .controls { display: flex; gap: 10px; margin-bottom: 20px; }
     .progress-bar { width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; }
     .fill { height: 100%; background: #007bff; transition: width 0.3s; }
-    .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 15px; }
     .result-item { text-align: center; padding: 15px; background: #f8f9fa; border-radius: 5px; }
   `]
 })

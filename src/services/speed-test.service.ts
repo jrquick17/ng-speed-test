@@ -14,6 +14,20 @@ export interface SpeedTestResult {
     kbps: number;
     mbps: number;
     duration: number;
+    /**
+     * Latency (time-to-first-byte), in milliseconds - the median across the iterations that
+     * succeeded (D9). Unlike `duration`, this is milliseconds, not seconds - TTFB is normally a
+     * two- or three-digit number of ms, so seconds would round it away. 0 if no iteration ever
+     * received a response.
+     */
+    latency: number;
+    /**
+     * Jitter, in milliseconds: the population standard deviation of the per-iteration latency
+     * samples that made up `latency` (D9). A larger value means TTFB varied more between
+     * iterations. Always 0 when fewer than 2 iterations succeeded - there's no variance to
+     * measure from a single sample.
+     */
+    jitter: number;
 }
 
 interface NetworkInformation {
@@ -211,7 +225,23 @@ export class SpeedTestService {
             : (sorted[mid - 1] + sorted[mid]) / 2;
     }
 
-    private downloadTest(settings: SpeedTestSettingsModel, allResults: SpeedTestResultsModel[] = [], warmedUp = false): Observable<number> {
+    /**
+     * Population standard deviation of a set of latency samples (D9) - the jitter figure exposed
+     * on `SpeedTestResult`. A larger result means more variance between samples. Needs at least 2
+     * samples to mean anything; with 0 or 1 there's no variance to measure, so this returns 0
+     * rather than NaN.
+     */
+    private jitter(values: number[]): number {
+        if (values.length < 2) {
+            return 0;
+        }
+
+        const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+        const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length;
+        return Math.sqrt(variance);
+    }
+
+    private downloadTest(settings: SpeedTestSettingsModel, allResults: SpeedTestResultsModel[] = [], warmedUp = false): Observable<{ bps: number; latencyMs: number; jitterMs: number }> {
         // Quick connectivity check first
         return this.checkConnectivity().pipe(
             switchMap(isConnected => {
@@ -250,6 +280,10 @@ export class SpeedTestService {
                         })
                             .then(response => {
                                 clearTimeout(fetchTimeout);
+                                // Response headers have arrived - this is time-to-first-byte
+                                // (D9), whether or not the response ends up being usable, so it's
+                                // recorded before the ok check below.
+                                testResult.firstByte();
                                 if (!response.ok) {
                                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                                 }
@@ -295,7 +329,18 @@ export class SpeedTestService {
                         return throwError(() => new Error('All speed test iterations failed - no internet connection or server unreachable'));
                     }
 
-                    return of(this.median(validResults.map(result => result.speedBps)));
+                    // Latency/jitter (D9) are derived only from the same valid results bps is -
+                    // a failed iteration's latency (if it even has one; a network error never
+                    // gets that far) shouldn't skew either figure.
+                    const latencies = validResults
+                        .map(result => result.latencyMs)
+                        .filter((latencyMs): latencyMs is number => latencyMs !== null);
+
+                    return of({
+                        bps: this.median(validResults.map(result => result.speedBps)),
+                        latencyMs: latencies.length > 0 ? this.median(latencies) : 0,
+                        jitterMs: this.jitter(latencies)
+                    });
                 } else {
                     settings.iterations!--;
                     return this.downloadTest(settings, allResults, true);
@@ -319,10 +364,11 @@ export class SpeedTestService {
     }
 
     /**
-     * Get internet speed in bits per second (bps)
-     * Fails fast if no internet connection is available
+     * Runs a full speed test and resolves the raw aggregate: bps plus latency/jitter (D9).
+     * `getBps()` and `getSpeedTestResult()` both build on this rather than duplicating the
+     * connectivity/init-delay/teardown machinery below.
      */
-    getBps(customSettings?: Partial<SpeedTestSettingsModel>): Observable<number> {
+    private runSpeedTest(customSettings?: Partial<SpeedTestSettingsModel>): Observable<{ bps: number; latencyMs: number; jitterMs: number }> {
         return new Observable(observer => {
             // Check connectivity immediately
             if (!navigator.onLine) {
@@ -345,8 +391,8 @@ export class SpeedTestService {
                     this.validateSettings(settings);
 
                     downloadSubscription = this.downloadTest(settings).subscribe({
-                        next: (speedBps) => {
-                            observer.next(speedBps);
+                        next: (result) => {
+                            observer.next(result);
                             observer.complete();
                         },
                         error: (error) => {
@@ -369,6 +415,14 @@ export class SpeedTestService {
                 downloadSubscription?.unsubscribe();
             };
         });
+    }
+
+    /**
+     * Get internet speed in bits per second (bps)
+     * Fails fast if no internet connection is available
+     */
+    getBps(customSettings?: Partial<SpeedTestSettingsModel>): Observable<number> {
+        return this.runSpeedTest(customSettings).pipe(map(result => result.bps));
     }
 
     /**
@@ -498,12 +552,14 @@ export class SpeedTestService {
     getSpeedTestResult(settings?: Partial<SpeedTestSettingsModel>): Observable<SpeedTestResult> {
         const startTime = Date.now();
 
-        return this.getBps(settings).pipe(
-            map(bps => ({
-                bps,
-                kbps: bps / 1000,
-                mbps: bps / (1000 * 1000),
-                duration: (Date.now() - startTime) / 1000
+        return this.runSpeedTest(settings).pipe(
+            map(result => ({
+                bps: result.bps,
+                kbps: result.bps / 1000,
+                mbps: result.bps / (1000 * 1000),
+                duration: (Date.now() - startTime) / 1000,
+                latency: result.latencyMs,
+                jitter: result.jitterMs
             })),
             timeout(this.DEFAULT_TIMEOUT + 5000), // Overall timeout slightly longer than individual request timeout
             catchError(error => {

@@ -20,6 +20,9 @@ describe('SpeedTestService signals API (C5)', () => {
         vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(okResponse())));
         // Every performance.now() call advances by a fixed amount, so the resulting speedBps is
         // deterministic regardless of how much real wall-clock time actually elapses in the test.
+        // A successful iteration makes 3 calls (start, firstByte() for D9 latency, end) rather
+        // than 2, so its duration is 2000ms - bps values below are halved from a naive 1s-per-tick
+        // read.
         let elapsed = 0;
         vi.spyOn(performance, 'now').mockImplementation(() => (elapsed += 1000));
     });
@@ -54,7 +57,7 @@ describe('SpeedTestService signals API (C5)', () => {
                 }
             });
 
-            expect(bps()).toBe(8_000_000); // 1,000,000 bytes * 8 bits, over whatever real duration elapsed
+            expect(bps()).toBe(4_000_000); // 1,000,000 bytes * 8 bits / 2s (mocked performance.now() clock)
         });
 
         it('getKbpsSignal() and getMbpsSignal() resolve to the decimal (C2) conversion of the same bps', async () => {
@@ -73,8 +76,8 @@ describe('SpeedTestService signals API (C5)', () => {
                 }
             });
 
-            expect(kbps()).toBeCloseTo(8_000_000 / 1000);
-            expect(mbps()).toBeCloseTo(8_000_000 / 1000 / 1000);
+            expect(kbps()).toBeCloseTo(4_000_000 / 1000);
+            expect(mbps()).toBeCloseTo(4_000_000 / 1000 / 1000);
         });
 
         it('getSpeedTestResultSignal() resolves to the full SpeedTestResult object', async () => {
@@ -90,9 +93,11 @@ describe('SpeedTestService signals API (C5)', () => {
                 }
             });
 
-            expect(result()!.bps).toBe(8_000_000);
-            expect(result()!.kbps).toBeCloseTo(8_000_000 / 1000);
-            expect(result()!.mbps).toBeCloseTo(8_000_000 / 1000 / 1000);
+            expect(result()!.bps).toBe(4_000_000);
+            expect(result()!.kbps).toBeCloseTo(4_000_000 / 1000);
+            expect(result()!.mbps).toBeCloseTo(4_000_000 / 1000 / 1000);
+            expect(result()!.latency).toBe(1000); // D9 - single iteration's recorded TTFB
+            expect(result()!.jitter).toBe(0); // no variance to measure from a single sample
         });
 
         it('accepts an explicit injector for use outside an ambient injection context', () => {
@@ -136,7 +141,7 @@ describe('SpeedTestService signals API (C5)', () => {
                 }
             });
 
-            expect(fixture.nativeElement.textContent).toContain('done:8000000');
+            expect(fixture.nativeElement.textContent).toContain('done:4000000');
         });
     });
 });

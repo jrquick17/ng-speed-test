@@ -254,7 +254,9 @@ describe('SpeedTestService', () => {
         beforeEach(() => {
             // Every performance.now() call advances by a fixed amount, so any single start()/end()
             // pair - regardless of how many other iterations ran before it - always measures the
-            // same 1000ms delta, making the resulting speedBps deterministic per iteration.
+            // same delta, making the resulting speedBps deterministic per iteration. A successful
+            // iteration now makes 3 calls (start, firstByte() for D9 latency, end) instead of 2,
+            // so its duration is 2000ms, not 1000ms - halving the bps values below versus pre-D9.
             let elapsed = 0;
             vi.spyOn(performance, 'now').mockImplementation(() => (elapsed += 1000));
         });
@@ -266,7 +268,7 @@ describe('SpeedTestService', () => {
                 service.getBps({ iterations: 3, retryDelay: 0, file: testFile })
             );
 
-            expect(bps).toBe(8_000_000); // 1,000,000 bytes * 8 bits / 1s, both valid results identical
+            expect(bps).toBe(4_000_000); // 1,000,000 bytes * 8 bits / 2s, both valid results identical
         });
 
         it('discards an iteration that returns a non-OK HTTP response', async () => {
@@ -276,7 +278,7 @@ describe('SpeedTestService', () => {
                 service.getBps({ iterations: 2, retryDelay: 0, file: testFile })
             );
 
-            expect(bps).toBe(8_000_000);
+            expect(bps).toBe(4_000_000);
         });
 
         it('errors with a descriptive message when every iteration fails', async () => {
@@ -288,15 +290,15 @@ describe('SpeedTestService', () => {
         });
 
         it('reports the median, not the mean, when one of three results is a severe outlier', async () => {
-            // bps per iteration: 8,000,000 / 8,000,000 / 800,000,000 (1s duration each).
-            // Mean would be ~272,000,000; median (sorted middle value) is 8,000,000.
+            // bps per iteration: 4,000,000 / 4,000,000 / 400,000,000 (2s duration each).
+            // Mean would be ~136,000,000; median (sorted middle value) is 4,000,000.
             stubFetchWithOutcomes([{ size: 1_000_000 }, { size: 1_000_000 }, { size: 100_000_000 }]);
 
             const bps = await firstValueFrom(
                 service.getBps({ iterations: 3, retryDelay: 0, file: testFile })
             );
 
-            expect(bps).toBe(8_000_000);
+            expect(bps).toBe(4_000_000);
         });
 
         it('reports the same median regardless of which iteration the outlier occurred in', async () => {
@@ -308,11 +310,11 @@ describe('SpeedTestService', () => {
                 service.getBps({ iterations: 3, retryDelay: 0, file: testFile })
             );
 
-            expect(bps).toBe(8_000_000);
+            expect(bps).toBe(4_000_000);
         });
 
         it('averages the two middle values for an even number of valid results', async () => {
-            // bps per iteration: 8e6, 16e6, 24e6, 32e6 (sorted). Median = (16e6 + 24e6) / 2 = 20e6.
+            // bps per iteration: 4e6, 8e6, 12e6, 16e6 (sorted). Median = (8e6 + 12e6) / 2 = 10e6.
             stubFetchWithOutcomes([
                 { size: 1_000_000 },
                 { size: 2_000_000 },
@@ -324,11 +326,11 @@ describe('SpeedTestService', () => {
                 service.getBps({ iterations: 4, retryDelay: 0, file: testFile })
             );
 
-            expect(bps).toBe(20_000_000);
+            expect(bps).toBe(10_000_000);
         });
 
         it('excludes a failed iteration before computing the median of the remaining outlier pair', async () => {
-            // Only 2 valid results (8e6, 8e8) after the failure is discarded - median of 2 is
+            // Only 2 valid results (4e6, 4e8) after the failure is discarded - median of 2 is
             // their average, same as a mean would give at n=2, but the failed iteration must
             // never be counted as a third value.
             stubFetchWithOutcomes(['network-error', { size: 1_000_000 }, { size: 100_000_000 }]);
@@ -337,7 +339,58 @@ describe('SpeedTestService', () => {
                 service.getBps({ iterations: 3, retryDelay: 0, file: testFile })
             );
 
-            expect(bps).toBe(404_000_000); // (8,000,000 + 800,000,000) / 2
+            expect(bps).toBe(202_000_000); // (4,000,000 + 400,000,000) / 2
+        });
+    });
+
+    describe('latency and jitter (D9)', () => {
+        it('reports latency as the median TTFB and jitter as the population stddev across iterations', async () => {
+            // Per iteration: start(), firstByte(), end() - 3 performance.now() calls each, no
+            // warm-up ticks (warmUp() never touches testResult). Sequenced explicitly (rather than
+            // the usual fixed +1000 mock) so each iteration gets its own distinct latency:
+            // iter1 TTFB = 100ms, iter2 = 200ms, iter3 = 300ms; every iteration's overall duration
+            // is a constant 1000ms so bps stays identical across all three and doesn't confound
+            // the assertion.
+            const values = [0, 100, 1000, 2000, 2200, 3000, 4000, 4300, 5000];
+            vi.spyOn(performance, 'now').mockImplementation(() => values.shift()!);
+            stubFetch(['ok', 'ok', 'ok']);
+
+            const result = await firstValueFrom(
+                service.getSpeedTestResult({ iterations: 3, retryDelay: 0, file: testFile })
+            );
+
+            expect(result.latency).toBe(200); // median of [100, 200, 300]
+            // Population stddev of [100, 200, 300]: mean 200, variance ((-100)^2+0+100^2)/3.
+            const expectedJitter = Math.sqrt(((100 - 200) ** 2 + (200 - 200) ** 2 + (300 - 200) ** 2) / 3);
+            expect(result.jitter).toBeCloseTo(expectedJitter);
+        });
+
+        it('excludes a discarded HTTP-error iteration\'s latency even though its headers did arrive', async () => {
+            // iter1 (http-error): start(0), firstByte(500) -> latency 500ms, then fails before
+            // end() is ever called. iter2 (ok): start(2000), firstByte(2300) -> latency 300ms,
+            // end(3000). If the discarded iteration's latency leaked into aggregation, the
+            // reported latency would be median([500, 300]) = 400 instead of just 300.
+            const values = [0, 500, 2000, 2300, 3000];
+            vi.spyOn(performance, 'now').mockImplementation(() => values.shift()!);
+            stubFetch(['http-error', 'ok']);
+
+            const result = await firstValueFrom(
+                service.getSpeedTestResult({ iterations: 2, retryDelay: 0, file: testFile })
+            );
+
+            expect(result.latency).toBe(300);
+            expect(result.jitter).toBe(0); // only one valid latency sample
+        });
+
+        it('still errors (rather than reporting a bogus 0 latency) when every iteration fails before a response arrives', async () => {
+            // A network error never reaches firstByte(), so no iteration has a latency to
+            // aggregate - this asserts computing latency/jitter doesn't change the pre-existing
+            // all-iterations-failed error path.
+            stubFetch(['network-error', 'network-error']);
+
+            await expect(
+                firstValueFrom(service.getSpeedTestResult({ iterations: 2, retryDelay: 0, file: testFile }))
+            ).rejects.toThrow('All speed test iterations failed - no internet connection or server unreachable');
         });
     });
 
@@ -367,7 +420,7 @@ describe('SpeedTestService', () => {
             );
 
             expect(fetchMock).toHaveBeenCalledTimes(2);
-            expect(bps).toBe(4_000); // 500 bytes * 8 bits / 1s - the timed fetch's body, not the warm-up's
+            expect(bps).toBe(2_000); // 500 bytes * 8 bits / 2s - the timed fetch's body, not the warm-up's
         });
 
         it('warms up only once across multiple iterations in the same getBps() call', async () => {
@@ -392,7 +445,7 @@ describe('SpeedTestService', () => {
                 service.getBps({ iterations: 1, retryDelay: 0, file: testFile })
             );
 
-            expect(bps).toBe(8_000_000); // the timed fetch succeeded despite the warm-up failing
+            expect(bps).toBe(4_000_000); // the timed fetch succeeded despite the warm-up failing
         });
     });
 
@@ -470,9 +523,10 @@ describe('SpeedTestService', () => {
 
             // See the readResponseBody() cancellation test above for the elapsed-time trace:
             // 300 bytes read (100 + 200) before the 1500ms cap cancels the read; testResult.end()
-            // then measures a 4s wall-clock duration off the same mocked performance.now() clock,
-            // giving speedBps = 300 * 8 / 4 = 600.
-            expect(bps).toBe(600);
+            // then measures a 5s wall-clock duration off the same mocked performance.now() clock
+            // (the usual 4 ticks - start, readResponseBody's own startTime + 2 chunk checks - plus
+            // one more for D9's firstByte() latency read), giving speedBps = 300 * 8 / 5 = 480.
+            expect(bps).toBe(480);
             expect(readMock).toHaveBeenCalledTimes(2);
             expect(cancelMock).toHaveBeenCalledTimes(1);
             expect(blobMock).not.toHaveBeenCalled();
@@ -620,7 +674,7 @@ describe('SpeedTestService', () => {
 
             const kbps = await firstValueFrom(service.getKbps({ iterations: 1, retryDelay: 0, file: testFile }));
 
-            expect(kbps).toBeCloseTo(8_000_000 / 1000);
+            expect(kbps).toBeCloseTo(4_000_000 / 1000);
         });
 
         it('getMbps() divides bps by 1000 twice', async () => {
@@ -628,20 +682,24 @@ describe('SpeedTestService', () => {
 
             const mbps = await firstValueFrom(service.getMbps({ iterations: 1, retryDelay: 0, file: testFile }));
 
-            expect(mbps).toBeCloseTo(8_000_000 / 1000 / 1000);
+            expect(mbps).toBeCloseTo(4_000_000 / 1000 / 1000);
         });
 
-        it('getSpeedTestResult() returns bps/kbps/mbps/duration together', async () => {
+        it('getSpeedTestResult() returns bps/kbps/mbps/duration/latency/jitter together (D9)', async () => {
             stubFetch(['ok']);
 
             const result = await firstValueFrom(
                 service.getSpeedTestResult({ iterations: 1, retryDelay: 0, file: testFile })
             );
 
-            expect(result.bps).toBe(8_000_000);
-            expect(result.kbps).toBeCloseTo(8_000_000 / 1000);
-            expect(result.mbps).toBeCloseTo(8_000_000 / 1000 / 1000);
+            expect(result.bps).toBe(4_000_000);
+            expect(result.kbps).toBeCloseTo(4_000_000 / 1000);
+            expect(result.mbps).toBeCloseTo(4_000_000 / 1000 / 1000);
             expect(result.duration).toBeGreaterThanOrEqual(0);
+            // A single iteration: latency is the one recorded TTFB (1 tick = 1000ms on this
+            // mocked clock); jitter is 0 - there's no variance to measure from a single sample.
+            expect(result.latency).toBe(1000);
+            expect(result.jitter).toBe(0);
         });
     });
 
@@ -668,7 +726,7 @@ describe('SpeedTestService', () => {
                 service.getBps({ iterations: 1, retryDelay: 0, file: testFile }) // testFile.size = 1,000,000 (unused hint)
             );
 
-            expect(bps).toBe(4_000); // 500 bytes * 8 bits / 1s - matches the real body, not the size hint
+            expect(bps).toBe(2_000); // 500 bytes * 8 bits / 2s - matches the real body, not the size hint
         });
 
         it('does not require file.size at all - an omitted hint still reports correctly', async () => {
@@ -687,7 +745,7 @@ describe('SpeedTestService', () => {
                 service.getBps({ iterations: 1, retryDelay: 0, file: noSizeFile })
             );
 
-            expect(bps).toBe(2_000_000); // 250,000 bytes * 8 bits / 1s
+            expect(bps).toBe(1_000_000); // 250,000 bytes * 8 bits / 2s
         });
     });
 

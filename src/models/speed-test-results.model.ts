@@ -7,6 +7,7 @@ export interface SpeedTestResults {
     speedBps: number;
     speedKbps: number;
     speedMbps: number;
+    latencyMs: number | null;
 }
 
 export class SpeedTestResultsModel implements SpeedTestResults {
@@ -16,6 +17,7 @@ export class SpeedTestResultsModel implements SpeedTestResults {
     public endTime: number | null = null;
     public bytesReceived: number = 0;
     public speedBps: number = 0;
+    public latencyMs: number | null = null;
 
     get speedKbps(): number {
         return this.speedBps / 1000;
@@ -65,5 +67,19 @@ export class SpeedTestResultsModel implements SpeedTestResults {
 
     start(): void {
         this.startTime = performance.now();
+    }
+
+    /**
+     * Records latency (time-to-first-byte, D9): the elapsed time between start() and the moment
+     * the response arrives - i.e. right after fetch()'s promise resolves with a Response, before
+     * the body is read. Deliberately separate from end()/error() so it still gets recorded for an
+     * iteration that fails with a non-OK HTTP status (headers did arrive) but not for one that
+     * fails before a response is ever received (a network error). No-op if start() was never
+     * called, or if latency was already recorded once.
+     */
+    firstByte(): void {
+        if (this.startTime !== null && this.latencyMs === null) {
+            this.latencyMs = performance.now() - this.startTime;
+        }
     }
 }

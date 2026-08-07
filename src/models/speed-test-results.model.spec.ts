@@ -101,4 +101,67 @@ describe('SpeedTestResultsModel', () => {
         expect(result.endTime).toBe(2000);
         expect(result.speedBps).toBe(8_000_000);
     });
+
+    describe('firstByte() - latency / time-to-first-byte (D9)', () => {
+        it('records the elapsed time between start() and firstByte()', () => {
+            vi.mocked(performance.now).mockReturnValueOnce(1000).mockReturnValueOnce(1250);
+
+            const result = new SpeedTestResultsModel();
+            result.start();
+            result.firstByte();
+
+            expect(result.latencyMs).toBe(250);
+        });
+
+        it('is a no-op if start() was never called', () => {
+            const result = new SpeedTestResultsModel();
+            result.firstByte();
+
+            expect(result.latencyMs).toBeNull();
+            expect(performance.now).not.toHaveBeenCalled();
+        });
+
+        it('ignores a second firstByte() call, keeping the first recorded value', () => {
+            vi.mocked(performance.now)
+                .mockReturnValueOnce(1000) // start()
+                .mockReturnValueOnce(1250); // first firstByte()
+
+            const result = new SpeedTestResultsModel();
+            result.start();
+            result.firstByte();
+            result.firstByte(); // performance.now() would return a later value here if called again
+
+            expect(result.latencyMs).toBe(250);
+        });
+
+        it('does not affect duration/speedBps - end() still measures start() to end()', () => {
+            vi.mocked(performance.now)
+                .mockReturnValueOnce(1000) // start()
+                .mockReturnValueOnce(1250) // firstByte()
+                .mockReturnValueOnce(2000); // end()
+
+            const result = new SpeedTestResultsModel();
+            result.start();
+            result.firstByte();
+            result.end(BYTES_RECEIVED);
+
+            expect(result.latencyMs).toBe(250);
+            expect(result.duration).toBe(1); // 2000 - 1000, unaffected by the firstByte() call in between
+            expect(result.speedBps).toBe(8_000_000);
+        });
+
+        it('still records latency for a response that later fails via error() (e.g. a non-OK HTTP status)', () => {
+            vi.mocked(performance.now)
+                .mockReturnValueOnce(1000) // start()
+                .mockReturnValueOnce(1300); // firstByte() - headers arrived before the failure
+
+            const result = new SpeedTestResultsModel();
+            result.start();
+            result.firstByte();
+            result.error();
+
+            expect(result.latencyMs).toBe(300);
+            expect(result.speedBps).toBe(0); // still discarded from bps aggregation
+        });
+    });
 });

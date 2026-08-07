@@ -176,6 +176,9 @@
             @if (averageSpeed > 0) {
               <div class="average-speed">
                 Average: {{ getFormattedSpeed(averageSpeed) }} Mbps
+                @if (averageLatency > 0) {
+                  &middot; {{ getFormattedLatency(averageLatency) }} ms latency
+                }
               </div>
             }
           </div>
@@ -186,6 +189,9 @@
                 class="speed-bar-container">
                 <div class="speed-label">
                   Test {{ speeds.length - i }}: {{ getFormattedSpeed(speedInstance) }} Mbps
+                  @if (latencies[i] !== undefined) {
+                    ({{ getFormattedLatency(latencies[i]) }} ms)
+                  }
                 </div>
                 <mat-progress-bar
                   mode="determinate"
@@ -206,6 +212,12 @@
               </div>
               <div class="stat-item">
                 <strong>Range:</strong> {{ getFormattedSpeed(getSpeedRange()) }} Mbps
+              </div>
+              <div class="stat-item">
+                <strong>Latency:</strong> {{ getFormattedLatency(getMinLatency()) }}-{{ getFormattedLatency(getMaxLatency()) }} ms
+              </div>
+              <div class="stat-item">
+                <strong>Jitter:</strong> {{ getFormattedLatency(getLatencyJitter()) }} ms
               </div>
             </div>
           }

@@ -29,6 +29,9 @@ export class AppComponent implements OnInit, OnDestroy {
   isTracking = false;
   iterations = 1;
   speeds: number[] = [];
+  // Latency (TTFB), in ms, one entry per completed iteration - alongside speeds so best/worst/
+  // jitter can be derived from the same per-iteration data the speed stats already use.
+  latencies: number[] = [];
 
   // Enhanced UI state
   currentIteration = 0;
@@ -37,6 +40,7 @@ export class AppComponent implements OnInit, OnDestroy {
   errorMessage = '';
   lastTestDuration = 0;
   averageSpeed = 0;
+  averageLatency = 0;
 
   // Connection quality indicators
   connectionQuality = 'unknown';
@@ -213,12 +217,12 @@ export class AppComponent implements OnInit, OnDestroy {
   private runSingleSpeedTest(): void {
     const testStartTime = Date.now();
 
-    this.speedTestService.getMbps({
+    this.speedTestService.getSpeedTestResult({
       iterations: 1,
       retryDelay: 1500
     }).subscribe({
-      next: (speed) => {
-        this.handleSpeedTestSuccess(speed, testStartTime);
+      next: (result) => {
+        this.handleSpeedTestSuccess(result.mbps, result.latency, testStartTime);
       },
       error: (error) => {
         this.handleSpeedTestError(error);
@@ -271,6 +275,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private initializeSpeedTest(): void {
     // Reset state for new test
     this.speeds = [];
+    this.latencies = [];
     this.hasTracked = false;
     this.isTracking = true;
     this.currentIteration = 0;
@@ -282,10 +287,11 @@ export class AppComponent implements OnInit, OnDestroy {
   /**
    * Handle successful speed test result
    */
-  private handleSpeedTestSuccess(speed: number, testStartTime: number): void {
+  private handleSpeedTestSuccess(speed: number, latency: number, testStartTime: number): void {
     const testDuration = (Date.now() - testStartTime) / 1000;
 
     this.speeds.unshift(speed);
+    this.latencies.unshift(latency);
     this.currentIteration++;
     this.progressPercentage = (this.currentIteration / this.iterations) * 100;
 
@@ -348,6 +354,11 @@ export class AppComponent implements OnInit, OnDestroy {
     // Calculate average speed
     if (this.speeds.length > 0) {
       this.averageSpeed = this.speeds.reduce((a, b) => a + b, 0) / this.speeds.length;
+    }
+
+    // Calculate average latency
+    if (this.latencies.length > 0) {
+      this.averageLatency = this.latencies.reduce((a, b) => a + b, 0) / this.latencies.length;
     }
 
     // Update connection quality based on speed results
@@ -426,6 +437,43 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   getSpeedRange(): number {
     return this.getMaxSpeed() - this.getMinSpeed();
+  }
+
+  /**
+   * Get formatted latency for display
+   */
+  getFormattedLatency(latency: number): string {
+    return latency?.toFixed(0) || '0';
+  }
+
+  /**
+   * Get maximum latency from results
+   */
+  getMaxLatency(): number {
+    return this.latencies.length > 0 ? Math.max(...this.latencies) : 0;
+  }
+
+  /**
+   * Get minimum latency from results
+   */
+  getMinLatency(): number {
+    return this.latencies.length > 0 ? Math.min(...this.latencies) : 0;
+  }
+
+  /**
+   * Jitter across this run's iterations: the population standard deviation of the collected
+   * per-iteration latencies, the same measure SpeedTestService.getSpeedTestResult() itself uses
+   * internally (D9) - computed here rather than read off a single result because each iteration
+   * in this demo is its own iterations:1 call, so any one result's own `jitter` is always 0.
+   */
+  getLatencyJitter(): number {
+    if (this.latencies.length < 2) {
+      return 0;
+    }
+
+    const mean = this.averageLatency;
+    const variance = this.latencies.reduce((sum, value) => sum + (value - mean) ** 2, 0) / this.latencies.length;
+    return Math.sqrt(variance);
   }
 
   /**

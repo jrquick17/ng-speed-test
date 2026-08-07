@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+* `getSpeedTestResult()`/`getSpeedTestResultSignal()` now include `latency` and `jitter`, both in
+  milliseconds (unlike `duration`, which is seconds). `latency` is the median time-to-first-byte across the
+  iterations that succeeded (`0` if none did); `jitter` is the population standard deviation of those same
+  latency samples, a measure of how much TTFB varied between iterations (`0` with fewer than 2 successful
+  iterations). `getBps()`/`getKbps()`/`getMbps()` and their signal equivalents are unaffected — they only ever
+  exposed the numeric speed, by [jrquick17](https://github.com/jrquick17)
 
 ## [4.0.0]
 ### Changed
