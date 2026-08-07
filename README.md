@@ -30,7 +30,7 @@ A modern, lightweight Angular library for testing internet connection speed with
 - [API Reference](#-api-reference)
 - [Examples](#-examples)
 - [Browser Support](#-browser-support)
-- [Contributing](#-contributing)
+- [Development Setup](#-development-setup)
 
 ## 🚀 Installation
 
