@@ -1,5 +1,5 @@
 import * as i0 from '@angular/core';
-import { InjectionToken, EnvironmentProviders } from '@angular/core';
+import { InjectionToken, EnvironmentProviders, Injector, Signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import * as i1 from '@angular/common';
 import * as i2 from '@angular/forms';
@@ -7,12 +7,16 @@ import * as i2 from '@angular/forms';
 interface SpeedTestFile {
     path: string;
     shouldBustCache: boolean;
-    size: number;
+    /**
+     * Optional hint for the file's byte size. Not used to compute speed - the actual response
+     * body size is what's measured (C3). Safe to omit for a custom path.
+     */
+    size?: number;
 }
 declare class SpeedTestFileModel implements SpeedTestFile {
     path: string;
     shouldBustCache: boolean;
-    size: number;
+    size?: number;
     constructor(file?: Partial<SpeedTestFile>);
 }
 
@@ -27,29 +31,24 @@ interface SpeedTestResults {
     speedMbps: number;
 }
 declare class SpeedTestResultsModel implements SpeedTestResults {
-    private fileSize;
     duration: number;
     hasEnded: boolean;
     startTime: number | null;
     endTime: number | null;
     bytesReceived: number;
     speedBps: number;
-    constructor(fileSize: number);
     get speedKbps(): number;
     get speedMbps(): number;
     private _update;
     /**
-     * Reverting C3 (3.4.1): speed is once again computed from the configured `fileSize` by
-     * default, matching v3.3.0 exactly - `end()` with no argument (every call site except the
-     * one below) behaves identically to pre-3.4.0.
-     *
-     * `bytesReceived`, if passed, is used instead. This one exception exists only to support
-     * `maxSampleDuration` (D7, not part of C3, kept on purpose): when a read is cancelled early,
-     * `fileSize` describes the whole configured file, not what was actually sampled, so dividing
-     * by it would wildly overstate speed. Only the caller opting into `maxSampleDuration` passes
-     * a value here; everyone else keeps the reverted, file-size-based behavior unchanged.
+     * bytesReceived is the actual response body size (e.g. Blob.size, or the accumulated total
+     * from readResponseBody()), not the configured file.size hint. Speed is always computed from
+     * this - a redirected, re-encoded, truncated, or otherwise changed file reports its real
+     * speed instead of a confidently wrong number derived from the configured hint (C3, re-applied
+     * for real in 4.0.0 after first landing in error as an undisclosed breaking change in 3.4.0
+     * and being reverted in 3.4.1 - see CHANGELOG.md).
      */
-    end(bytesReceived?: number): void;
+    end(bytesReceived: number): void;
     error(): void;
     start(): void;
 }
@@ -149,6 +148,17 @@ declare class SpeedTestService {
      * every pre-D7 test's mocked Response working unchanged.
      */
     private readResponseBody;
+    /**
+     * Middle value of the sorted valid results, or the average of the two middle values when the
+     * count is even (D8, re-applied for real in 4.0.0 after the checklist previously claimed this
+     * landed when the code still used a plain arithmetic mean). Chosen over a trimmed mean: the
+     * default `iterations` is 3, too small to trim an equal count off both ends and still have
+     * more than one sample left, whereas a median degrades gracefully at any count - 1 iteration
+     * returns that value unchanged, 2 average both (identical to a mean at n=2), and only at 3+
+     * does it diverge, which is exactly where a single outlier can be outvoted instead of dragging
+     * the result toward it.
+     */
+    private median;
     private downloadTest;
     private validateSettings;
     /**
@@ -157,21 +167,54 @@ declare class SpeedTestService {
      */
     getBps(customSettings?: Partial<SpeedTestSettingsModel>): Observable<number>;
     /**
+     * Signal-based equivalent of `getBps()` (C5). Starts `undefined` and updates once the test
+     * completes; if the test fails, reading the signal after that point rethrows the error, same
+     * as `toSignal()`'s standard behavior for a source that errors.
+     *
+     * Must be called within an injection context - e.g. as a component field initializer
+     * (`speed = this.speedTestService.getBpsSignal();`) - or pass an explicit `injector`
+     * otherwise. This is what lets the underlying subscription clean up automatically via the
+     * calling component's `DestroyRef` rather than needing manual unsubscription.
+     *
+     * Uses `toSignal()`, not Angular's newer `resource()`/`rxResource()` - those only became
+     * stable `@publicApi` at Angular 22.0, and this library still supports Angular 20/21.
+     * `toSignal()` writes plain signals directly, independent of `NgZone`, so this works
+     * correctly in a zoneless application - verified in `speed-test.service.spec.ts`.
+     */
+    getBpsSignal(customSettings?: Partial<SpeedTestSettingsModel>, injector?: Injector): Signal<number | undefined>;
+    /**
      * Properly merge custom settings with defaults
      */
     private mergeSettings;
     /**
-     * Get internet speed in kilobits per second (Kbps)
+     * Get internet speed in kilobits per second (Kbps), using the decimal convention
+     * (1 Kbps = 1,000 bps) that ISPs and other speed test tools use.
      */
     getKbps(settings?: Partial<SpeedTestSettingsModel>): Observable<number>;
     /**
-     * Get internet speed in megabits per second (Mbps)
+     * Signal-based equivalent of `getKbps()` (C5). See `getBpsSignal()`'s doc for the injection
+     * context requirement and the `toSignal()`-over-`resource()` rationale.
+     */
+    getKbpsSignal(settings?: Partial<SpeedTestSettingsModel>, injector?: Injector): Signal<number | undefined>;
+    /**
+     * Get internet speed in megabits per second (Mbps), using the decimal convention
+     * (1 Mbps = 1,000,000 bps) that ISPs and other speed test tools use.
      */
     getMbps(settings?: Partial<SpeedTestSettingsModel>): Observable<number>;
+    /**
+     * Signal-based equivalent of `getMbps()` (C5). See `getBpsSignal()`'s doc for the injection
+     * context requirement and the `toSignal()`-over-`resource()` rationale.
+     */
+    getMbpsSignal(settings?: Partial<SpeedTestSettingsModel>, injector?: Injector): Signal<number | undefined>;
     /**
      * Get comprehensive speed test results with fast failure for offline scenarios
      */
     getSpeedTestResult(settings?: Partial<SpeedTestSettingsModel>): Observable<SpeedTestResult>;
+    /**
+     * Signal-based equivalent of `getSpeedTestResult()` (C5). See `getBpsSignal()`'s doc for the
+     * injection context requirement and the `toSignal()`-over-`resource()` rationale.
+     */
+    getSpeedTestResultSignal(settings?: Partial<SpeedTestSettingsModel>, injector?: Injector): Signal<SpeedTestResult | undefined>;
     /**
      * Check if the browser is online with enhanced detection.
      *
