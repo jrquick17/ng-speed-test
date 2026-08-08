@@ -172,6 +172,21 @@ Pre-configured test files hosted on GitHub:
 | **5MB** | 4,952,221 | `https://raw.githubusercontent.com/jrquick17/ng-speed-test/.../5mb.jpg` *(default)* |
 | 13MB | 13,848,150 | `https://raw.githubusercontent.com/jrquick17/ng-speed-test/.../13mb.jpg` |
 
+> **Self-hosting.** `raw.githubusercontent.com` isn't intended for production traffic - it has no
+> SLA and undocumented rate limits, so it's a hard runtime dependency you don't control. For
+> anything beyond quick prototyping, host a test file yourself and point `file.path`/`file.size`
+> at it instead of the default:
+>
+> 1. Copy one of the files above (or use your own - any file works, since C3 speed is computed
+>    from bytes actually received, not from `file.size`) into your app's own static assets.
+> 2. Serve it from your own domain or CDN, and confirm the response includes an
+>    `Access-Control-Allow-Origin` header covering your app's origin (or `*`) - without it, the
+>    browser blocks `fetch()` from reading the response body and every test using that file fails.
+>    A same-origin path (e.g. `/assets/5mb.jpg`) needs no CORS header at all.
+> 3. Point at it via `provideSpeedTest({ file: { path, size } })` (global default) or per-call via
+>    `getBps({ file: { path, size } })` - see [Global Configuration](#global-configuration) above.
+>    `size` is optional; omit it if you don't know the exact byte count.
+
 ## 📚 API Reference
 
 ### Core Methods
