@@ -98,7 +98,7 @@
     "@compodoc/compodoc": "^2.0.0",
     "@types/node": "^22.0.0",
     "angular-eslint": "22.1.0",
-    "eslint": "^9.28.0",
+    "eslint": "^10.9.1",
     "jsdom": "^30.0.1",
     "ng-packagr": "^22.0.0",
     "rimraf": "^6.0.0",
