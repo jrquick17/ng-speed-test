@@ -97,7 +97,7 @@
     "@angular/router": "22.1.6",
     "@compodoc/compodoc": "^2.0.0",
     "@types/node": "^26.6.2",
-    "angular-eslint": "22.1.0",
+    "angular-eslint": "22.5.0",
     "eslint": "^10.9.1",
     "jsdom": "^30.0.1",
     "ng-packagr": "^22.0.0",
